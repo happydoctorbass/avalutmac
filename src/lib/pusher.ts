@@ -20,4 +20,5 @@ export const GAME_EVENTS = {
   REVEAL_CARD: 'reveal-card',
   REVEAL_ALL: 'reveal-all',
   RESET: 'reset-game',
+  CELEBRATE: 'celebrate-win',
 } as const;

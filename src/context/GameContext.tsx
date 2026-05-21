@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { getPusherClient, GAME_CHANNEL, GAME_EVENTS } from '@/lib/pusher';
-import { CardData, GameStatus, ToggleStatePayload, RevealCardPayload } from '@/types/game';
+import { CardData, GameStatus, ToggleStatePayload, RevealCardPayload, GameLanguage } from '@/types/game';
+import { triggerWinConfetti } from '@/lib/confetti-helper';
 
 interface GameContextValue {
   gameState: GameStatus;
@@ -11,6 +12,7 @@ interface GameContextValue {
   revealedCards: boolean[];
   playerId: string;
   betAmount: number;
+  language: GameLanguage;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
@@ -24,56 +26,47 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [sessionId, setSessionId] = useState<number>(Date.now());
   const [playerId, setPlayerId] = useState('');
   const [betAmount, setBetAmount] = useState(0);
+  const [language, setLanguage] = useState<GameLanguage>('en');
 
   useEffect(() => {
     const client = getPusherClient();
     if (!client || listenerActive) return;
     listenerActive = true;
-    console.log('🟢 Pusher Listener Active');
 
     const channel = client.subscribe(GAME_CHANNEL);
 
-    const onToggle = (data: ToggleStatePayload) => {
-      setGameState(data.state);
-      if (data.state === 'IDLE') {
-        setRevealedCards([false, false, false, false, false]);
-        setCards([]);
-        setPlayerId('');
-        setBetAmount(0);
-      } else if (data.state === 'GAME') {
+    const onToggle = (d: ToggleStatePayload) => {
+      setGameState(d.state);
+      setRevealedCards([false, false, false, false, false]);
+      if (d.state === 'IDLE') {
+        setCards([]); setPlayerId(''); setBetAmount(0);
+      } else {
         setSessionId(Date.now());
-        setRevealedCards([false, false, false, false, false]);
-        if (data.cards) setCards(data.cards);
-        if (data.playerId) setPlayerId(data.playerId);
-        if (data.betAmount !== undefined) setBetAmount(data.betAmount);
+        if (d.cards) setCards(d.cards);
+        if (d.playerId) setPlayerId(d.playerId);
+        if (d.betAmount !== undefined) setBetAmount(d.betAmount);
+        if (d.language) setLanguage(d.language);
       }
     };
 
-    const onReveal = (data: RevealCardPayload) => {
-      setRevealedCards((prev) => {
-        const next = [...prev];
-        next[data.index] = true;
-        return next;
-      });
-      if (data.card) {
-        setCards((prev) => {
-          const next = [...prev];
-          next[data.index] = data.card!;
-          return next;
-        });
-      }
+    const onReveal = (d: RevealCardPayload) => {
+      setRevealedCards(p => { const n = [...p]; n[d.index] = true; return n; });
+      if (d.card) setCards(p => { const n = [...p]; n[d.index] = d.card!; return n; });
     };
 
     const onRevealAll = () => setRevealedCards([...ALL_REVEALED]);
+    const onCelebrate = () => triggerWinConfetti();
 
     channel.bind(GAME_EVENTS.TOGGLE_STATE, onToggle);
     channel.bind(GAME_EVENTS.REVEAL_CARD, onReveal);
     channel.bind(GAME_EVENTS.REVEAL_ALL, onRevealAll);
+    channel.bind(GAME_EVENTS.CELEBRATE, onCelebrate);
 
     const teardown = () => {
       channel.unbind(GAME_EVENTS.TOGGLE_STATE, onToggle);
       channel.unbind(GAME_EVENTS.REVEAL_CARD, onReveal);
       channel.unbind(GAME_EVENTS.REVEAL_ALL, onRevealAll);
+      channel.unbind(GAME_EVENTS.CELEBRATE, onCelebrate);
       client.unsubscribe(GAME_CHANNEL);
       listenerActive = false;
     };
@@ -84,7 +77,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   return (
     <GameContext.Provider
-      value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount }}
+      value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount, language }}
     >
       {children}
     </GameContext.Provider>

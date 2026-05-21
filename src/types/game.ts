@@ -8,12 +8,14 @@ export interface CardData {
 }
 
 export type GameStatus = 'IDLE' | 'GAME';
+export type GameLanguage = 'en' | 'zh';
 
 export interface ToggleStatePayload {
   state: GameStatus;
   cards?: CardData[];
   playerId?: string;
   betAmount?: number;
+  language?: GameLanguage;
 }
 
 export interface RevealCardPayload {

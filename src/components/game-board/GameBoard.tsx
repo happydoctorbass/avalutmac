@@ -3,10 +3,12 @@
 import { Card } from '../card/Card';
 import { useGameContext } from '@/context/GameContext';
 import { motion } from 'framer-motion';
+import { DICTIONARY } from '@/lib/constants';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards, playerId, betAmount } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount, language } = useGameContext();
+  const dict = DICTIONARY[language];
 
   return (
     <div className={styles.board}>
@@ -30,8 +32,14 @@ export function GameBoard() {
       </div>
 
       <div className={styles.infoPanel}>
-        <span className={styles.infoText}>ИГРОК: {playerId || '—'}</span>
-        <span className={styles.infoText}>СТАВКА: {betAmount.toLocaleString('ru-RU')} $</span>
+        <div className={styles.infoBlock}>
+          <span className={styles.infoLabel}>{dict.guest}</span>
+          <span className={styles.infoValue}>{playerId || '—'}</span>
+        </div>
+        <div className={styles.infoBlock}>
+          <span className={styles.infoLabel}>{dict.bet}</span>
+          <span className={styles.infoValue}>{betAmount.toLocaleString('en-US')}</span>
+        </div>
       </div>
     </div>
   );

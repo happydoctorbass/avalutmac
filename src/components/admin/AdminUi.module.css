@@ -38,6 +38,29 @@
   gap: 0.75rem;
 }
 
+.btnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btnCelebrate {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-light);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent-gold) 100%);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  width: 100%;
+}
+
+.btnCelebrate:hover {
+  opacity: 0.9;
+}
+
 .cardBtn {
   padding: 1.5rem 0.75rem;
   border-radius: 0.5rem;

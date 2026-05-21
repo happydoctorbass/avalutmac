@@ -7,6 +7,7 @@
   background: var(--color-bg-card);
   gap: 3rem;
   overflow: hidden;
+  position: relative;
 }
 
 .title {
@@ -25,21 +26,37 @@
 }
 
 .infoPanel {
+  position: absolute;
+  bottom: 2.5rem;
   display: flex;
   justify-content: space-between;
-  width: min(90vw, 720px);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background: rgba(13, 21, 38, 0.6);
-  backdrop-filter: blur(12px);
+  width: min(95vw, 900px);
+  padding: 1.5rem 3rem;
   z-index: 10;
 }
 
-.infoText {
+.infoBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.infoLabel {
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--placeholder);
+  text-transform: uppercase;
+}
+
+.infoValue {
   font-family: serif;
-  font-size: 1.25rem;
+  font-size: 3.5rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   color: var(--color-accent-gold);
   text-transform: uppercase;
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 10px rgba(197, 160, 89, 0.4);
 }
