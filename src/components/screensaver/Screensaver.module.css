@@ -5,8 +5,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle, #5e0b15 0%, #2a0004 100%);
-  color: #d4af37;
+  background: radial-gradient(circle at center, var(--bg-navy-deep) 0%, var(--bg-navy-dark) 100%);
+  color: var(--casino-gold);
   font-family: serif;
   position: relative;
   overflow: hidden;
@@ -17,12 +17,9 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  border: 2px solid rgba(212, 175, 55, 0.5);
-  box-shadow: 0 0 50px rgba(212, 175, 55, 0.2);
+  border: 2px solid rgba(52, 105, 254, 0.45);
+  box-shadow: 0 0 60px rgba(52, 105, 254, 0.35), 0 0 30px rgba(212, 175, 55, 0.2);
   animation: pulse 3s infinite ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 @keyframes pulse {
@@ -34,14 +31,20 @@
 .logo {
   font-size: 5rem;
   letter-spacing: 0.5rem;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  color: var(--casino-gold);
+  text-shadow:
+    0 0 24px rgba(52, 105, 254, 0.65),
+    0 0 48px rgba(52, 105, 254, 0.35),
+    0 0 20px rgba(212, 175, 55, 0.5);
   margin-bottom: 1rem;
   z-index: 10;
 }
 
 .status {
   font-size: 1.2rem;
-  opacity: 0.7;
+  color: var(--text-light);
+  opacity: 0.75;
   text-transform: uppercase;
+  letter-spacing: 0.2em;
   z-index: 10;
 }

@@ -1,0 +1,38 @@
+.row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  max-width: 42rem;
+}
+
+.field {
+  flex: 1;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--slate-muted);
+  margin-bottom: 0.5rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--steel-mid);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--steel-mid) 0%, var(--steel-dark) 100%);
+  color: var(--text-light);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input::placeholder {
+  color: var(--slate-muted);
+}
+
+.input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 12px rgba(52, 105, 254, 0.35);
+}

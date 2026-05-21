@@ -9,7 +9,7 @@ function HomeContent() {
   const { gameState, sessionId } = useGameSync();
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-black">
+    <main className="relative w-full h-screen overflow-hidden" style={{ background: 'var(--bg-navy-dark)' }}>
       {gameState === 'IDLE' ? (
         <Screensaver />
       ) : (

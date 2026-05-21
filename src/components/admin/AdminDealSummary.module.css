@@ -1,0 +1,40 @@
+.wrap {
+  padding: 2rem;
+  padding-top: 0;
+}
+
+.title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--slate-muted);
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dealCard {
+  padding: 1rem 1.5rem;
+  border: 2px solid var(--steel-mid);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  background: linear-gradient(180deg, var(--steel-mid) 0%, var(--steel-dark) 100%);
+  color: var(--text-light);
+}
+
+.dealLabel {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--slate-muted);
+  margin-bottom: 0.25rem;
+}
+
+.dealRed {
+  color: #ff6b6b;
+}

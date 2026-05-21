@@ -5,6 +5,8 @@ import { GAME_EVENTS } from '@/lib/pusher';
 import { getRandomCards } from '@/lib/deck';
 import { CardData } from '@/types/game';
 import { AdminInputs } from './AdminInputs';
+import { AdminBranding } from './AdminBranding';
+import styles from './AdminPanel.module.css';
 
 interface AdminPanelProps {
   currentCards?: CardData[];
@@ -39,52 +41,48 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
   };
 
   return (
-    <div className="p-8 text-slate-900 font-sans">
-      <h1 className="text-3xl font-bold mb-8 border-b pb-4">Панель управления питбосса</h1>
+    <div className={styles.panel}>
+      <AdminBranding />
+      <h1 className={styles.header}>Панель управления питбосса</h1>
 
-      <section className="mb-12">
-        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Основное управление</h2>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Основное управление</h2>
         <AdminInputs
           playerId={playerId}
           betAmount={betAmount}
           onPlayerIdChange={setPlayerId}
           onBetAmountChange={setBetAmount}
         />
-        <div className="flex flex-wrap gap-4">
-          <button onClick={startGame} className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95">
-            Начать игру
-          </button>
-          <button onClick={startGame} className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95">
-            Новая раздача
-          </button>
+        <div className={styles.btnRow}>
+          <button type="button" onClick={startGame} className={styles.btnPrimary}>Начать игру</button>
+          <button type="button" onClick={startGame} className={styles.btnPrimary}>Новая раздача</button>
           <button
+            type="button"
             onClick={() => { onCardsGenerated?.([]); sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }}
-            className="px-8 py-4 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
+            className={styles.btnIdle}
           >
             Сбросить в заставку
           </button>
         </div>
       </section>
 
-      <section>
-        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Управление картами</h2>
-        <button
-          onClick={() => sendCommand(GAME_EVENTS.REVEAL_ALL, {})}
-          className="mb-6 px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
-        >
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Управление картами</h2>
+        <button type="button" onClick={() => sendCommand(GAME_EVENTS.REVEAL_ALL, {})} className={styles.btnRevealAll}>
           РАСКРЫТЬ ВСЕ
         </button>
-        <div className="grid grid-cols-5 gap-4 max-w-4xl">
+        <div className={styles.cardGrid}>
           {[0, 1, 2, 3, 4].map((idx) => (
             <button
               key={idx}
+              type="button"
               onClick={() => sendCommand(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] })}
-              className="px-4 py-8 bg-white border-2 border-slate-200 hover:border-amber-500 rounded-xl font-bold transition-colors shadow-sm text-slate-700 hover:text-amber-600"
+              className={styles.cardBtn}
             >
               Карта {idx + 1}
-              <span className="block text-[10px] text-slate-400 mt-2 font-normal">Нажмите, чтобы открыть</span>
+              <span className={styles.cardHint}>Нажмите, чтобы открыть</span>
               {currentCards[idx] && (
-                <span className={`block text-xl mt-2 font-bold ${currentCards[idx].color === 'red' ? 'text-red-500' : 'text-slate-900'}`}>
+                <span className={`${styles.cardValue} ${currentCards[idx].color === 'red' ? styles.cardRed : styles.cardBlack}`}>
                   {currentCards[idx].rank}{currentCards[idx].suit}
                 </span>
               )}

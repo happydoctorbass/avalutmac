@@ -3,24 +3,24 @@
 import { useState } from 'react';
 import { AdminPanel } from '@/components/admin/AdminPanel';
 import { CardData } from '@/types/game';
+import pageStyles from './AdminPage.module.css';
+import dealStyles from '@/components/admin/AdminDealSummary.module.css';
 
 export default function AdminPage() {
   const [currentCards, setCurrentCards] = useState<CardData[]>([]);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className={pageStyles.page}>
       <AdminPanel currentCards={currentCards} onCardsGenerated={setCurrentCards} />
-      
+
       {currentCards.length > 0 && (
-        <div className="p-8 pt-0 text-slate-900">
-          <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">
-            Расклад в этой раздаче
-          </h2>
-          <div className="flex gap-4">
+        <div className={dealStyles.wrap}>
+          <h2 className={dealStyles.title}>Расклад в этой раздаче</h2>
+          <div className={dealStyles.grid}>
             {currentCards.map((card, idx) => (
-              <div key={idx} className="px-6 py-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-lg shadow-sm">
-                <span className="text-slate-400 text-sm block mb-1">Карта {idx + 1}</span>
-                <span className={card.color === 'red' ? 'text-red-500' : 'text-slate-900'}>
+              <div key={idx} className={dealStyles.dealCard}>
+                <span className={dealStyles.dealLabel}>Карта {idx + 1}</span>
+                <span className={card.color === 'red' ? dealStyles.dealRed : ''}>
                   {card.rank}{card.suit}
                 </span>
               </div>

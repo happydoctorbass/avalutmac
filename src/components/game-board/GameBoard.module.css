@@ -4,10 +4,9 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
-  /* Темно-зеленый радиальный градиент с микро-текстурой (через шум или узор) */
-  background: 
-    radial-gradient(circle, #1a4f2c 0%, #0a2e15 100%),
-    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background:
+    radial-gradient(ellipse at center, var(--navy-soft) 0%, var(--bg-navy-deep) 40%, var(--steel-deep) 100%),
+    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
   background-blend-mode: overlay;
   gap: 3rem;
   overflow: hidden;
@@ -16,11 +15,11 @@
 
 .title {
   font-size: 2.5rem;
-  color: #d4af37;
+  color: var(--casino-gold);
   font-family: serif;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  text-shadow: 0 0 20px rgba(52, 105, 254, 0.35), 2px 2px 4px rgba(0, 0, 0, 0.5);
   z-index: 10;
 }
 
@@ -37,8 +36,10 @@
   align-items: center;
   width: min(90vw, 720px);
   padding: 1.25rem 2rem;
-  border-top: 1px solid rgba(212, 175, 55, 0.35);
-  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 100%);
+  border: 2px solid var(--casino-gold);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(17, 37, 64, 0.85) 0%, rgba(48, 61, 78, 0.9) 100%);
+  box-shadow: 0 0 20px rgba(52, 105, 254, 0.2), inset 0 0 24px rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
 
@@ -47,7 +48,7 @@
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #d4af37;
-  text-shadow: 0 0 12px rgba(212, 175, 55, 0.45), 2px 2px 4px rgba(0, 0, 0, 0.6);
+  color: var(--text-light);
+  text-shadow: 0 0 8px rgba(246, 255, 255, 0.4), 2px 2px 6px rgba(0, 0, 0, 0.7);
   text-transform: uppercase;
 }
