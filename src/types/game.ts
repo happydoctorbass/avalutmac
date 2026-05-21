@@ -12,6 +12,8 @@ export type GameStatus = 'IDLE' | 'GAME';
 export interface ToggleStatePayload {
   state: GameStatus;
   cards?: CardData[];
+  playerId?: string;
+  betAmount?: number;
 }
 
 export interface RevealCardPayload {

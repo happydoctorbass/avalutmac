@@ -30,3 +30,24 @@
   z-index: 10;
   position: relative;
 }
+
+.infoPanel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: min(90vw, 720px);
+  padding: 1.25rem 2rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.35);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.35) 100%);
+  z-index: 10;
+}
+
+.infoText {
+  font-family: serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #d4af37;
+  text-shadow: 0 0 12px rgba(212, 175, 55, 0.45), 2px 2px 4px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+}

@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { GAME_EVENTS } from '@/lib/pusher';
 import { getRandomCards } from '@/lib/deck';
 import { CardData } from '@/types/game';
+import { AdminInputs } from './AdminInputs';
 
 interface AdminPanelProps {
   currentCards?: CardData[];
@@ -10,7 +12,10 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
-  const sendCommand = async (event: string, data: any) => {
+  const [playerId, setPlayerId] = useState('');
+  const [betAmount, setBetAmount] = useState('');
+
+  const sendCommand = async (event: string, data: object) => {
     try {
       await fetch('/api/pusher', {
         method: 'POST',
@@ -18,62 +23,66 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
         body: JSON.stringify({ event, data }),
       });
     } catch (error) {
-      console.error('Failed to send command:', error);
+      console.error('Ошибка отправки команды:', error);
     }
+  };
+
+  const startGame = () => {
+    const randomCards = getRandomCards(5);
+    onCardsGenerated?.(randomCards);
+    sendCommand(GAME_EVENTS.TOGGLE_STATE, {
+      state: 'GAME',
+      cards: randomCards,
+      playerId: playerId.trim() || '—',
+      betAmount: Number(betAmount) || 0,
+    });
   };
 
   return (
     <div className="p-8 text-slate-900 font-sans">
-      <h1 className="text-3xl font-bold mb-8 border-b pb-4">Pitboss Control Panel</h1>
-      
+      <h1 className="text-3xl font-bold mb-8 border-b pb-4">Панель управления питбосса</h1>
+
       <section className="mb-12">
-        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Main Controls</h2>
-        <div className="flex gap-4">
-          <button 
-            onClick={() => {
-              const randomCards = getRandomCards(5);
-              onCardsGenerated?.(randomCards);
-              sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'GAME', cards: randomCards });
-            }}
-            className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
-          >
-            ACTIVATE GAME MODE
+        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Основное управление</h2>
+        <AdminInputs
+          playerId={playerId}
+          betAmount={betAmount}
+          onPlayerIdChange={setPlayerId}
+          onBetAmountChange={setBetAmount}
+        />
+        <div className="flex flex-wrap gap-4">
+          <button onClick={startGame} className="px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95">
+            Начать игру
           </button>
-
-          <button 
-            onClick={() => {
-              const randomCards = getRandomCards(5);
-              onCardsGenerated?.(randomCards);
-              sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'GAME', cards: randomCards });
-            }}
-            className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
-          >
-            NEW SHUFFLE
+          <button onClick={startGame} className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95">
+            Новая раздача
           </button>
-
-          <button 
-            onClick={() => {
-              onCardsGenerated?.([]);
-              sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' });
-            }}
+          <button
+            onClick={() => { onCardsGenerated?.([]); sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }}
             className="px-8 py-4 bg-slate-700 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
           >
-            RETURN TO SCREENSAVER
+            Сбросить в заставку
           </button>
         </div>
       </section>
 
       <section>
-        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Individual Card Reveal</h2>
+        <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">Управление картами</h2>
+        <button
+          onClick={() => sendCommand(GAME_EVENTS.REVEAL_ALL, {})}
+          className="mb-6 px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-bold shadow-lg transition-all active:scale-95"
+        >
+          РАСКРЫТЬ ВСЕ
+        </button>
         <div className="grid grid-cols-5 gap-4 max-w-4xl">
           {[0, 1, 2, 3, 4].map((idx) => (
-            <button 
+            <button
               key={idx}
               onClick={() => sendCommand(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] })}
               className="px-4 py-8 bg-white border-2 border-slate-200 hover:border-amber-500 rounded-xl font-bold transition-colors shadow-sm text-slate-700 hover:text-amber-600"
             >
-              CARD {idx + 1}
-              <span className="block text-[10px] text-slate-400 mt-2 font-normal">CLICK TO OPEN</span>
+              Карта {idx + 1}
+              <span className="block text-[10px] text-slate-400 mt-2 font-normal">Нажмите, чтобы открыть</span>
               {currentCards[idx] && (
                 <span className={`block text-xl mt-2 font-bold ${currentCards[idx].color === 'red' ? 'text-red-500' : 'text-slate-900'}`}>
                   {currentCards[idx].rank}{currentCards[idx].suit}

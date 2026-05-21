@@ -18,5 +18,6 @@ export const GAME_CHANNEL = 'casino-game-channel';
 export const GAME_EVENTS = {
   TOGGLE_STATE: 'toggle-state',
   REVEAL_CARD: 'reveal-card',
+  REVEAL_ALL: 'reveal-all',
   RESET: 'reset-game',
 } as const;

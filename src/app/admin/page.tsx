@@ -14,12 +14,12 @@ export default function AdminPage() {
       {currentCards.length > 0 && (
         <div className="p-8 pt-0 text-slate-900">
           <h2 className="text-sm uppercase tracking-wider text-slate-500 mb-4 font-bold">
-            Current Deal Summary
+            Расклад в этой раздаче
           </h2>
           <div className="flex gap-4">
             {currentCards.map((card, idx) => (
               <div key={idx} className="px-6 py-4 bg-white border-2 border-slate-200 rounded-xl font-bold text-lg shadow-sm">
-                <span className="text-slate-400 text-sm block mb-1">CARD {idx + 1}</span>
+                <span className="text-slate-400 text-sm block mb-1">Карта {idx + 1}</span>
                 <span className={card.color === 'red' ? 'text-red-500' : 'text-slate-900'}>
                   {card.rank}{card.suit}
                 </span>

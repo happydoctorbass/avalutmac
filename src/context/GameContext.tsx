@@ -9,10 +9,12 @@ interface GameContextValue {
   sessionId: number;
   cards: CardData[];
   revealedCards: boolean[];
+  playerId: string;
+  betAmount: number;
 }
 
 const GameContext = createContext<GameContextValue | null>(null);
-
+const ALL_REVEALED = [true, true, true, true, true] as const;
 let listenerActive = false;
 
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -20,38 +22,34 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [revealedCards, setRevealedCards] = useState<boolean[]>([false, false, false, false, false]);
   const [cards, setCards] = useState<CardData[]>([]);
   const [sessionId, setSessionId] = useState<number>(Date.now());
+  const [playerId, setPlayerId] = useState('');
+  const [betAmount, setBetAmount] = useState(0);
 
   useEffect(() => {
     const client = getPusherClient();
     if (!client || listenerActive) return;
     listenerActive = true;
-
     console.log('🟢 Pusher Listener Active');
-
-    client.connection.bind('state_change', (states: { current: string }) => {
-      console.log('Connection status change:', states.current);
-    });
 
     const channel = client.subscribe(GAME_CHANNEL);
 
     const onToggle = (data: ToggleStatePayload) => {
-      console.log('Event received: TOGGLE_STATE');
-      setGameState((prev) => {
-        console.log('Current State before change:', prev);
-        return data.state;
-      });
+      setGameState(data.state);
       if (data.state === 'IDLE') {
         setRevealedCards([false, false, false, false, false]);
         setCards([]);
+        setPlayerId('');
+        setBetAmount(0);
       } else if (data.state === 'GAME') {
         setSessionId(Date.now());
         setRevealedCards([false, false, false, false, false]);
         if (data.cards) setCards(data.cards);
+        if (data.playerId) setPlayerId(data.playerId);
+        if (data.betAmount !== undefined) setBetAmount(data.betAmount);
       }
     };
 
     const onReveal = (data: RevealCardPayload) => {
-      console.log('Event received: REVEAL_CARD');
       setRevealedCards((prev) => {
         const next = [...prev];
         next[data.index] = true;
@@ -66,12 +64,16 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
     };
 
+    const onRevealAll = () => setRevealedCards([...ALL_REVEALED]);
+
     channel.bind(GAME_EVENTS.TOGGLE_STATE, onToggle);
     channel.bind(GAME_EVENTS.REVEAL_CARD, onReveal);
+    channel.bind(GAME_EVENTS.REVEAL_ALL, onRevealAll);
 
     const teardown = () => {
       channel.unbind(GAME_EVENTS.TOGGLE_STATE, onToggle);
       channel.unbind(GAME_EVENTS.REVEAL_CARD, onReveal);
+      channel.unbind(GAME_EVENTS.REVEAL_ALL, onRevealAll);
       client.unsubscribe(GAME_CHANNEL);
       listenerActive = false;
     };
@@ -81,7 +83,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <GameContext.Provider value={{ gameState, sessionId, cards, revealedCards }}>
+    <GameContext.Provider
+      value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount }}
+    >
       {children}
     </GameContext.Provider>
   );

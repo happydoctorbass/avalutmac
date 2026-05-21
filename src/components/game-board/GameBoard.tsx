@@ -6,17 +6,16 @@ import { motion } from 'framer-motion';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount } = useGameContext();
 
   return (
     <div className={styles.board}>
       <h2 className={styles.title}>Niu Niu Bonus</h2>
-      
+
       <div className={styles.cardsContainer}>
         {revealedCards.map((isRevealed, index) => {
           const card = cards[index];
           const value = card ? `${card.rank}${card.suit}` : '';
-          
           return (
             <motion.div
               key={index}
@@ -28,6 +27,11 @@ export function GameBoard() {
             </motion.div>
           );
         })}
+      </div>
+
+      <div className={styles.infoPanel}>
+        <span className={styles.infoText}>ИГРОК: {playerId || '—'}</span>
+        <span className={styles.infoText}>СТАВКА: {betAmount.toLocaleString('ru-RU')} $</span>
       </div>
     </div>
   );
