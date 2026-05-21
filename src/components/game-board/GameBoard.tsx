@@ -34,11 +34,17 @@ export function GameBoard() {
       <div className={styles.infoPanel}>
         <div className={styles.infoBlock}>
           <span className={styles.infoLabel}>{dict.guest}</span>
-          <span className={styles.infoValue}>{playerId || '—'}</span>
+          <span className={styles.infoValue}>
+            <span className={styles.icon}>👤</span>
+            {playerId || '—'}
+          </span>
         </div>
         <div className={styles.infoBlock}>
           <span className={styles.infoLabel}>{dict.bet}</span>
-          <span className={styles.infoValue}>{betAmount.toLocaleString('en-US')}</span>
+          <span className={styles.infoValue}>
+            <span className={styles.icon}>$</span>
+            {betAmount.toLocaleString('en-US')}
+          </span>
         </div>
       </div>
     </div>

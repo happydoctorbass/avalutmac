@@ -17,7 +17,9 @@ export const createDeck = (): CardData[] => {
   return deck;
 };
 
+export const FULL_DECK: CardData[] = createDeck();
+
 export const getRandomCards = (count: number): CardData[] => {
-  const deck = createDeck();
+  const deck = [...FULL_DECK];
   return deck.sort(() => Math.random() - 0.5).slice(0, count);
 };
