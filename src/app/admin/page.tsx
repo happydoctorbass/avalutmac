@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AdminPanel } from '@/components/admin/AdminPanel';
-import { CardData } from '@/lib/deck';
+import { CardData } from '@/types/game';
 
 export default function AdminPage() {
   const [currentCards, setCurrentCards] = useState<CardData[]>([]);

@@ -1,7 +1,8 @@
 'use client';
 
 import { GAME_EVENTS } from '@/lib/pusher';
-import { getRandomCards, CardData } from '@/lib/deck';
+import { getRandomCards } from '@/lib/deck';
+import { CardData } from '@/types/game';
 
 interface AdminPanelProps {
   currentCards?: CardData[];

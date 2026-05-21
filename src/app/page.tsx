@@ -5,14 +5,14 @@ import { Screensaver } from '@/components/screensaver/Screensaver';
 import { GameBoard } from '@/components/game-board/GameBoard';
 
 export default function Home() {
-  const { gameState } = useGameSync();
+  const { gameState, sessionId } = useGameSync();
 
   return (
     <main className="relative w-full h-screen overflow-hidden bg-black">
       {gameState === 'IDLE' ? (
         <Screensaver />
       ) : (
-        <GameBoard />
+        <GameBoard key={sessionId} />
       )}
     </main>
   );
