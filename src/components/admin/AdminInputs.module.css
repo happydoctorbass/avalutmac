@@ -1,38 +1,39 @@
 .row {
   display: flex;
   gap: 1rem;
-  margin-bottom: 1.5rem;
-  max-width: 42rem;
+  flex-wrap: wrap;
 }
 
 .field {
   flex: 1;
+  min-width: 12rem;
 }
 
 .label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--slate-muted);
-  margin-bottom: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--placeholder);
+  margin-bottom: 0.375rem;
 }
 
 .input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid var(--steel-mid);
-  border-radius: 12px;
-  background: linear-gradient(180deg, var(--steel-mid) 0%, var(--steel-dark) 100%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--border-muted);
+  background: var(--panel-dark);
   color: var(--text-light);
+  font-size: 0.875rem;
   outline: none;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input::placeholder {
-  color: var(--slate-muted);
+  color: var(--placeholder);
 }
 
 .input:focus {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 12px rgba(52, 105, 254, 0.35);
+  border-color: var(--button-primary);
+  box-shadow: 0 0 0 2px rgba(52, 105, 254, 0.25);
 }

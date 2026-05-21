@@ -1,0 +1,54 @@
+.btnPrimary {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--button-primary);
+  border: 1px solid rgba(52, 105, 254, 0.5);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnPrimary:hover {
+  background: rgba(52, 105, 254, 0.85);
+}
+
+.btnSecondary {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: var(--panel-dark);
+  border: 1px solid var(--border-muted);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btnSecondary:hover {
+  background: rgba(29, 57, 96, 0.8);
+  border-color: var(--button-primary);
+}
+
+.btnOutline {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: transparent;
+  border: 1px solid var(--border-muted);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnOutline:hover {
+  background: rgba(29, 57, 96, 0.45);
+}
+
+.btnRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}

@@ -7,7 +7,7 @@ export function Screensaver() {
     <div className={styles.container}>
       <div className={styles.pulseCircle} />
       <h1 className={styles.logo}>ADMIRAL CASINO</h1>
-      <p className={styles.status}>Ожидание следующего раунда...</p>
+      <p className={styles.status}>Awaiting next round</p>
     </div>
   );
 }

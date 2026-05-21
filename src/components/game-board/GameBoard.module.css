@@ -5,21 +5,20 @@
   justify-content: center;
   height: 100vh;
   background:
-    radial-gradient(ellipse at center, var(--navy-soft) 0%, var(--bg-navy-deep) 40%, var(--steel-deep) 100%),
-    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+    radial-gradient(ellipse at center, var(--panel-dark) 0%, var(--bg-midnight) 70%),
+    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
   background-blend-mode: overlay;
   gap: 3rem;
   overflow: hidden;
-  position: relative;
 }
 
 .title {
   font-size: 2.5rem;
-  color: var(--casino-gold);
+  color: var(--brand-gold);
   font-family: serif;
   text-transform: uppercase;
   letter-spacing: 0.3em;
-  text-shadow: 0 0 20px rgba(52, 105, 254, 0.35), 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 16px rgba(212, 175, 55, 0.25);
   z-index: 10;
 }
 
@@ -27,28 +26,24 @@
   display: flex;
   gap: 1.5rem;
   z-index: 10;
-  position: relative;
 }
 
 .infoPanel {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   width: min(90vw, 720px);
   padding: 1.25rem 2rem;
-  border: 2px solid var(--casino-gold);
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(17, 37, 64, 0.85) 0%, rgba(48, 61, 78, 0.9) 100%);
-  box-shadow: 0 0 20px rgba(52, 105, 254, 0.2), inset 0 0 24px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--brand-gold);
+  border-radius: 0.375rem;
+  background: rgba(17, 37, 64, 0.92);
   z-index: 10;
 }
 
 .infoText {
   font-family: serif;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   color: var(--text-light);
-  text-shadow: 0 0 8px rgba(246, 255, 255, 0.4), 2px 2px 6px rgba(0, 0, 0, 0.7);
   text-transform: uppercase;
 }

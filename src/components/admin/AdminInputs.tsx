@@ -23,7 +23,7 @@ export function AdminInputs({
           type="text"
           value={playerId}
           onChange={(e) => onPlayerIdChange(e.target.value)}
-          placeholder="Например: P-1024"
+          placeholder="P-1024"
           className={styles.input}
         />
       </label>
