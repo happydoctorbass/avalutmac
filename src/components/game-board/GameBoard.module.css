@@ -1,0 +1,32 @@
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  /* Темно-зеленый радиальный градиент с микро-текстурой (через шум или узор) */
+  background: 
+    radial-gradient(circle, #1a4f2c 0%, #0a2e15 100%),
+    url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-blend-mode: overlay;
+  gap: 3rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #d4af37;
+  font-family: serif;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+.cardsContainer {
+  display: flex;
+  gap: 1.5rem;
+  z-index: 10;
+  position: relative;
+}

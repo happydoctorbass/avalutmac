@@ -1,0 +1,13 @@
+'use client';
+
+import styles from './Screensaver.module.css';
+
+export function Screensaver() {
+  return (
+    <div className={styles.container}>
+      <div className={styles.pulseCircle} />
+      <h1 className={styles.logo}>CASINO PREMIUM</h1>
+      <p className={styles.status}>Waiting for next round...</p>
+    </div>
+  );
+}
