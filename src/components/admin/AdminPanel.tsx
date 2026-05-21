@@ -47,39 +47,44 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
       <AdminBranding />
       <h1 className={styles.header}>Панель управления питбосса</h1>
 
-      <section className={styles.block}>
-        <h2 className={styles.blockTitle}>Клиентские данные</h2>
-        <AdminInputs
-          playerId={playerId}
-          betAmount={betAmount}
-          onPlayerIdChange={setPlayerId}
-          onBetAmountChange={setBetAmount}
-        />
-      </section>
+      <div className={styles.layout}>
+        <div className={styles.leftCol}>
+          <section className={styles.block}>
+            <h2 className={styles.blockTitle}>Клиентские данные</h2>
+            <AdminInputs
+              playerId={playerId}
+              betAmount={betAmount}
+              onPlayerIdChange={setPlayerId}
+              onBetAmountChange={setBetAmount}
+            />
+          </section>
 
-      <section className={styles.block}>
-        <h2 className={styles.blockTitle}>Запуск раунда</h2>
-        <div className={ui.btnRow}>
-          <button type="button" onClick={startGame} className={ui.btnPrimary}>Начать игру</button>
-          <button type="button" onClick={startGame} className={ui.btnPrimary}>Новая раздача</button>
-          <button
-            type="button"
-            onClick={() => { onCardsGenerated?.([]); sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }}
-            className={ui.btnOutline}
-          >
-            Сбросить в заставку
-          </button>
+          <section className={styles.block}>
+            <h2 className={styles.blockTitle}>Запуск раунда</h2>
+            <div className={ui.btnRow}>
+              <button type="button" onClick={startGame} className={ui.btnPrimary}>START</button>
+              <button
+                type="button"
+                onClick={() => { onCardsGenerated?.([]); sendCommand(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }}
+                className={ui.btnSecondary}
+              >
+                STOP
+              </button>
+            </div>
+          </section>
         </div>
-      </section>
 
-      <section className={styles.block}>
-        <h2 className={styles.blockTitle}>Управление картами</h2>
-        <AdminCardSection
-          currentCards={currentCards}
-          onRevealAll={() => sendCommand(GAME_EVENTS.REVEAL_ALL, {})}
-          onRevealCard={(idx) => sendCommand(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] })}
-        />
-      </section>
+        <div className={styles.rightCol}>
+          <section className={styles.block}>
+            <h2 className={styles.blockTitle}>Управление картами</h2>
+            <AdminCardSection
+              currentCards={currentCards}
+              onRevealAll={() => sendCommand(GAME_EVENTS.REVEAL_ALL, {})}
+              onRevealCard={(idx) => sendCommand(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] })}
+            />
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

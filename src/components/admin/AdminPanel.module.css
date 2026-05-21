@@ -1,27 +1,42 @@
 .panel {
   position: relative;
   min-height: 100vh;
-  padding: 2rem 2rem 5rem;
+  padding: 2rem;
   color: var(--text-light);
-  background: var(--bg-midnight);
+  background: var(--color-bg-base);
 }
 
 .header {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border-muted);
-  color: var(--brand-gold);
+  color: var(--color-accent-gold);
   letter-spacing: 0.03em;
 }
 
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 2rem;
+}
+
+.leftCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .block {
-  margin-bottom: 2rem;
   padding: 1.25rem;
   border-radius: 0.5rem;
-  border: 1px solid var(--border-muted);
-  background: rgba(17, 37, 64, 0.6);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
 }
 
 .blockTitle {

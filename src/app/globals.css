@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --bg-midnight: #112540;
-  --panel-dark: #1d3960;
-  --border-muted: #4f5f76;
-  --brand-gold: #d4af37;
-  --button-primary: #3469fe;
+  --color-bg-base: #050a12;
+  --color-bg-card: #0d1526;
+  --color-primary: #2563eb;
+  --color-accent-gold: #c5a059;
+  --color-border: rgba(255, 255, 255, 0.1);
   --text-light: #f6ffff;
   --placeholder: #647795;
-  --background: var(--bg-midnight);
+  --background: var(--color-bg-base);
   --foreground: var(--text-light);
 }
 
