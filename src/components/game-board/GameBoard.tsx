@@ -1,12 +1,12 @@
 'use client';
 
 import { Card } from '../card/Card';
-import { useGameSync } from '@/hooks/useGameSync';
+import { useGameContext } from '@/context/GameContext';
 import { motion } from 'framer-motion';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards } = useGameSync();
+  const { revealedCards, cards } = useGameContext();
 
   return (
     <div className={styles.board}>

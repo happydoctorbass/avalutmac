@@ -1,10 +1,11 @@
 'use client';
 
+import { GameProvider } from '@/context/GameContext';
 import { useGameSync } from '@/hooks/useGameSync';
 import { Screensaver } from '@/components/screensaver/Screensaver';
 import { GameBoard } from '@/components/game-board/GameBoard';
 
-export default function Home() {
+function HomeContent() {
   const { gameState, sessionId } = useGameSync();
 
   return (
@@ -15,5 +16,13 @@ export default function Home() {
         <GameBoard key={sessionId} />
       )}
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <GameProvider>
+      <HomeContent />
+    </GameProvider>
   );
 }

@@ -1,14 +1,17 @@
 import Pusher from 'pusher-js';
 
-console.log('Pusher Key:', process.env.NEXT_PUBLIC_PUSHER_KEY);
+let instance: Pusher | null = null;
 
-// Инициализируем клиент только в браузере
-export const pusherClient = typeof window !== 'undefined'
-  ? new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+export function getPusherClient(): Pusher | null {
+  if (typeof window === 'undefined') return null;
+  if (!instance) {
+    instance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
       forceTLS: true,
-    })
-  : null;
+    });
+  }
+  return instance;
+}
 
 export const GAME_CHANNEL = 'casino-game-channel';
 
