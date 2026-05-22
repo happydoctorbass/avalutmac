@@ -15,18 +15,28 @@
 }
 
 .layout {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 2rem;
-}
-
-.leftCol {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.rightCol {
+.topRow {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.topRow > * {
+  flex: 1;
+}
+
+.bottomRow {
+  display: flex;
+  gap: 2rem;
+}
+
+.bottomCol {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

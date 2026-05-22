@@ -1,7 +1,6 @@
 import { GameType, CardData, GameLanguage } from '@/types/game';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import styles from './AdminGameSelector.module.css';
-import ui from './AdminUi.module.css';
 import { GAME_EVENTS } from '@/lib/pusher';
 
 interface AdminGameSelectorProps {
@@ -27,10 +26,28 @@ export function AdminGameSelector({
   setLanguage,
   sendCommand,
 }: AdminGameSelectorProps) {
+  const [localTimer, setLocalTimer] = useState(timerDuration);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('timerDuration');
+    if (saved) {
+      setLocalTimer(saved);
+      setTimerDuration(saved);
+    }
+  }, [setTimerDuration]);
+
+  const handleTimerChange = (val: string) => {
+    setLocalTimer(val);
+    setTimerDuration(val);
+    localStorage.setItem('timerDuration', val);
+  };
+
   const handleLanguageChange = (lang: GameLanguage) => {
     setLanguage(lang);
     sendCommand(GAME_EVENTS.UPDATE_LANG, { language: lang });
   };
+
+  const isBaccarat = gameType === 'BACCARAT_TRIPLE';
 
   return (
     <div className={styles.selectorGrid}>
@@ -39,14 +56,14 @@ export function AdminGameSelector({
         <div className="flex gap-2">
           <button
             type="button"
-            className={`${styles.toggleBtn} ${gameType === 'BACCARAT_TRIPLE' ? styles.active : ''}`}
+            className={`${styles.toggleBtn} ${styles.fixedWidthBtn} ${isBaccarat ? styles.active : ''}`}
             onClick={() => { setGameType('BACCARAT_TRIPLE'); setCardCount(2); }}
           >
             BACCARAT
           </button>
           <button
             type="button"
-            className={`${styles.toggleBtn} ${gameType === 'NIU_NIU_TRIPLE' ? styles.active : ''}`}
+            className={`${styles.toggleBtn} ${styles.fixedWidthBtn} ${!isBaccarat ? styles.active : ''}`}
             onClick={() => setGameType('NIU_NIU_TRIPLE')}
           >
             NIU NIU
@@ -54,37 +71,19 @@ export function AdminGameSelector({
         </div>
       </div>
 
-      <div className={styles.field}>
-        <span className={styles.label}>Количество карт</span>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            disabled={gameType === 'BACCARAT_TRIPLE'}
-            className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`}
-            onClick={() => setCardCount(2)}
-          >
-            2 Карты
-          </button>
-          <button
-            type="button"
-            disabled={gameType === 'BACCARAT_TRIPLE'}
-            className={`${styles.toggleBtn} ${cardCount === 5 ? styles.active : ''}`}
-            onClick={() => setCardCount(5)}
-          >
-            5 Карт
-          </button>
+      {!isBaccarat && (
+        <div className={styles.field}>
+          <span className={styles.label}>Количество карт</span>
+          <div className="flex gap-2">
+            <button type="button" className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`} onClick={() => setCardCount(2)}>2 Карты</button>
+            <button type="button" className={`${styles.toggleBtn} ${cardCount === 5 ? styles.active : ''}`} onClick={() => setCardCount(5)}>5 Карт</button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className={styles.field}>
-        <span className={styles.label}>Таймер (сек)</span>
-        <input
-          type="number"
-          value={timerDuration}
-          onChange={(e) => setTimerDuration(e.target.value)}
-          placeholder="Например, 10"
-          className={styles.input}
-        />
+        <span className={styles.label}>Таймер (MM:SS)</span>
+        <input type="text" value={localTimer} onChange={(e) => handleTimerChange(e.target.value)} placeholder="01:30" className={styles.input} />
       </div>
 
       <div className={styles.field}>

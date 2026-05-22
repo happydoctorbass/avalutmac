@@ -8,14 +8,19 @@ import { TimerDisplay } from './TimerDisplay';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards, playerId, betAmount, language, cardCount, timerDuration, gameState } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount, language, cardCount, timerDuration, gameState, gameType } = useGameContext();
   const dict = DICTIONARY[language];
   const isRunning = gameState === 'GAME';
+  
+  const title = gameType === 'BACCARAT_TRIPLE' ? dict.titleBACCARAT_TRIPLE : dict.titleNIU_NIU_TRIPLE;
 
   return (
     <div className={styles.board}>
-      <TimerDisplay duration={timerDuration} isRunning={isRunning} />
-      
+      <div className={styles.topSection}>
+        <TimerDisplay duration={timerDuration} isRunning={isRunning} />
+        <h2 className={styles.title}>{title}</h2>
+      </div>
+
       <div className={styles.cardsContainer}>
         {Array.from({ length: cardCount }).map((_, index) => {
           const card = cards[index];
@@ -37,18 +42,12 @@ export function GameBoard() {
 
       <div className={styles.infoPanel}>
         <div className={styles.infoBlock}>
-          <span className={styles.infoLabel}>{dict.guest}</span>
-          <span className={styles.infoValue}>
-            <span className={styles.icon}>👤</span>
-            {playerId || '—'}
-          </span>
+          <span className={styles.infoLabel}>👤 {dict.guest}</span>
+          <span className={styles.infoValue}>{playerId || '—'}</span>
         </div>
         <div className={styles.infoBlock}>
-          <span className={styles.infoLabel}>{dict.bet}</span>
-          <span className={styles.infoValue}>
-            <span className={styles.icon}>$</span>
-            {betAmount.toLocaleString('en-US')}
-          </span>
+          <span className={styles.infoLabel}>$ {dict.bet}</span>
+          <span className={styles.infoValue}>{betAmount.toLocaleString('en-US')}</span>
         </div>
       </div>
     </div>

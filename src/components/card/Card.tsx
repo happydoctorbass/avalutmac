@@ -28,7 +28,7 @@ export function Card({ isRevealed, value, cardCount = 5 }: CardProps) {
       >
         <div className={`${styles.face} ${styles.back}`}>
           <div className={styles.logoContainer}>
-            <Image src="/logo.png" alt="Logo" fill style={{ objectFit: 'contain' }} />
+            <img src="/logos/logo.png" alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
         </div>
         

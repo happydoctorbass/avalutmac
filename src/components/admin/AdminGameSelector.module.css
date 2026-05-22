@@ -46,6 +46,11 @@
   font-size: 0.875rem;
 }
 
+.fixedWidthBtn {
+  width: 120px;
+  flex: none;
+}
+
 .toggleBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
