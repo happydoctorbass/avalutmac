@@ -1,18 +1,16 @@
-import { CardData, GameType } from '@/types/game';
+import { CardData } from '@/types/game';
 import { FULL_DECK } from '@/lib/deck';
 import styles from './AdminCardGrid.module.css';
 
 interface AdminCardGridProps {
   cardCount: number;
-  gameType: GameType;
   selectedCards: (CardData | null)[];
   onCardChange: (index: number, card: CardData | null) => void;
   onRevealCard: (index: number) => void;
   revealedStates: boolean[];
 }
 
-export function AdminCardGrid({ cardCount, gameType, selectedCards, onCardChange, onRevealCard, revealedStates }: AdminCardGridProps) {
-  const isNiuNiu = gameType === 'NIU_NIU_TRIPLE';
+export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onRevealCard, revealedStates }: AdminCardGridProps) {
   const slots = Array.from({ length: cardCount }, (_, i) => i);
 
   const handleSelect = (idx: number, val: string) => {
@@ -39,7 +37,7 @@ export function AdminCardGrid({ cardCount, gameType, selectedCards, onCardChange
               type="button"
               className={`${styles.cardBtn} ${isRevealed ? styles.revealed : ''}`}
               onClick={() => onRevealCard(idx)}
-              disabled={isRevealed || (!card && isNiuNiu)}
+              disabled={isRevealed || !card}
             >
               <span className={styles.cardLabel}>Карта {idx + 1}</span>
               {card ? (
@@ -50,16 +48,14 @@ export function AdminCardGrid({ cardCount, gameType, selectedCards, onCardChange
                 <span className={styles.cardEmpty}>?</span>
               )}
             </button>
-            {isNiuNiu && (
-              <select value={val} onChange={e => handleSelect(idx, e.target.value)} className={styles.select}>
-                <option value="">- Выбрать -</option>
-                {FULL_DECK.map((c) => (
-                  <option key={`${c.rank}-${c.suit}`} value={`${c.rank}-${c.suit}`} disabled={isCardUsed(c, idx)}>
-                    {c.rank} {c.suit}
-                  </option>
-                ))}
-              </select>
-            )}
+            <select value={val} onChange={e => handleSelect(idx, e.target.value)} className={styles.select}>
+              <option value="">- Выбрать -</option>
+              {FULL_DECK.map((c) => (
+                <option key={`${c.rank}-${c.suit}`} value={`${c.rank}-${c.suit}`} disabled={isCardUsed(c, idx)}>
+                  {c.rank} {c.suit}
+                </option>
+              ))}
+            </select>
           </div>
         );
       })}

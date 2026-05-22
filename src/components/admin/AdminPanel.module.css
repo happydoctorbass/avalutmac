@@ -9,23 +9,31 @@
 .header {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
   color: var(--color-accent-gold);
   letter-spacing: 0.03em;
+}
+
+.topRow {
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.topRow > * {
+  flex: 1;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
   gap: 1.25rem;
-  min-height: calc(100vh - 8rem);
 }
 
 .block {
   display: flex;
   flex-direction: column;
-  min-height: 0;
   height: 100%;
   padding: 1.25rem;
   border-radius: 0.5rem;
@@ -47,12 +55,16 @@
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--placeholder);
+  margin-bottom: 1rem;
   font-weight: 600;
+}
+
+.blockTitleNoMargin {
+  margin-bottom: 0;
 }
 
 .blockBody {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: auto;

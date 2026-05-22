@@ -25,19 +25,13 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
   const [timerDuration, setTimerDuration] = useState('01:30');
   const [manualCards, setManualCards] = useState<(CardData | null)[]>([null, null, null, null, null]);
 
-  const send = (event: string, data: object) =>
-    fetch('/api/pusher', { method: 'POST', body: JSON.stringify({ event, data }) });
-
+  const send = (event: string, data: object) => fetch('/api/pusher', { method: 'POST', body: JSON.stringify({ event, data }) });
   const valid = playerId.trim() !== '' && betAmount.trim() !== '';
-  const parseTimer = (v: string) => {
-    const p = v.split(':');
-    return p.length === 2 ? (parseInt(p[0]) || 0) * 60 + (parseInt(p[1]) || 0) : parseInt(v) || 0;
-  };
+  const parseTimer = (v: string) => v.includes(':') ? (parseInt(v.split(':')[0]) || 0) * 60 + (parseInt(v.split(':')[1]) || 0) : parseInt(v) || 0;
 
   const startGame = () => {
     if (!valid) return;
-    const niu = gameType === 'NIU_NIU_TRIPLE';
-    const ok = niu && manualCards.slice(0, cardCount).every(c => c !== null);
+    const ok = manualCards.slice(0, cardCount).every(c => c !== null);
     const cards = ok ? (manualCards.slice(0, cardCount) as CardData[]) : getRandomCards(cardCount);
     onCardsGenerated?.(cards);
     send(GAME_EVENTS.TOGGLE_STATE, {
@@ -51,24 +45,13 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
       <AdminBranding />
       <h1 className={styles.header}>Панель управления питбосса</h1>
 
-      <div className={styles.grid}>
+      <div className={styles.topRow}>
         <section className={styles.block}>
           <h2 className={styles.blockTitle}>Клиентские данные</h2>
           <div className={styles.blockBody}>
             <AdminInputs
               playerId={playerId} betAmount={betAmount} language={language}
               onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-            />
-          </div>
-        </section>
-
-        <section className={styles.block}>
-          <h2 className={styles.blockTitle}>Настройки игры</h2>
-          <div className={styles.blockBody}>
-            <AdminGameSelector
-              gameType={gameType} setGameType={setGameType} cardCount={cardCount} setCardCount={setCardCount}
-              timerDuration={timerDuration} setTimerDuration={setTimerDuration}
-              language={language} setLanguage={setLanguage} sendCommand={send}
             />
           </div>
         </section>
@@ -83,15 +66,27 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
             </div>
           </div>
         </section>
+      </div>
+
+      <div className={styles.grid}>
+        <section className={styles.block}>
+          <h2 className={styles.blockTitle}>Настройки игры</h2>
+          <div className={styles.blockBody}>
+            <AdminGameSelector
+              gameType={gameType} setGameType={setGameType} cardCount={cardCount} setCardCount={setCardCount}
+              timerDuration={timerDuration} setTimerDuration={setTimerDuration}
+            />
+          </div>
+        </section>
 
         <section className={styles.block}>
           <div className={styles.blockHead}>
-            <h2 className={styles.blockTitle}>Управление картами</h2>
+            <h2 className={`${styles.blockTitle} ${styles.blockTitleNoMargin}`}>Управление картами</h2>
             <button type="button" onClick={() => send(GAME_EVENTS.REVEAL_ALL, {})} className={styles.headBtn}>ОТКРЫТЬ ВСЕ</button>
           </div>
           <div className={styles.blockBody}>
             <AdminCardGrid
-              cardCount={cardCount} gameType={gameType} selectedCards={manualCards}
+              cardCount={cardCount} selectedCards={manualCards}
               onCardChange={(idx, c) => setManualCards(p => { const n = [...p]; n[idx] = c; return n; })}
               onRevealCard={(idx) => send(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] || manualCards[idx] })}
               revealedStates={Array(cardCount).fill(false)}
