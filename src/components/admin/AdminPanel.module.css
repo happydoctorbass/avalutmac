@@ -9,44 +9,37 @@
 .header {
   font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: var(--color-accent-gold);
   letter-spacing: 0.03em;
 }
 
-.layout {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.topRow {
-  display: flex;
-  gap: 2rem;
-  align-items: flex-start;
-}
-
-.topRow > * {
-  flex: 1;
-}
-
-.bottomRow {
-  display: flex;
-  gap: 2rem;
-}
-
-.bottomCol {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.25rem;
+  min-height: calc(100vh - 8rem);
 }
 
 .block {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
   padding: 1.25rem;
   border-radius: 0.5rem;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
+}
+
+.blockHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 
 .blockTitle {
@@ -54,6 +47,30 @@
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--placeholder);
-  margin-bottom: 1rem;
   font-weight: 600;
+}
+
+.blockBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.headBtn {
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-light);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.headBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
