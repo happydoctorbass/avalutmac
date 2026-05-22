@@ -21,4 +21,5 @@ export const GAME_EVENTS = {
   REVEAL_ALL: 'reveal-all',
   RESET: 'reset-game',
   CELEBRATE: 'celebrate-win',
+  UPDATE_LANG: 'update-lang',
 } as const;

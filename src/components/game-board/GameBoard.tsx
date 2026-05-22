@@ -4,20 +4,24 @@ import { Card } from '../card/Card';
 import { useGameContext } from '@/context/GameContext';
 import { motion } from 'framer-motion';
 import { DICTIONARY } from '@/lib/constants';
+import { TimerDisplay } from './TimerDisplay';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards, playerId, betAmount, language } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount, language, cardCount, timerDuration, gameState } = useGameContext();
   const dict = DICTIONARY[language];
+  const isRunning = gameState === 'GAME';
 
   return (
     <div className={styles.board}>
-      <h2 className={styles.title}>Niu Niu Bonus</h2>
-
+      <TimerDisplay duration={timerDuration} isRunning={isRunning} />
+      
       <div className={styles.cardsContainer}>
-        {revealedCards.map((isRevealed, index) => {
+        {Array.from({ length: cardCount }).map((_, index) => {
           const card = cards[index];
           const value = card ? `${card.rank}${card.suit}` : '';
+          const isRevealed = revealedCards[index] || false;
+          
           return (
             <motion.div
               key={index}
@@ -25,7 +29,7 @@ export function GameBoard() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ delay: index * 0.15, type: 'spring', stiffness: 200, damping: 20 }}
             >
-              <Card isRevealed={isRevealed} value={value} />
+              <Card isRevealed={isRevealed} value={value} cardCount={cardCount} />
             </motion.div>
           );
         })}

@@ -53,7 +53,7 @@
 
 .infoValue {
   font-family: serif;
-  font-size: 4.9rem; /* 3.5rem * 1.4 = 4.9rem */
+  font-size: 6.8rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: var(--color-accent-gold);
@@ -61,11 +61,11 @@
   text-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 10px rgba(197, 160, 89, 0.4);
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .icon {
   font-family: var(--font-sans);
-  font-size: 3.5rem;
-  opacity: 0.8;
+  font-size: 4.5rem;
+  opacity: 0.7;
 }

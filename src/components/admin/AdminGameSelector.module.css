@@ -1,0 +1,58 @@
+.selectorGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--placeholder);
+  margin-bottom: 0.375rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-base);
+  color: var(--text-light);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+}
+
+.toggleBtn {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-base);
+  color: var(--placeholder);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.toggleBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.active {
+  background: var(--color-primary);
+  color: var(--text-light);
+  border-color: var(--color-primary);
+}

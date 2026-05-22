@@ -1,0 +1,73 @@
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100px;
+}
+
+.cardBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  border-radius: 0.5rem;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cardBtn:hover:not(:disabled) {
+  border-color: var(--color-accent-gold);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.cardBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.revealed {
+  border-color: var(--color-primary);
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.cardLabel {
+  font-size: 0.625rem;
+  color: var(--placeholder);
+  margin-bottom: 0.5rem;
+}
+
+.cardValue {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.cardEmpty {
+  font-size: 1.5rem;
+  color: var(--placeholder);
+}
+
+.red {
+  color: #e85d5d;
+}
+
+.select {
+  width: 100%;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-base);
+  color: var(--text-light);
+  font-size: 0.75rem;
+  outline: none;
+}

@@ -9,6 +9,7 @@ export interface CardData {
 
 export type GameStatus = 'IDLE' | 'GAME';
 export type GameLanguage = 'en' | 'zh';
+export type GameType = 'BACCARAT_TRIPLE' | 'NIU_NIU_TRIPLE';
 
 export interface ToggleStatePayload {
   state: GameStatus;
@@ -16,6 +17,9 @@ export interface ToggleStatePayload {
   playerId?: string;
   betAmount?: number;
   language?: GameLanguage;
+  gameType?: GameType;
+  cardCount?: number;
+  timerDuration?: number;
 }
 
 export interface RevealCardPayload {

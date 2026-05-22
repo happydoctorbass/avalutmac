@@ -1,0 +1,16 @@
+.timerContainer {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.timerText {
+  font-family: var(--font-mono), monospace;
+  font-size: 5rem;
+  font-weight: 700;
+  color: var(--color-accent-gold);
+  text-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
+  letter-spacing: 0.1em;
+}
