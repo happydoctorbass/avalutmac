@@ -47,15 +47,19 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
 
       <section className={`${styles.block} ${styles.clientBlock}`}>
         <h2 className={styles.blockTitle}>Клиентские данные</h2>
-        <div className={styles.blockBody}>
-          <AdminInputs
-            playerId={playerId} betAmount={betAmount} language={language}
-            onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-          />
-          <div className={styles.launchRow}>
-            <button onClick={startGame} className={`${ui.btnPrimary} ${styles.launchBtn} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
-            <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={`${ui.btnSecondary} ${styles.launchBtn}`}>STOP</button>
-            <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={`${ui.btnCelebrate} ${styles.launchBtn}`}>ПОБЕДА ГОСТЯ 🎉</button>
+        <div className={styles.clientInner}>
+          <div className={styles.clientSub}>
+            <AdminInputs
+              playerId={playerId} betAmount={betAmount} language={language}
+              onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
+            />
+          </div>
+          <div className={styles.clientSub}>
+            <div className={styles.launchCol}>
+              <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
+              <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
+              <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
+            </div>
           </div>
         </div>
       </section>

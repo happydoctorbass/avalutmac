@@ -22,23 +22,36 @@
   height: auto;
 }
 
-.clientBlock .blockBody {
-  flex: 0 0 auto;
-}
-
-.launchRow {
+.clientInner {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  height: auto;
+  align-items: stretch;
+  gap: 1rem;
 }
 
-.launchBtn {
-  width: auto;
-  flex: 1;
-  min-width: 8rem;
+.clientSub {
+  padding: 1rem;
+  border-radius: 0.375rem;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+}
+
+.clientSub:first-child {
+  flex: 1 1 auto;
+  min-width: 16rem;
+}
+
+.clientSub:last-child {
+  flex: 0 0 auto;
+  min-width: 11rem;
+}
+
+.launchCol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  height: 100%;
 }
 
 .grid {
