@@ -1,14 +1,14 @@
 .cardScene {
-  width: 140px;
-  height: 200px;
+  height: min(200px, 28vh);
+  width: calc(min(200px, 28vh) * 0.7);
   perspective: 1200px;
   filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.5));
   transition: width 0.3s, height 0.3s;
 }
 
 .largeCard {
-  width: 260px;
-  height: 371px;
+  height: min(371px, 45vh);
+  width: calc(min(371px, 45vh) * 0.7);
 }
 
 .cardInner {

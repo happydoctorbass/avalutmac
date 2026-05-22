@@ -6,7 +6,7 @@
 
 .timerText {
   font-family: var(--font-mono), monospace;
-  font-size: 5rem;
+  font-size: clamp(3rem, 8vh, 5rem);
   font-weight: 700;
   color: var(--color-accent-gold);
   text-shadow: 0 0 20px rgba(197, 160, 89, 0.4);
