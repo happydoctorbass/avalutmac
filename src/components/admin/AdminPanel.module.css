@@ -14,15 +14,21 @@
   letter-spacing: 0.03em;
 }
 
-.topRow {
-  display: flex;
-  flex-direction: row;
-  gap: 1.25rem;
+.clientBlock {
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 100%;
   margin-bottom: 1.25rem;
+  height: auto;
 }
 
-.topRow > * {
-  flex: 1;
+.clientBlock .blockBody {
+  flex: 0 0 auto;
+}
+
+.launchRow {
+  margin-top: 1rem;
+  height: auto;
 }
 
 .grid {

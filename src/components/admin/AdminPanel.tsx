@@ -45,28 +45,20 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
       <AdminBranding />
       <h1 className={styles.header}>Панель управления питбосса</h1>
 
-      <div className={styles.topRow}>
-        <section className={styles.block}>
-          <h2 className={styles.blockTitle}>Клиентские данные</h2>
-          <div className={styles.blockBody}>
-            <AdminInputs
-              playerId={playerId} betAmount={betAmount} language={language}
-              onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-            />
+      <section className={`${styles.block} ${styles.clientBlock}`}>
+        <h2 className={styles.blockTitle}>Клиентские данные</h2>
+        <div className={styles.blockBody}>
+          <AdminInputs
+            playerId={playerId} betAmount={betAmount} language={language}
+            onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
+          />
+          <div className={`${ui.btnRow} ${styles.launchRow}`}>
+            <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
+            <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
+            <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
           </div>
-        </section>
-
-        <section className={styles.block}>
-          <h2 className={styles.blockTitle}>Запуск раунда</h2>
-          <div className={styles.blockBody}>
-            <div className={ui.btnRow}>
-              <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
-              <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
-              <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
-            </div>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       <div className={styles.grid}>
         <section className={styles.block}>

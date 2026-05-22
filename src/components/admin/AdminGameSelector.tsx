@@ -45,7 +45,7 @@ export function AdminGameSelector({
           <button
             type="button"
             className={`${styles.toggleBtn} ${isBaccarat ? styles.active : ''}`}
-            onClick={() => { setGameType('BACCARAT_TRIPLE'); setCardCount(2); }}
+            onClick={() => { setGameType('BACCARAT_TRIPLE'); setCardCount(5); }}
           >
             BACCARAT
           </button>
@@ -59,10 +59,12 @@ export function AdminGameSelector({
         </div>
       </div>
 
-      <div className={`${styles.field} ${isBaccarat ? styles.disabledField : ''}`}>
+      <div className={styles.field}>
         <span className={styles.label}>Количество карт</span>
         <div className="flex gap-2">
-          <button type="button" className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`} onClick={() => setCardCount(2)}>2 Карты</button>
+          {!isBaccarat && (
+            <button type="button" className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`} onClick={() => setCardCount(2)}>2 Карты</button>
+          )}
           <button type="button" className={`${styles.toggleBtn} ${cardCount === 5 ? styles.active : ''}`} onClick={() => setCardCount(5)}>5 Карт</button>
         </div>
       </div>

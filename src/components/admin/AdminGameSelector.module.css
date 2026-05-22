@@ -9,11 +9,6 @@
   flex-direction: column;
 }
 
-.disabledField {
-  opacity: 0.2;
-  pointer-events: none;
-}
-
 .label {
   display: block;
   font-size: 0.8125rem;
