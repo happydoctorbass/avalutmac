@@ -15,9 +15,7 @@
 }
 
 .clientBlock {
-  flex: 0 0 auto;
-  width: fit-content;
-  max-width: 100%;
+  width: 100%;
   margin-bottom: 1.25rem;
   height: auto;
 }
@@ -27,6 +25,7 @@
   flex-direction: row;
   align-items: stretch;
   gap: 1rem;
+  width: 100%;
 }
 
 .clientSub {
@@ -42,8 +41,7 @@
 }
 
 .clientSub:last-child {
-  flex: 0 0 auto;
-  min-width: 11rem;
+  flex: 0 0 14rem;
 }
 
 .launchCol {
