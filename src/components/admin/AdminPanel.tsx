@@ -8,6 +8,7 @@ import { AdminInputs } from './AdminInputs';
 import { AdminBranding } from './AdminBranding';
 import { AdminGameSelector } from './AdminGameSelector';
 import { AdminCardGrid } from './AdminCardGrid';
+import { AdminStatsBlock } from './AdminStatsBlock';
 import styles from './AdminPanel.module.css';
 import ui from './AdminUi.module.css';
 
@@ -45,26 +46,27 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
       <AdminBranding />
       <h1 className={styles.header}>Панель управления питбосса</h1>
 
-      <section className={`${styles.block} ${styles.clientBlock}`}>
-        <h2 className={styles.blockTitle}>Клиентские данные</h2>
-        <div className={styles.clientInner}>
-          <div className={styles.clientSub}>
-            <AdminInputs
-              playerId={playerId} betAmount={betAmount} language={language}
-              onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-            />
-          </div>
-          <div className={styles.clientSub}>
-            <div className={styles.launchCol}>
-              <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
-              <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
-              <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
+      <div className={styles.grid}>
+        <section className={styles.block}>
+          <h2 className={styles.blockTitle}>Клиентские данные</h2>
+          <div className={styles.clientInner}>
+            <div className={styles.clientSub}>
+              <AdminInputs
+                playerId={playerId} betAmount={betAmount} language={language}
+                onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
+              />
+            </div>
+            <div className={styles.clientSub}>
+              <div className={styles.launchCol}>
+                <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
+                <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
+                <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className={styles.grid}>
+        <AdminStatsBlock />
         <section className={styles.block}>
           <h2 className={styles.blockTitle}>Настройки игры</h2>
           <div className={styles.blockBody}>

@@ -14,12 +14,6 @@
   letter-spacing: 0.03em;
 }
 
-.clientBlock {
-  width: 100%;
-  margin-bottom: 1.25rem;
-  height: auto;
-}
-
 .clientInner {
   display: flex;
   flex-direction: row;
