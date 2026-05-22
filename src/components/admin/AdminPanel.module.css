@@ -27,8 +27,18 @@
 }
 
 .launchRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin-top: 1rem;
   height: auto;
+}
+
+.launchBtn {
+  width: auto;
+  flex: 1;
+  min-width: 8rem;
 }
 
 .grid {

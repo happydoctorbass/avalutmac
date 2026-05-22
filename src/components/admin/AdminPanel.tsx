@@ -52,10 +52,10 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
             playerId={playerId} betAmount={betAmount} language={language}
             onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
           />
-          <div className={`${ui.btnRow} ${styles.launchRow}`}>
-            <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
-            <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
-            <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
+          <div className={styles.launchRow}>
+            <button onClick={startGame} className={`${ui.btnPrimary} ${styles.launchBtn} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
+            <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={`${ui.btnSecondary} ${styles.launchBtn}`}>STOP</button>
+            <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={`${ui.btnCelebrate} ${styles.launchBtn}`}>ПОБЕДА ГОСТЯ 🎉</button>
           </div>
         </div>
       </section>

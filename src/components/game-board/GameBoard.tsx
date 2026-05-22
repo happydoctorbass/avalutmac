@@ -44,7 +44,6 @@ export function GameBoard() {
         <div className={styles.infoBlock}>
           <span className={styles.infoLabel}>{dict.guest}</span>
           <span className={styles.infoValue}>
-            <span className={styles.icon}>👤</span>
             ID {playerId || '—'}
           </span>
         </div>
