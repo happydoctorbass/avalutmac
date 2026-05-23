@@ -1,20 +1,17 @@
 'use client';
 
 import { useGameContext } from '@/context/GameContext';
-import { useBetsLeaderboard } from '@/hooks/useBetsLeaderboard';
 import styles from './AdminStatsBlock.module.css';
 
 export function AdminStatsBlock() {
-  const { dbSessionId, betsVersion } = useGameContext();
-  const { bets, loading } = useBetsLeaderboard(dbSessionId, betsVersion);
+  const { bets, sessionId } = useGameContext();
 
   return (
     <section className={styles.block}>
       <h2 className={styles.title}>Статистика / Лидеры</h2>
       <div className={styles.tableWrap}>
-        {loading && <p className={styles.hint}>Загрузка…</p>}
-        {!loading && !dbSessionId && <p className={styles.hint}>Запустите раунд (СТАРТ)</p>}
-        {!loading && dbSessionId && bets.length === 0 && <p className={styles.hint}>Ставок пока нет</p>}
+        {!sessionId && <p className={styles.hint}>Запустите раунд (СТАРТ)</p>}
+        {sessionId && bets.length === 0 && <p className={styles.hint}>Ставок пока нет</p>}
         {bets.length > 0 && (
           <table className={styles.table}>
             <thead>

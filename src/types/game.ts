@@ -20,7 +20,7 @@ export interface ToggleStatePayload {
   gameType?: GameType;
   cardCount?: number;
   finishAt?: string | null;
-  dbSessionId?: string | null;
+  sessionId?: string | null;
 }
 
 export interface RevealCardPayload {
@@ -31,7 +31,7 @@ export interface RevealCardPayload {
 export interface NewBidPayload {
   playerId: string;
   amount: number;
-  createdAt?: string;
+  id: string;
 }
 
 export interface BetRow {

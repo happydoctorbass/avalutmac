@@ -14,16 +14,16 @@ interface AdminBetBoxProps {
 }
 
 export function AdminBetBox({ playerId, betAmount, inputValid, onClear }: AdminBetBoxProps) {
-  const { gameState, dbSessionId, finishAt } = useGameContext();
+  const { gameState, sessionId, finishAt } = useGameContext();
   const { isExpired } = useFinishClock(finishAt, gameState === 'GAME');
   const [loading, setLoading] = useState(false);
-  const disabled = !inputValid || gameState !== 'GAME' || !dbSessionId || isExpired || loading;
+  const disabled = !inputValid || gameState !== 'GAME' || !sessionId || isExpired || loading;
 
   const addBid = async () => {
-    if (disabled || !dbSessionId) return;
+    if (disabled || !sessionId) return;
     setLoading(true);
     try {
-      const res = await postBid(playerId.trim(), Number(betAmount), dbSessionId);
+      const res = await postBid(playerId.trim(), Number(betAmount), sessionId);
       if (res.ok) onClear();
     } finally {
       setLoading(false);

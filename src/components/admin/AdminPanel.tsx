@@ -7,7 +7,6 @@ import { CardData, GameLanguage, GameType } from '@/types/game';
 import { useGameContext } from '@/context/GameContext';
 import { postPusher, postStart, postStop } from '@/lib/admin-api';
 import { useFinishClock } from '@/hooks/useFinishClock';
-import { AdminBranding } from './AdminBranding';
 import { AdminTopRow } from './AdminTopRow';
 import { AdminGameSelector } from './AdminGameSelector';
 import { AdminCardGrid } from './AdminCardGrid';
@@ -21,7 +20,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
-  const { gameState, finishAt, revealedCards, dbSessionId } = useGameContext();
+  const { gameState, finishAt, revealedCards, sessionId } = useGameContext();
   const { display } = useFinishClock(finishAt, gameState === 'GAME');
   
   const [playerId, setPlayerId] = useState('');
@@ -48,13 +47,11 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
 
   const stopGame = async () => {
     onCardsGenerated?.([]);
-    await postStop(dbSessionId);
+    await postStop(sessionId);
   };
 
   return (
     <div className={panel.panel}>
-      <AdminBranding />
-      
       <div className={grid.grid}>
         {/* Бокс А: Управление */}
         <section className={grid.block}>
