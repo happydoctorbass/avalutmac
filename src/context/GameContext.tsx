@@ -38,12 +38,25 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('localBets');
-    if (saved) { try { setBets(JSON.parse(saved)); } catch {} }
+    if (saved) { 
+      try { 
+        const parsed = JSON.parse(saved);
+        setTimeout(() => setBets(parsed), 0);
+      } catch {} 
+    }
   }, []);
 
   const addBet = useCallback((b: BetRow) => {
     setBets((prev) => {
       const next = [b, ...prev].sort((x, y) => y.amount - x.amount);
+      localStorage.setItem('localBets', JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const removeBet = useCallback((betId: string) => {
+    setBets((prev) => {
+      const next = prev.filter(b => b.id !== betId);
       localStorage.setItem('localBets', JSON.stringify(next));
       return next;
     });
@@ -56,8 +69,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const setters: GameSetters = useMemo(() => ({
     setGameState, setRevealedCards, setCards, setSessionId, setPlayerId, setBetAmount,
-    setLanguage, setGameType, setCardCount, setFinishAt, addBet, clearBets,
-  }), [addBet, clearBets]);
+    setLanguage, setGameType, setCardCount, setFinishAt, addBet, removeBet, clearBets,
+  }), [addBet, removeBet, clearBets]);
 
   useEffect(() => {
     const client = getPusherClient();
@@ -65,7 +78,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     listenerActive = true;
     const channel = client.subscribe(GAME_CHANNEL);
     const handlers = createPusherHandlers(setters);
-    Object.entries(handlers).forEach(([ev, fn]) => channel.bind(ev, fn as any));
+    Object.entries(handlers).forEach(([ev, fn]) => channel.bind(ev, fn as (...args: unknown[]) => void));
     const teardown = () => { channel.unbind_all(); client.unsubscribe(GAME_CHANNEL); listenerActive = false; };
     window.addEventListener('beforeunload', teardown);
     return () => window.removeEventListener('beforeunload', teardown);

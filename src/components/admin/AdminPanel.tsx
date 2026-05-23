@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { GAME_EVENTS } from '@/lib/pusher';
 import { getRandomCards } from '@/lib/deck';
 import { CardData, GameLanguage, GameType } from '@/types/game';
@@ -19,34 +19,59 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
-  const { revealedCards, sessionId } = useGameContext();
+  const { gameState, revealedCards, sessionId, cardCount } = useGameContext();
   
   const [playerId, setPlayerId] = useState('');
   const [betAmount, setBetAmount] = useState('');
   const [language, setLanguage] = useState<GameLanguage>('en');
-  const [gameType, setGameType] = useState<GameType>('NIU_NIU_TRIPLE');
-  const [cardCount, setCardCount] = useState(5);
+  const [localGameType, setLocalGameType] = useState<GameType>('NIU_NIU_TRIPLE');
+  const [localCardCount, setLocalCardCount] = useState(5);
   const [durationMinutes, setDurationMinutes] = useState('180');
   const [manualCards, setManualCards] = useState<(CardData | null)[]>([null, null, null, null, null]);
 
   const clearInput = () => { setPlayerId(''); setBetAmount(''); };
 
+  const activeCardCount = gameState === 'GAME' ? cardCount : localCardCount;
+  const allCardsSelected = manualCards.slice(0, activeCardCount).every((c) => c !== null);
+
+  useEffect(() => {
+    if (gameState === 'GAME' && currentCards && currentCards.length > 0) {
+      setTimeout(() => {
+        setManualCards((prev) => {
+          const next = [...prev];
+          currentCards.forEach((c, i) => {
+            if (c && !next[i]) next[i] = c;
+          });
+          return next;
+        });
+      }, 0);
+    }
+  }, [gameState, currentCards]);
+
   const resolveCards = () => {
-    const ok = manualCards.slice(0, cardCount).every((c) => c !== null);
-    return ok ? (manualCards.slice(0, cardCount) as CardData[]) : getRandomCards(cardCount);
+    const ok = manualCards.slice(0, localCardCount).every((c) => c !== null);
+    return ok ? (manualCards.slice(0, localCardCount) as CardData[]) : getRandomCards(localCardCount);
   };
 
   const startGame = async () => {
     const cards = resolveCards();
     onCardsGenerated?.(cards);
+    
+    // Update local manualCards to match the generated/resolved cards so they show up in the grid
+    setManualCards((prev) => {
+      const next = [...prev];
+      cards.forEach((c, i) => { next[i] = c; });
+      return next;
+    });
+
     const currentPid = playerId.trim();
     const currentBet = Number(betAmount) || 0;
     clearInput();
     await postStart({ 
       cards, 
       language, 
-      gameType, 
-      cardCount, 
+      gameType: localGameType, 
+      cardCount: localCardCount, 
       durationMinutes: Number(durationMinutes) || 180,
       playerId: currentPid,
       betAmount: currentBet
@@ -55,6 +80,7 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
 
   const stopGame = async () => {
     onCardsGenerated?.([]);
+    setManualCards([null, null, null, null, null]);
     await postStop(sessionId);
   };
 
@@ -81,7 +107,7 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
         <section className={grid.block}>
           <h2 className={grid.blockTitle}>Настройки игры</h2>
           <AdminGameSelector
-            gameType={gameType} setGameType={setGameType} cardCount={cardCount} setCardCount={setCardCount}
+            gameType={localGameType} setGameType={setLocalGameType} cardCount={localCardCount} setCardCount={setLocalCardCount}
             durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
           />
         </section>
@@ -90,13 +116,21 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
         <section className={grid.block}>
           <div className={grid.blockHead}>
             <h2 className={grid.blockTitleNoMargin}>Управление картами</h2>
-            <button type="button" onClick={() => postPusher(GAME_EVENTS.REVEAL_ALL, {})} className={grid.headBtn}>ОТКРЫТЬ ВСЕ</button>
+            <button 
+              type="button" 
+              onClick={() => postPusher(GAME_EVENTS.REVEAL_ALL, {})} 
+              className={grid.headBtn}
+              disabled={!allCardsSelected}
+            >
+              ОТКРЫТЬ ВСЕ
+            </button>
           </div>
           <AdminCardGrid
-            cardCount={cardCount} selectedCards={manualCards}
+            cardCount={activeCardCount} selectedCards={manualCards}
             onCardChange={(idx, c) => setManualCards((p) => { const n = [...p]; n[idx] = c; return n; })}
-            onRevealCard={(idx) => postPusher(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] || manualCards[idx] })}
-            revealedStates={revealedCards.slice(0, cardCount)}
+            onRevealCard={(idx) => postPusher(GAME_EVENTS.REVEAL_CARD, { index: idx, card: manualCards[idx] })}
+            revealedStates={revealedCards.slice(0, activeCardCount)}
+            allCardsSelected={allCardsSelected}
           />
         </section>
       </div>

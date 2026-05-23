@@ -4,16 +4,20 @@ import { useEffect, useState } from 'react';
 import { formatRemaining } from '@/lib/format-clock';
 
 export function useFinishClock(finishAt: string | null, active: boolean) {
-  const [tick, setTick] = useState(0);
+  const [now, setNow] = useState<number>(0);
 
   useEffect(() => {
-    if (!active || !finishAt) return;
-    const id = setInterval(() => setTick((n) => n + 1), 1000);
-    return () => clearInterval(id);
+    let id: NodeJS.Timeout;
+    if (active && finishAt) {
+      id = setInterval(() => setNow(Date.now()), 1000);
+    }
+    return () => {
+      if (id) clearInterval(id);
+    };
   }, [active, finishAt]);
 
   const end = finishAt ? new Date(finishAt).getTime() : 0;
-  const remaining = finishAt ? end - Date.now() : 0;
+  const remaining = finishAt ? end - now : 0;
   const isExpired = Boolean(finishAt && active && remaining <= 0);
 
   return {

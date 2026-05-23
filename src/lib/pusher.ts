@@ -22,5 +22,6 @@ export const GAME_EVENTS = {
   CELEBRATE: 'celebrate-win',
   UPDATE_LANG: 'update-lang',
   NEW_BID: 'new-bid',
+  CANCEL_BID: 'cancel-bid',
   BETS_UPDATED: 'bets-updated',
 } as const;

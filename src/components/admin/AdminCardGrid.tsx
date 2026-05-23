@@ -8,9 +8,10 @@ interface AdminCardGridProps {
   onCardChange: (index: number, card: CardData | null) => void;
   onRevealCard: (index: number) => void;
   revealedStates: boolean[];
+  allCardsSelected: boolean;
 }
 
-export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onRevealCard, revealedStates }: AdminCardGridProps) {
+export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onRevealCard, revealedStates, allCardsSelected }: AdminCardGridProps) {
   const slots = Array.from({ length: cardCount }, (_, i) => i);
 
   const handleSelect = (idx: number, val: string) => {
@@ -37,7 +38,7 @@ export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onReveal
               type="button"
               className={`${styles.cardBtn} ${isRevealed ? styles.revealed : ''}`}
               onClick={() => onRevealCard(idx)}
-              disabled={isRevealed || !card}
+              disabled={isRevealed || !card || !allCardsSelected}
             >
               <span className={styles.cardLabel}>Карта {idx + 1}</span>
               {card ? (

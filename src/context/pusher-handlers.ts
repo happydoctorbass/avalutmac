@@ -16,6 +16,7 @@ export type GameSetters = {
   setCardCount: (n: number) => void;
   setFinishAt: (s: string | null) => void;
   addBet: (b: BetRow) => void;
+  removeBet: (id: string) => void;
   clearBets: () => void;
 };
 
@@ -60,6 +61,10 @@ export function createPusherHandlers(s: GameSetters) {
     });
   };
 
+  const onCancelBid = (d: { betId: string }) => {
+    s.removeBet(d.betId);
+  };
+
   return {
     [GAME_EVENTS.TOGGLE_STATE]: onToggle,
     [GAME_EVENTS.REVEAL_CARD]: onReveal,
@@ -67,5 +72,6 @@ export function createPusherHandlers(s: GameSetters) {
     [GAME_EVENTS.CELEBRATE]: () => triggerWinConfetti(),
     [GAME_EVENTS.UPDATE_LANG]: (d: { language: GameLanguage }) => s.setLanguage(d.language),
     [GAME_EVENTS.NEW_BID]: onBid,
+    [GAME_EVENTS.CANCEL_BID]: onCancelBid,
   };
 }

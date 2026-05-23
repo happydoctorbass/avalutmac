@@ -18,7 +18,12 @@ export function AdminGameSelector({
 
   useEffect(() => {
     const saved = localStorage.getItem('auctionMinutes');
-    if (saved) { setLocalMin(saved); setDurationMinutes(saved); }
+    if (saved) { 
+      setTimeout(() => {
+        setLocalMin(saved);
+        setDurationMinutes(saved);
+      }, 0);
+    }
   }, [setDurationMinutes]);
 
   const saveMin = (val: string) => {
@@ -47,7 +52,26 @@ export function AdminGameSelector({
       </div>
       <div className={styles.field}>
         <span className={styles.label}>Таймер аукциона (мин)</span>
-        <input type="number" min="1" value={localMin} onChange={(e) => saveMin(e.target.value)} placeholder="180" className={styles.input} />
+        <div className={styles.timePicker}>
+          {[1, 3, 5, 10, 30, 60].map((min) => (
+            <button
+              key={min}
+              type="button"
+              className={`${styles.timeBtn} ${localMin === String(min) ? styles.active : ''}`}
+              onClick={() => saveMin(String(min))}
+            >
+              {min}м
+            </button>
+          ))}
+          <input 
+            type="number" 
+            min="1" 
+            value={localMin} 
+            onChange={(e) => saveMin(e.target.value)} 
+            placeholder="Свой" 
+            className={styles.timeInputCustom} 
+          />
+        </div>
       </div>
     </div>
   );
