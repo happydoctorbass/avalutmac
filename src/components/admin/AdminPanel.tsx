@@ -6,7 +6,6 @@ import { getRandomCards } from '@/lib/deck';
 import { CardData, GameLanguage, GameType } from '@/types/game';
 import { useGameContext } from '@/context/GameContext';
 import { postPusher, postStart, postStop } from '@/lib/admin-api';
-import { useFinishClock } from '@/hooks/useFinishClock';
 import { AdminTopRow } from './AdminTopRow';
 import { AdminGameSelector } from './AdminGameSelector';
 import { AdminCardGrid } from './AdminCardGrid';
@@ -20,8 +19,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
-  const { gameState, finishAt, revealedCards, sessionId } = useGameContext();
-  const { display } = useFinishClock(finishAt, gameState === 'GAME');
+  const { revealedCards, sessionId } = useGameContext();
   
   const [playerId, setPlayerId] = useState('');
   const [betAmount, setBetAmount] = useState('');
@@ -41,8 +39,18 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
   const startGame = async () => {
     const cards = resolveCards();
     onCardsGenerated?.(cards);
+    const currentPid = playerId.trim();
+    const currentBet = Number(betAmount) || 0;
     clearInput();
-    await postStart({ cards, language, gameType, cardCount, durationMinutes: Number(durationMinutes) || 180 });
+    await postStart({ 
+      cards, 
+      language, 
+      gameType, 
+      cardCount, 
+      durationMinutes: Number(durationMinutes) || 180,
+      playerId: currentPid,
+      betAmount: currentBet
+    });
   };
 
   const stopGame = async () => {
@@ -57,7 +65,6 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
         <section className={grid.block}>
           <div className={grid.boxHeader}>
             <h2 className={grid.blockTitleNoMargin}>Управление</h2>
-            {gameState === 'GAME' && finishAt && <span className={grid.largeTimer}>{display}</span>}
           </div>
           <AdminTopRow
             playerId={playerId} betAmount={betAmount} language={language}

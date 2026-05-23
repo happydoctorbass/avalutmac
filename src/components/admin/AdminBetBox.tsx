@@ -34,7 +34,6 @@ export function AdminBetBox({ playerId, betAmount, inputValid, onClear }: AdminB
 
   return (
     <button type="button" className={cls} onClick={addBid} disabled={disabled}>
-      <span className={styles.plusIcon}>➕</span>
       <span className={styles.btnText}>
         {loading ? 'Сохранение…' : isExpired ? 'АУКЦИОН ЗАВЕРШЁН' : 'ДОБАВИТЬ ИГРОКА'}
       </span>

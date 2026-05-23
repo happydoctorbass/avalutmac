@@ -23,14 +23,6 @@
   margin-bottom: 1rem;
 }
 
-.largeTimer {
-  font-family: var(--font-mono), monospace;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-accent-gold);
-  letter-spacing: 0.1em;
-}
-
 .blockHead {
   display: flex;
   justify-content: space-between;
