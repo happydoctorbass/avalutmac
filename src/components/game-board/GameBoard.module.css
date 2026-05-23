@@ -23,7 +23,7 @@
 }
 
 .boardTwo .infoValue {
-  font-size: clamp(3.5rem, 10vh, 8rem);
+  font-size: calc(clamp(2.5rem, 9vw, 12rem) * var(--font-scale, 1));
 }
 
 .topSection {
@@ -86,7 +86,7 @@
 
 .infoValue {
   font-family: serif;
-  font-size: clamp(4rem, 12vh, 10rem);
+  font-size: calc(clamp(2rem, 7vw, 10rem) * var(--font-scale, 1));
   font-weight: 700;
   color: var(--color-accent-gold);
   line-height: 1;

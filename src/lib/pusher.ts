@@ -24,4 +24,5 @@ export const GAME_EVENTS = {
   NEW_BID: 'new-bid',
   CLEAR_BETS: 'clear-bets',
   BETS_UPDATED: 'bets-updated',
+  UPDATE_FONT_SCALE: 'update-font-scale',
 } as const;

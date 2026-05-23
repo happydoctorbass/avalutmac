@@ -20,6 +20,7 @@ export async function POST(req: Request) {
       cardCount: body.cardCount,
       finishAt,
       sessionId,
+      fontScale: body.fontScale || 100,
     });
 
     if (body.playerId && body.betAmount) {

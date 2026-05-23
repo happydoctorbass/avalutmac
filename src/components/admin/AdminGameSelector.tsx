@@ -2,6 +2,8 @@ import { GameType } from '@/types/game';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import styles from './AdminGameSelector.module.css';
 
+import { sendFontScale } from '@/lib/admin-api';
+
 interface AdminGameSelectorProps {
   gameType: GameType;
   setGameType: Dispatch<SetStateAction<GameType>>;
@@ -9,10 +11,12 @@ interface AdminGameSelectorProps {
   setCardCount: Dispatch<SetStateAction<number>>;
   durationMinutes: string;
   setDurationMinutes: Dispatch<SetStateAction<string>>;
+  fontScale: number;
+  setFontScale: Dispatch<SetStateAction<number>>;
 }
 
 export function AdminGameSelector({
-  gameType, setGameType, cardCount, setCardCount, durationMinutes, setDurationMinutes,
+  gameType, setGameType, cardCount, setCardCount, durationMinutes, setDurationMinutes, fontScale, setFontScale
 }: AdminGameSelectorProps) {
   const [localMin, setLocalMin] = useState(durationMinutes);
 
@@ -24,12 +28,22 @@ export function AdminGameSelector({
         setDurationMinutes(saved);
       }, 0);
     }
-  }, [setDurationMinutes]);
+    const savedScale = localStorage.getItem('tvFontScale');
+    if (savedScale) {
+      setTimeout(() => setFontScale(Number(savedScale)), 0);
+    }
+  }, [setDurationMinutes, setFontScale]);
 
   const saveMin = (val: string) => {
     setLocalMin(val);
     setDurationMinutes(val);
     localStorage.setItem('auctionMinutes', val);
+  };
+
+  const handleFontChange = (newScale: number) => {
+    setFontScale(newScale);
+    localStorage.setItem('tvFontScale', newScale.toString());
+    sendFontScale(newScale);
   };
 
   return (
@@ -68,6 +82,14 @@ export function AdminGameSelector({
             placeholder="Свой (мин)" 
             className={styles.timeInputCustom} 
           />
+        </div>
+      </div>
+      <div className={styles.field}>
+        <span className={styles.label}>Размер текста (ID и Ставка) на ТВ</span>
+        <div className={styles.row}>
+          <button type="button" className={styles.toggleBtn} onClick={() => handleFontChange(Math.max(30, fontScale - 10))}>- Уменьшить</button>
+          <div className={styles.scaleDisplay}>{fontScale}%</div>
+          <button type="button" className={styles.toggleBtn} onClick={() => handleFontChange(Math.min(200, fontScale + 10))}>+ Увеличить</button>
         </div>
       </div>
     </div>

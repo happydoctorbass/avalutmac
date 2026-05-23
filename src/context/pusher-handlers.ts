@@ -15,6 +15,7 @@ export type GameSetters = {
   setGameType: (t: import('@/types/game').GameType) => void;
   setCardCount: (n: number) => void;
   setFinishAt: (s: string | null) => void;
+  setFontScale: (n: number) => void;
   addBet: (b: BetRow) => void;
   clearBets: () => void;
 };
@@ -40,6 +41,7 @@ export function createPusherHandlers(s: GameSetters) {
       if (d.gameType) s.setGameType(d.gameType);
       if (d.cardCount) s.setCardCount(d.cardCount);
       if (d.finishAt) s.setFinishAt(d.finishAt);
+      if (d.fontScale) s.setFontScale(d.fontScale);
     }
   };
 
@@ -72,5 +74,6 @@ export function createPusherHandlers(s: GameSetters) {
     [GAME_EVENTS.UPDATE_LANG]: (d: { language: GameLanguage }) => s.setLanguage(d.language),
     [GAME_EVENTS.NEW_BID]: onBid,
     [GAME_EVENTS.CLEAR_BETS]: onClearBets,
+    [GAME_EVENTS.UPDATE_FONT_SCALE]: (d: { scale: number }) => s.setFontScale(d.scale),
   };
 }

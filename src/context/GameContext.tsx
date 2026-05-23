@@ -17,6 +17,7 @@ interface GameContextValue {
   gameType: GameType;
   cardCount: number;
   finishAt: string | null;
+  fontScale: number;
   bets: BetRow[];
 }
 
@@ -34,6 +35,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [gameType, setGameType] = useState<GameType>('NIU_NIU_TRIPLE');
   const [cardCount, setCardCount] = useState(5);
   const [finishAt, setFinishAt] = useState<string | null>(null);
+  const [fontScale, setFontScale] = useState(100);
   const [bets, setBets] = useState<BetRow[]>([]);
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const setters: GameSetters = useMemo(() => ({
     setGameState, setRevealedCards, setCards, setSessionId, setPlayerId, setBetAmount,
-    setLanguage, setGameType, setCardCount, setFinishAt, addBet, clearBets,
+    setLanguage, setGameType, setCardCount, setFinishAt, setFontScale, addBet, clearBets,
   }), [addBet, clearBets]);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [setters]);
 
   return (
-    <GameContext.Provider value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount, language, gameType, cardCount, finishAt, bets }}>
+    <GameContext.Provider value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount, language, gameType, cardCount, finishAt, fontScale, bets }}>
       <AutoFinish finishAt={finishAt} gameState={gameState} />
       {children}
     </GameContext.Provider>

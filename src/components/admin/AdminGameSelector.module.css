@@ -91,3 +91,16 @@
 .timeInputCustom:focus {
   border-color: var(--color-primary);
 }
+
+.scaleDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  font-weight: bold;
+  color: var(--color-accent-gold);
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+}

@@ -8,7 +8,7 @@ import { TimerDisplay } from './TimerDisplay';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards, playerId, betAmount, language, cardCount, gameType } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount, language, cardCount, gameType, fontScale } = useGameContext();
   const dict = DICTIONARY[language];
   const title = gameType === 'BACCARAT_TRIPLE' ? dict.titleBACCARAT_TRIPLE : dict.titleNIU_NIU_TRIPLE;
   const twoCards = cardCount === 2;
@@ -32,7 +32,7 @@ export function GameBoard() {
           );
         })}
       </div>
-      <div className={styles.infoPanel}>
+      <div className={styles.infoPanel} style={{ '--font-scale': fontScale / 100 } as React.CSSProperties}>
         <div className={styles.infoBlock}>
           <span className={styles.infoLabel}>{dict.guest}</span>
           <span className={styles.infoValue}>ID: {playerId || '—'}</span>
