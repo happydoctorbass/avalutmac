@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { formatRemaining } from '@/lib/format-clock';
 
 export function useFinishClock(finishAt: string | null, active: boolean) {
-  const [now, setNow] = useState<number>(0);
+  const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
     let id: NodeJS.Timeout;
@@ -23,6 +23,6 @@ export function useFinishClock(finishAt: string | null, active: boolean) {
   return {
     display: finishAt && active ? formatRemaining(remaining) : '00 : 00 : 00',
     isExpired,
-    tick,
+    tick: now,
   };
 }

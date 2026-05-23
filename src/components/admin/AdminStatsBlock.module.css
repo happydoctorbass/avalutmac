@@ -6,7 +6,6 @@
   border-radius: 0.5rem;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
-  min-height: 22rem;
   overflow: hidden;
 }
 
@@ -24,6 +23,25 @@
   flex: 1;
   overflow-y: auto;
   min-height: 0;
+  padding-right: 0.25rem;
+}
+
+.tableWrap::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tableWrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+
+.tableWrap::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+.tableWrap::-webkit-scrollbar-thumb:hover {
+  background: #1d4ed8;
 }
 
 .table {

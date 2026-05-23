@@ -54,14 +54,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const removeBet = useCallback((betId: string) => {
-    setBets((prev) => {
-      const next = prev.filter(b => b.id !== betId);
-      localStorage.setItem('localBets', JSON.stringify(next));
-      return next;
-    });
-  }, []);
-
   const clearBets = useCallback(() => {
     setBets([]);
     localStorage.removeItem('localBets');
@@ -69,8 +61,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const setters: GameSetters = useMemo(() => ({
     setGameState, setRevealedCards, setCards, setSessionId, setPlayerId, setBetAmount,
-    setLanguage, setGameType, setCardCount, setFinishAt, addBet, removeBet, clearBets,
-  }), [addBet, removeBet, clearBets]);
+    setLanguage, setGameType, setCardCount, setFinishAt, addBet, clearBets,
+  }), [addBet, clearBets]);
 
   useEffect(() => {
     const client = getPusherClient();

@@ -1,9 +1,10 @@
 .panel {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
   padding: 1.5rem;
   color: var(--text-light);
   background: #112540;
+  overflow: hidden;
 }
 
 .header {

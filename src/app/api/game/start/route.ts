@@ -21,6 +21,16 @@ export async function POST(req: Request) {
       finishAt,
       sessionId,
     });
+
+    if (body.playerId && body.betAmount) {
+      await broadcast(GAME_EVENTS.NEW_BID, {
+        id: Math.random().toString(36).substring(2, 9),
+        playerId: body.playerId,
+        amount: Number(body.betAmount),
+        createdAt: new Date().toISOString(),
+      });
+    }
+
     return NextResponse.json({ success: true, session: { id: sessionId, finishAt } });
   } catch (e) {
     console.error('START_ERROR', e);

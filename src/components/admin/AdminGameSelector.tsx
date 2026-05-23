@@ -53,22 +53,19 @@ export function AdminGameSelector({
       <div className={styles.field}>
         <span className={styles.label}>Таймер аукциона (мин)</span>
         <div className={styles.timePicker}>
-          {[1, 3, 5, 10, 30, 60].map((min) => (
-            <button
-              key={min}
-              type="button"
-              className={`${styles.timeBtn} ${localMin === String(min) ? styles.active : ''}`}
-              onClick={() => saveMin(String(min))}
-            >
-              {min}м
-            </button>
-          ))}
+          <button
+            type="button"
+            className={`${styles.timeBtn} ${localMin === '180' ? styles.active : ''}`}
+            onClick={() => saveMin('180')}
+          >
+            3 часа
+          </button>
           <input 
             type="number" 
             min="1" 
             value={localMin} 
             onChange={(e) => saveMin(e.target.value)} 
-            placeholder="Свой" 
+            placeholder="Свой (мин)" 
             className={styles.timeInputCustom} 
           />
         </div>
