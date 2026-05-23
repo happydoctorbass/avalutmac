@@ -21,10 +21,6 @@ export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onReveal
     onCardChange(idx, c);
   };
 
-  const isCardUsed = (card: CardData, currentIndex: number) => {
-    return selectedCards.some((sc, i) => sc && i !== currentIndex && sc.rank === card.rank && sc.suit === card.suit);
-  };
-
   return (
     <div className={styles.grid}>
       {slots.map((idx) => {
@@ -52,7 +48,7 @@ export function AdminCardGrid({ cardCount, selectedCards, onCardChange, onReveal
             <select value={val} onChange={e => handleSelect(idx, e.target.value)} className={styles.select}>
               <option value="">- Выбрать -</option>
               {FULL_DECK.map((c) => (
-                <option key={`${c.rank}-${c.suit}`} value={`${c.rank}-${c.suit}`} disabled={isCardUsed(c, idx)}>
+                <option key={`${c.rank}-${c.suit}`} value={`${c.rank}-${c.suit}`}>
                   {c.rank} {c.suit}
                 </option>
               ))}
