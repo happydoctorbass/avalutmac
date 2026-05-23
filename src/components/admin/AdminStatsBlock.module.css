@@ -1,12 +1,12 @@
 .block {
   display: flex;
   flex-direction: column;
-  height: 14rem;
-  max-height: 14rem;
+  height: 100%;
   padding: 1.25rem;
   border-radius: 0.5rem;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
+  min-height: 22rem;
   overflow: hidden;
 }
 
