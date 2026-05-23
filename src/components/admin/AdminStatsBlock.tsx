@@ -1,43 +1,37 @@
+'use client';
+
+import { useGameContext } from '@/context/GameContext';
+import { useBetsLeaderboard } from '@/hooks/useBetsLeaderboard';
 import styles from './AdminStatsBlock.module.css';
 
-const BARS = [42, 68, 55, 82, 48, 71, 60, 88, 52, 76];
-
 export function AdminStatsBlock() {
+  const { dbSessionId, betsVersion } = useGameContext();
+  const { bets, loading } = useBetsLeaderboard(dbSessionId, betsVersion);
+
   return (
     <section className={styles.block}>
-      <h2 className={styles.title}>Статистика</h2>
-      <div className={styles.chartWrap}>
-        <svg className={styles.chart} viewBox="0 0 280 120" aria-hidden>
-          <defs>
-            <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--color-primary)" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="var(--color-accent-gold)" stopOpacity="0.35" />
-            </linearGradient>
-          </defs>
-          {BARS.map((h, i) => (
-            <rect
-              key={i}
-              x={8 + i * 27}
-              y={110 - h}
-              width="18"
-              height={h}
-              rx="3"
-              fill="url(#barGrad)"
-              opacity="0.55"
-            />
-          ))}
-          <polyline
-            className={styles.line}
-            points="17,75 44,52 71,58 98,38 125,48 152,32 179,42 206,28 233,36 260,22"
-            fill="none"
-            stroke="var(--color-accent-gold)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+      <h2 className={styles.title}>Статистика / Лидеры</h2>
+      <div className={styles.tableWrap}>
+        {loading && <p className={styles.hint}>Загрузка…</p>}
+        {!loading && !dbSessionId && <p className={styles.hint}>Запустите раунд (СТАРТ)</p>}
+        {!loading && dbSessionId && bets.length === 0 && <p className={styles.hint}>Ставок пока нет</p>}
+        {bets.length > 0 && (
+          <table className={styles.table}>
+            <thead>
+              <tr><th>ID</th><th>Ставка ($)</th><th>Дата / время</th></tr>
+            </thead>
+            <tbody>
+              {bets.map((b) => (
+                <tr key={b.id}>
+                  <td>{b.player_id}</td>
+                  <td className={styles.amount}>{b.amount.toLocaleString('en-US')}</td>
+                  <td>{new Date(b.created_at).toLocaleString('ru-RU')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-      <p className={styles.notice}>Статистика ещё находится в разработке</p>
     </section>
   );
 }

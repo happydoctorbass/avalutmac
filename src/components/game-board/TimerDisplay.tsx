@@ -1,29 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useGameContext } from '@/context/GameContext';
+import { useFinishClock } from '@/hooks/useFinishClock';
 import styles from './TimerDisplay.module.css';
 
-export function TimerDisplay({ duration, isRunning }: { duration: number, isRunning: boolean }) {
-  const [timeLeft, setTimeLeft] = useState(duration);
+export function TimerDisplay() {
+  const { finishAt, gameState } = useGameContext();
+  const active = gameState === 'GAME';
+  const { display } = useFinishClock(finishAt, active);
 
-  useEffect(() => {
-    setTimeLeft(duration);
-  }, [duration, isRunning]); // Reset when game starts
-
-  useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
-    const t = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-    return () => clearInterval(t);
-  }, [isRunning, timeLeft]);
-
-  if (duration <= 0 || !isRunning) return null;
-
-  const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-  const s = (timeLeft % 60).toString().padStart(2, '0');
+  if (!active || !finishAt) return null;
 
   return (
     <div className={styles.timerContainer}>
-      <span className={styles.timerText}>{m}:{s}</span>
+      <span className={styles.timerText}>{display}</span>
     </div>
   );
 }

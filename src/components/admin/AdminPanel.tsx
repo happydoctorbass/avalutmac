@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { GAME_EVENTS } from '@/lib/pusher';
 import { getRandomCards } from '@/lib/deck';
 import { CardData, GameLanguage, GameType } from '@/types/game';
-import { AdminInputs } from './AdminInputs';
+import { useGameContext } from '@/context/GameContext';
+import { postPusher, postStart, postStop } from '@/lib/admin-api';
 import { AdminBranding } from './AdminBranding';
+import { AdminTopRow } from './AdminTopRow';
 import { AdminGameSelector } from './AdminGameSelector';
 import { AdminCardGrid } from './AdminCardGrid';
 import { AdminStatsBlock } from './AdminStatsBlock';
-import styles from './AdminPanel.module.css';
-import ui from './AdminUi.module.css';
+import panel from './AdminPanel.module.css';
+import grid from './AdminGrid.module.css';
 
 interface AdminPanelProps {
   currentCards?: CardData[];
@@ -18,78 +20,64 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
+  const { revealedCards, dbSessionId } = useGameContext();
   const [playerId, setPlayerId] = useState('');
   const [betAmount, setBetAmount] = useState('');
   const [language, setLanguage] = useState<GameLanguage>('en');
   const [gameType, setGameType] = useState<GameType>('NIU_NIU_TRIPLE');
   const [cardCount, setCardCount] = useState(5);
-  const [timerDuration, setTimerDuration] = useState('01:30');
+  const [durationMinutes, setDurationMinutes] = useState('180');
   const [manualCards, setManualCards] = useState<(CardData | null)[]>([null, null, null, null, null]);
 
-  const send = (event: string, data: object) => fetch('/api/pusher', { method: 'POST', body: JSON.stringify({ event, data }) });
-  const valid = playerId.trim() !== '' && betAmount.trim() !== '';
-  const parseTimer = (v: string) => v.includes(':') ? (parseInt(v.split(':')[0]) || 0) * 60 + (parseInt(v.split(':')[1]) || 0) : parseInt(v) || 0;
+  const clearInput = () => { setPlayerId(''); setBetAmount(''); };
 
-  const startGame = () => {
-    if (!valid) return;
-    const ok = manualCards.slice(0, cardCount).every(c => c !== null);
-    const cards = ok ? (manualCards.slice(0, cardCount) as CardData[]) : getRandomCards(cardCount);
+  const resolveCards = () => {
+    const ok = manualCards.slice(0, cardCount).every((c) => c !== null);
+    return ok ? (manualCards.slice(0, cardCount) as CardData[]) : getRandomCards(cardCount);
+  };
+
+  const startGame = async () => {
+    const cards = resolveCards();
     onCardsGenerated?.(cards);
-    send(GAME_EVENTS.TOGGLE_STATE, {
-      state: 'GAME', cards, playerId: playerId.trim(), betAmount: Number(betAmount),
-      language, gameType, cardCount, timerDuration: parseTimer(timerDuration),
-    });
+    clearInput();
+    await postStart({ cards, language, gameType, cardCount, durationMinutes: Number(durationMinutes) || 180 });
+  };
+
+  const stopGame = async () => {
+    onCardsGenerated?.([]);
+    await postStop(dbSessionId);
   };
 
   return (
-    <div className={styles.panel}>
+    <div className={panel.panel}>
       <AdminBranding />
-      <h1 className={styles.header}>Панель управления питбосса</h1>
-
-      <div className={styles.grid}>
-        <section className={styles.block}>
-          <h2 className={styles.blockTitle}>Клиентские данные</h2>
-          <div className={styles.clientInner}>
-            <div className={styles.clientSub}>
-              <AdminInputs
-                playerId={playerId} betAmount={betAmount} language={language}
-                onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-              />
-            </div>
-            <div className={styles.clientSub}>
-              <div className={styles.launchCol}>
-                <button onClick={startGame} className={`${ui.btnPrimary} ${!valid ? ui.btnDisabled : ''}`} disabled={!valid}>START GAME</button>
-                <button onClick={() => { onCardsGenerated?.([]); send(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE' }); }} className={ui.btnSecondary}>STOP</button>
-                <button onClick={() => send(GAME_EVENTS.CELEBRATE, {})} className={ui.btnCelebrate}>ПОБЕДА ГОСТЯ 🎉</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
+      <h1 className={panel.header}>Панель управления питбосса</h1>
+      <AdminTopRow
+        playerId={playerId} betAmount={betAmount} language={language}
+        onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
+        onClearInput={clearInput} onStart={startGame}
+        onStop={stopGame} onCelebrate={() => postPusher(GAME_EVENTS.CELEBRATE, {})}
+      />
+      <div className={grid.grid}>
         <AdminStatsBlock />
-        <section className={styles.block}>
-          <h2 className={styles.blockTitle}>Настройки игры</h2>
-          <div className={styles.blockBody}>
-            <AdminGameSelector
-              gameType={gameType} setGameType={setGameType} cardCount={cardCount} setCardCount={setCardCount}
-              timerDuration={timerDuration} setTimerDuration={setTimerDuration}
-            />
-          </div>
+        <section className={grid.block}>
+          <h2 className={grid.blockTitle}>Настройки игры</h2>
+          <AdminGameSelector
+            gameType={gameType} setGameType={setGameType} cardCount={cardCount} setCardCount={setCardCount}
+            durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
+          />
         </section>
-
-        <section className={styles.block}>
-          <div className={styles.blockHead}>
-            <h2 className={`${styles.blockTitle} ${styles.blockTitleNoMargin}`}>Управление картами</h2>
-            <button type="button" onClick={() => send(GAME_EVENTS.REVEAL_ALL, {})} className={styles.headBtn}>ОТКРЫТЬ ВСЕ</button>
+        <section className={`${grid.block} ${grid.cardsSpan}`}>
+          <div className={grid.blockHead}>
+            <h2 className={grid.blockTitleNoMargin}>Управление картами</h2>
+            <button type="button" onClick={() => postPusher(GAME_EVENTS.REVEAL_ALL, {})} className={grid.headBtn}>ОТКРЫТЬ ВСЕ</button>
           </div>
-          <div className={styles.blockBody}>
-            <AdminCardGrid
-              cardCount={cardCount} selectedCards={manualCards}
-              onCardChange={(idx, c) => setManualCards(p => { const n = [...p]; n[idx] = c; return n; })}
-              onRevealCard={(idx) => send(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] || manualCards[idx] })}
-              revealedStates={Array(cardCount).fill(false)}
-            />
-          </div>
+          <AdminCardGrid
+            cardCount={cardCount} selectedCards={manualCards}
+            onCardChange={(idx, c) => setManualCards((p) => { const n = [...p]; n[idx] = c; return n; })}
+            onRevealCard={(idx) => postPusher(GAME_EVENTS.REVEAL_CARD, { index: idx, card: currentCards[idx] || manualCards[idx] })}
+            revealedStates={revealedCards.slice(0, cardCount)}
+          />
         </section>
       </div>
     </div>

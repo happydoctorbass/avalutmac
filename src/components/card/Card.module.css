@@ -7,8 +7,8 @@
 }
 
 .largeCard {
-  height: min(371px, 45vh);
-  width: calc(min(371px, 45vh) * 0.7);
+  height: min(371px, 38vh);
+  width: calc(min(371px, 38vh) * 0.7);
 }
 
 .cardInner {

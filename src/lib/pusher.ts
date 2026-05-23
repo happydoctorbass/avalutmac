@@ -19,7 +19,8 @@ export const GAME_EVENTS = {
   TOGGLE_STATE: 'toggle-state',
   REVEAL_CARD: 'reveal-card',
   REVEAL_ALL: 'reveal-all',
-  RESET: 'reset-game',
   CELEBRATE: 'celebrate-win',
   UPDATE_LANG: 'update-lang',
+  NEW_BID: 'new-bid',
+  BETS_UPDATED: 'bets-updated',
 } as const;

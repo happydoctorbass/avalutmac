@@ -9,6 +9,11 @@
   flex-direction: column;
 }
 
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .label {
   display: block;
   font-size: 0.8125rem;

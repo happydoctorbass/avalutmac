@@ -7,71 +7,47 @@ interface AdminGameSelectorProps {
   setGameType: Dispatch<SetStateAction<GameType>>;
   cardCount: number;
   setCardCount: Dispatch<SetStateAction<number>>;
-  timerDuration: string;
-  setTimerDuration: Dispatch<SetStateAction<string>>;
+  durationMinutes: string;
+  setDurationMinutes: Dispatch<SetStateAction<string>>;
 }
 
 export function AdminGameSelector({
-  gameType,
-  setGameType,
-  cardCount,
-  setCardCount,
-  timerDuration,
-  setTimerDuration,
+  gameType, setGameType, cardCount, setCardCount, durationMinutes, setDurationMinutes,
 }: AdminGameSelectorProps) {
-  const [localTimer, setLocalTimer] = useState(timerDuration);
+  const [localMin, setLocalMin] = useState(durationMinutes);
 
   useEffect(() => {
-    const saved = localStorage.getItem('timerDuration');
-    if (saved) {
-      setLocalTimer(saved);
-      setTimerDuration(saved);
-    }
-  }, [setTimerDuration]);
+    const saved = localStorage.getItem('auctionMinutes');
+    if (saved) { setLocalMin(saved); setDurationMinutes(saved); }
+  }, [setDurationMinutes]);
 
-  const handleTimerChange = (val: string) => {
-    setLocalTimer(val);
-    setTimerDuration(val);
-    localStorage.setItem('timerDuration', val);
+  const saveMin = (val: string) => {
+    setLocalMin(val);
+    setDurationMinutes(val);
+    localStorage.setItem('auctionMinutes', val);
   };
-
-  const isBaccarat = gameType === 'BACCARAT_TRIPLE';
 
   return (
     <div className={styles.selectorGrid}>
       <div className={styles.field}>
         <span className={styles.label}>Режим игры</span>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${isBaccarat ? styles.active : ''}`}
-            onClick={() => { setGameType('BACCARAT_TRIPLE'); setCardCount(5); }}
-          >
-            BACCARAT
-          </button>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${!isBaccarat ? styles.active : ''}`}
-            onClick={() => setGameType('NIU_NIU_TRIPLE')}
-          >
-            NIU NIU
-          </button>
+        <div className={styles.row}>
+          <button type="button" className={`${styles.toggleBtn} ${gameType === 'BACCARAT_TRIPLE' ? styles.active : ''}`}
+            onClick={() => setGameType('BACCARAT_TRIPLE')}>BACCARAT</button>
+          <button type="button" className={`${styles.toggleBtn} ${gameType === 'NIU_NIU_TRIPLE' ? styles.active : ''}`}
+            onClick={() => setGameType('NIU_NIU_TRIPLE')}>NIU NIU</button>
         </div>
       </div>
-
       <div className={styles.field}>
         <span className={styles.label}>Количество карт</span>
-        <div className="flex gap-2">
-          {!isBaccarat && (
-            <button type="button" className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`} onClick={() => setCardCount(2)}>2 Карты</button>
-          )}
+        <div className={styles.row}>
+          <button type="button" className={`${styles.toggleBtn} ${cardCount === 2 ? styles.active : ''}`} onClick={() => setCardCount(2)}>2 Карты</button>
           <button type="button" className={`${styles.toggleBtn} ${cardCount === 5 ? styles.active : ''}`} onClick={() => setCardCount(5)}>5 Карт</button>
         </div>
       </div>
-
       <div className={styles.field}>
-        <span className={styles.label}>Таймер (MM:SS)</span>
-        <input type="text" value={localTimer} onChange={(e) => handleTimerChange(e.target.value)} placeholder="01:30" className={styles.input} />
+        <span className={styles.label}>Таймер аукциона (мин)</span>
+        <input type="number" min="1" value={localMin} onChange={(e) => saveMin(e.target.value)} placeholder="180" className={styles.input} />
       </div>
     </div>
   );

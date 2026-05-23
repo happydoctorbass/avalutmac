@@ -1,11 +1,13 @@
 .block {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 14rem;
+  max-height: 14rem;
   padding: 1.25rem;
   border-radius: 0.5rem;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
+  overflow: hidden;
 }
 
 .title {
@@ -13,36 +15,48 @@
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--placeholder);
-  margin-bottom: 1rem;
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.tableWrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.table th {
+  text-align: left;
+  color: var(--placeholder);
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg-card);
+}
+
+.table td {
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-light);
+}
+
+.amount {
+  color: var(--color-accent-gold);
   font-weight: 600;
 }
 
-.chartWrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 7rem;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  background: var(--color-bg-base);
-  border: 1px solid var(--color-border);
-}
-
-.chart {
-  width: 100%;
-  max-width: 280px;
-  height: auto;
-}
-
-.line {
-  opacity: 0.85;
-}
-
-.notice {
-  margin-top: 1rem;
+.hint {
   font-size: 0.8125rem;
   color: var(--placeholder);
   text-align: center;
-  line-height: 1.4;
+  padding: 1rem;
 }
