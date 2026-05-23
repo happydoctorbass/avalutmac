@@ -24,7 +24,6 @@ export function AdminTopRow(props: AdminTopRowProps) {
   return (
     <div className={styles.topRow}>
       <section className={styles.miniBox}>
-        <h2 className={styles.miniTitle}>Ввод</h2>
         <AdminInputs
           playerId={props.playerId} betAmount={props.betAmount} language={props.language}
           onPlayerIdChange={props.onPlayerIdChange} onBetAmountChange={props.onBetAmountChange}
@@ -32,11 +31,9 @@ export function AdminTopRow(props: AdminTopRowProps) {
         />
       </section>
       <section className={styles.miniBox}>
-        <h2 className={styles.miniTitle}>Ставка</h2>
         <AdminBetBox playerId={props.playerId} betAmount={props.betAmount} inputValid={inputValid} onClear={props.onClearInput} />
       </section>
       <section className={styles.miniBox}>
-        <h2 className={styles.miniTitle}>Управление</h2>
         <AdminControlBox onStart={props.onStart} onStop={props.onStop} onCelebrate={props.onCelebrate} />
       </section>
     </div>

@@ -1,9 +1,9 @@
 .panel {
   position: relative;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1.5rem;
   color: var(--text-light);
-  background: var(--color-bg-base);
+  background: #112540;
 }
 
 .header {

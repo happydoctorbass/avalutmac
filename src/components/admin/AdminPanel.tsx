@@ -6,6 +6,7 @@ import { getRandomCards } from '@/lib/deck';
 import { CardData, GameLanguage, GameType } from '@/types/game';
 import { useGameContext } from '@/context/GameContext';
 import { postPusher, postStart, postStop } from '@/lib/admin-api';
+import { useFinishClock } from '@/hooks/useFinishClock';
 import { AdminBranding } from './AdminBranding';
 import { AdminTopRow } from './AdminTopRow';
 import { AdminGameSelector } from './AdminGameSelector';
@@ -20,7 +21,9 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelProps) {
-  const { revealedCards, dbSessionId } = useGameContext();
+  const { gameState, finishAt, revealedCards, dbSessionId } = useGameContext();
+  const { display } = useFinishClock(finishAt, gameState === 'GAME');
+  
   const [playerId, setPlayerId] = useState('');
   const [betAmount, setBetAmount] = useState('');
   const [language, setLanguage] = useState<GameLanguage>('en');
@@ -51,15 +54,26 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
   return (
     <div className={panel.panel}>
       <AdminBranding />
-      <h1 className={panel.header}>Панель управления питбосса</h1>
-      <AdminTopRow
-        playerId={playerId} betAmount={betAmount} language={language}
-        onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
-        onClearInput={clearInput} onStart={startGame}
-        onStop={stopGame} onCelebrate={() => postPusher(GAME_EVENTS.CELEBRATE, {})}
-      />
+      
       <div className={grid.grid}>
+        {/* Бокс А: Управление */}
+        <section className={grid.block}>
+          <div className={grid.boxHeader}>
+            <h2 className={grid.blockTitleNoMargin}>Управление</h2>
+            {gameState === 'GAME' && finishAt && <span className={grid.largeTimer}>{display}</span>}
+          </div>
+          <AdminTopRow
+            playerId={playerId} betAmount={betAmount} language={language}
+            onPlayerIdChange={setPlayerId} onBetAmountChange={setBetAmount} onLanguageChange={setLanguage}
+            onClearInput={clearInput} onStart={startGame}
+            onStop={stopGame} onCelebrate={() => postPusher(GAME_EVENTS.CELEBRATE, {})}
+          />
+        </section>
+
+        {/* Бокс Б: Статистика */}
         <AdminStatsBlock />
+
+        {/* Бокс В: Настройки */}
         <section className={grid.block}>
           <h2 className={grid.blockTitle}>Настройки игры</h2>
           <AdminGameSelector
@@ -67,7 +81,9 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
             durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
           />
         </section>
-        <section className={`${grid.block} ${grid.cardsSpan}`}>
+
+        {/* Бокс Г: Карты */}
+        <section className={grid.block}>
           <div className={grid.blockHead}>
             <h2 className={grid.blockTitleNoMargin}>Управление картами</h2>
             <button type="button" onClick={() => postPusher(GAME_EVENTS.REVEAL_ALL, {})} className={grid.headBtn}>ОТКРЫТЬ ВСЕ</button>
