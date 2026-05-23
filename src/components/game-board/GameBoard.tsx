@@ -17,7 +17,10 @@ export function GameBoard() {
     <div className={`${styles.board} ${twoCards ? styles.boardTwo : ''}`}>
       <div className={styles.topSection}>
         <TimerDisplay />
-        <h2 className={styles.title}>{title}</h2>
+        <div className={styles.titleWrapper}>
+          <h2 className={styles.title}>{title}</h2>
+          <h3 className={styles.subtitle}>{dict.subtitle}</h3>
+        </div>
       </div>
       <div className={styles.cardsContainer}>
         {Array.from({ length: cardCount }).map((_, index) => {
