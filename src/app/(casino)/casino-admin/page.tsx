@@ -7,9 +7,22 @@ import { SettingsCard } from './components/SettingsCard';
 import { MatchForm } from './components/MatchForm';
 import { MatchList } from './components/MatchList';
 import { TestDataCard } from './components/TestDataCard';
+import { CarouselControls } from './components/CarouselControls';
 
 export default function CasinoAdminPage() {
-  const { matches, focusMatchId, settings, addMatch, addMatches, removeMatch, setFocus, updateMatch, updateSettings } = useCasinoMatches();
+  const {
+    matches,
+    focusMatchId,
+    settings,
+    addMatch,
+    addMatches,
+    removeMatch,
+    setFocus,
+    updateMatch,
+    updateSettings,
+    nextCard,
+    prevCard,
+  } = useCasinoMatches();
 
   return (
     <AdminGuard>
@@ -26,6 +39,16 @@ export default function CasinoAdminPage() {
           </CardHeader>
           <CardContent>
             <SettingsCard settings={settings} onChange={updateSettings} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Управление каруселью</CardTitle>
+            <CardDescription>Двигайте карточки вручную вперёд и назад.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CarouselControls onPrev={prevCard} onNext={nextCard} disabled={matches.length < 2} />
           </CardContent>
         </Card>
 

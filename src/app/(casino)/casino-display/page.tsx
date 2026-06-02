@@ -5,7 +5,7 @@ import { useCasinoMatches } from '../hooks/useCasinoMatches';
 import { motion } from 'framer-motion';
 
 export default function CasinoDisplayPage() {
-  const { matches, focusMatchId, settings } = useCasinoMatches();
+  const { matches, focusMatchId, settings, currentIndex, nextCard } = useCasinoMatches();
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background text-foreground">
@@ -31,7 +31,13 @@ export default function CasinoDisplayPage() {
       </div>
 
       <div className="relative z-10 w-full">
-        <MatchCarousel matches={matches} focusMatchId={focusMatchId} settings={settings} />
+        <MatchCarousel
+          matches={matches}
+          focusMatchId={focusMatchId}
+          settings={settings}
+          currentIndex={currentIndex}
+          onNext={nextCard}
+        />
       </div>
     </div>
   );

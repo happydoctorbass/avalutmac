@@ -1,5 +1,6 @@
 'use client';
 
+import { CasinoSettings } from '@/types/match';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -7,8 +8,8 @@ export function SettingsCard({
   settings,
   onChange,
 }: {
-  settings: { cardCount: number; cardScale: number };
-  onChange: (s: { cardCount: number; cardScale: number }) => void;
+  settings: CasinoSettings;
+  onChange: (s: CasinoSettings) => void;
 }) {
   return (
     <div className="flex flex-wrap items-end gap-4">
@@ -34,7 +35,26 @@ export function SettingsCard({
           onChange={(e) => onChange({ ...settings, cardScale: Math.max(0.2, Number(e.target.value || 1)) })}
         />
       </div>
+      <div className="grid gap-2">
+        <Label>Смена каждые (сек)</Label>
+        <Input
+          type="number"
+          inputMode="numeric"
+          min={2}
+          className="w-28"
+          value={settings.rotateInterval}
+          onChange={(e) => onChange({ ...settings, rotateInterval: Math.max(2, Number(e.target.value || 15)) })}
+        />
+      </div>
+      <label className="flex items-center gap-2 pb-2 text-sm">
+        <input
+          type="checkbox"
+          className="h-4 w-4 accent-amber-500"
+          checked={settings.autoRotate}
+          onChange={(e) => onChange({ ...settings, autoRotate: e.target.checked })}
+        />
+        Авто-вращение
+      </label>
     </div>
   );
 }
-

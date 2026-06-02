@@ -1,14 +1,19 @@
 'use client';
 
-import { Match } from '@/types/match';
-import { useEffect, useState, useCallback } from 'react';
+import { Match, CasinoSettings, DEFAULT_SETTINGS } from '@/types/match';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { getPusherClient, GAME_CHANNEL } from '@/lib/pusher';
 
 export function useCasinoMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
-  const [settings, setSettings] = useState({ cardCount: 5, cardScale: 1.0 });
+  const [settings, setSettings] = useState<CasinoSettings>({ ...DEFAULT_SETTINGS });
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
+
+  // Keep latest values for callbacks/timers without re-binding
+  const ref = useRef({ matches, focusMatchId, settings, currentIndex });
+  ref.current = { matches, focusMatchId, settings, currentIndex };
 
   const fetchInitialState = async () => {
     try {
@@ -16,7 +21,8 @@ export function useCasinoMatches() {
       const data = await res.json();
       if (data.matches) setMatches(data.matches);
       if (data.focusMatchId !== undefined) setFocusMatchId(data.focusMatchId);
-      if (data.settings) setSettings(data.settings);
+      if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
+      if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
     } catch (e) {
       console.log('Failed to fetch initial state', e);
     }
@@ -31,13 +37,17 @@ export function useCasinoMatches() {
     const channel = pusher.subscribe(GAME_CHANNEL);
     channel.bind('pusher:subscription_succeeded', () => setIsConnected(true));
     channel.bind('pusher:subscription_error', () => setIsConnected(false));
-    
-    channel.bind('casino-sync', (data: { matches: Match[], focusMatchId: string | null, settings: any }) => {
-      setMatches(data.matches);
-      setFocusMatchId(data.focusMatchId);
-      if (data.settings) setSettings(data.settings);
-      localStorage.setItem('casino_matches', JSON.stringify(data.matches));
-    });
+
+    channel.bind(
+      'casino-sync',
+      (data: { matches: Match[]; focusMatchId: string | null; settings: CasinoSettings; currentIndex?: number }) => {
+        setMatches(data.matches);
+        setFocusMatchId(data.focusMatchId);
+        if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
+        if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
+        localStorage.setItem('casino_matches', JSON.stringify(data.matches));
+      },
+    );
 
     return () => {
       channel.unbind('casino-sync');
@@ -45,40 +55,72 @@ export function useCasinoMatches() {
     };
   }, []);
 
-  const syncState = useCallback(async (newMatches: Match[], newFocus: string | null, newSettings?: any) => {
-    const finalSettings = newSettings || settings;
-    setMatches(newMatches);
-    setFocusMatchId(newFocus);
-    setSettings(finalSettings);
-    await fetch('/api/casino/sync', {
-      method: 'POST',
-      body: JSON.stringify({ type: 'SYNC', matches: newMatches, focusMatchId: newFocus, settings: finalSettings })
+  const syncState = useCallback(
+    async (opts: {
+      matches?: Match[];
+      focusMatchId?: string | null;
+      settings?: CasinoSettings;
+      currentIndex?: number;
+    }) => {
+      const cur = ref.current;
+      const finalMatches = opts.matches ?? cur.matches;
+      const finalFocus = opts.focusMatchId !== undefined ? opts.focusMatchId : cur.focusMatchId;
+      const finalSettings = opts.settings ?? cur.settings;
+      const finalIndex = opts.currentIndex !== undefined ? opts.currentIndex : cur.currentIndex;
+
+      setMatches(finalMatches);
+      setFocusMatchId(finalFocus);
+      setSettings(finalSettings);
+      setCurrentIndex(finalIndex);
+
+      await fetch('/api/casino/sync', {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 'SYNC',
+          matches: finalMatches,
+          focusMatchId: finalFocus,
+          settings: finalSettings,
+          currentIndex: finalIndex,
+        }),
+      });
+    },
+    [],
+  );
+
+  const addMatch = (match: Match) => syncState({ matches: [...ref.current.matches, match] });
+  const addMatches = (newOnes: Match[]) => syncState({ matches: [...ref.current.matches, ...newOnes] });
+
+  const removeMatch = (id: string) =>
+    syncState({
+      matches: ref.current.matches.filter((m) => m.id !== id),
+      focusMatchId: ref.current.focusMatchId === id ? null : ref.current.focusMatchId,
     });
-  }, [settings]);
 
-  const addMatch = (match: Match) => {
-    syncState([...matches, match], focusMatchId);
+  const setFocus = (id: string | null) => syncState({ focusMatchId: id });
+
+  const updateMatch = (id: string, patch: Partial<Match>) =>
+    syncState({ matches: ref.current.matches.map((m) => (m.id === id ? { ...m, ...patch } : m)) });
+
+  const updateSettings = (newSettings: CasinoSettings) => syncState({ settings: newSettings });
+
+  const goToIndex = (index: number) => syncState({ currentIndex: index, focusMatchId: null });
+  const nextCard = () => syncState({ currentIndex: ref.current.currentIndex + 1, focusMatchId: null });
+  const prevCard = () => syncState({ currentIndex: ref.current.currentIndex - 1, focusMatchId: null });
+
+  return {
+    matches,
+    focusMatchId,
+    settings,
+    currentIndex,
+    isConnected,
+    addMatch,
+    addMatches,
+    removeMatch,
+    setFocus,
+    updateMatch,
+    updateSettings,
+    goToIndex,
+    nextCard,
+    prevCard,
   };
-
-  const addMatches = (newOnes: Match[]) => {
-    syncState([...matches, ...newOnes], focusMatchId);
-  };
-
-  const removeMatch = (id: string) => {
-    syncState(matches.filter(m => m.id !== id), focusMatchId === id ? null : focusMatchId);
-  };
-
-  const setFocus = (id: string | null) => {
-    syncState(matches, id);
-  };
-
-  const updateMatch = (id: string, patch: Partial<Match>) => {
-    syncState(matches.map((m) => (m.id === id ? { ...m, ...patch } : m)), focusMatchId);
-  };
-
-  const updateSettings = (newSettings: { cardCount: number, cardScale: number }) => {
-    syncState(matches, focusMatchId, newSettings);
-  };
-
-  return { matches, focusMatchId, settings, isConnected, addMatch, addMatches, removeMatch, setFocus, updateMatch, updateSettings };
 }
