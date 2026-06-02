@@ -1,12 +1,67 @@
 'use client';
 
 import { Match } from '@/types/match';
-import { Trophy, Activity, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 interface MatchCardProps {
   match: Match;
   isFocused?: boolean;
+}
+
+const MAX_NAME_PX = 28;
+const MIN_NAME_PX = 12;
+
+function TeamNames({ team1, team2, timeLabel }: { team1: string; team2: string; timeLabel: string }) {
+  const ref1 = useRef<HTMLSpanElement>(null);
+  const ref2 = useRef<HTMLSpanElement>(null);
+  const [size, setSize] = useState(MAX_NAME_PX);
+
+  useLayoutEffect(() => {
+    setSize(MAX_NAME_PX);
+  }, [team1, team2]);
+
+  useLayoutEffect(() => {
+    const a = ref1.current;
+    const b = ref2.current;
+    if (!a || !b) return;
+    const overflow = a.scrollWidth > a.clientWidth + 1 || b.scrollWidth > b.clientWidth + 1;
+    if (overflow && size > MIN_NAME_PX) {
+      setSize((s) => s - 1);
+    }
+  }, [size, team1, team2]);
+
+  return (
+    <div className="mt-2 flex w-full items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-1 flex-col items-end justify-center border-r border-border pr-4">
+        <span
+          ref={ref1}
+          className="block w-full overflow-hidden whitespace-nowrap text-right font-black leading-tight text-foreground"
+          style={{ fontSize: `${size}px` }}
+          title={team1}
+        >
+          {team1}
+        </span>
+      </div>
+
+      <div className="flex w-32 shrink-0 flex-col items-center justify-center">
+        <span className="text-4xl font-black text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+          {timeLabel}
+        </span>
+      </div>
+
+      <div className="flex min-w-0 flex-1 flex-col items-start justify-center border-l border-border pl-4">
+        <span
+          ref={ref2}
+          className="block w-full overflow-hidden whitespace-nowrap text-left font-black leading-tight text-foreground"
+          style={{ fontSize: `${size}px` }}
+          title={team2}
+        >
+          {team2}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 function Shimmer() {
@@ -71,37 +126,13 @@ export function MatchCard({ match, isFocused = false }: MatchCardProps) {
     );
   }
 
-  const SportIcon = match.sportType === 'football' ? Activity : match.sportType === 'basketball' ? Zap : Trophy;
-
   return (
     <CardShell isFocused={isFocused} className="w-[32rem] min-h-[16rem] p-8">
-      <div className="absolute top-4 left-4 text-muted-foreground opacity-60">
-        <SportIcon size={24} />
-      </div>
-
       <div className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber-500">
         {match.sportType}
       </div>
 
-      <div className="mt-2 flex w-full items-center justify-between gap-4">
-        <div className="flex min-w-0 flex-1 flex-col items-start justify-center border-r border-border pr-4">
-          <span className="w-full truncate text-right text-2xl font-black text-foreground" title={match.team1}>
-            {match.team1}
-          </span>
-        </div>
-
-        <div className="flex w-32 shrink-0 flex-col items-center justify-center">
-          <span className="text-4xl font-black text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.5)]">
-            {timeLabel}
-          </span>
-        </div>
-
-        <div className="flex min-w-0 flex-1 flex-col items-end justify-center border-l border-border pl-4">
-          <span className="w-full truncate text-left text-2xl font-black text-foreground" title={match.team2}>
-            {match.team2}
-          </span>
-        </div>
-      </div>
+      <TeamNames team1={match.team1} team2={match.team2} timeLabel={timeLabel} />
     </CardShell>
   );
 }
