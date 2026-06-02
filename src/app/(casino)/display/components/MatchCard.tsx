@@ -126,6 +126,8 @@ export function MatchCard({ match, isFocused = false }: MatchCardProps) {
     );
   }
 
+  const hasResult = Boolean(match.score || match.winner);
+
   return (
     <CardShell isFocused={isFocused} className="w-[32rem] min-h-[16rem] p-8">
       <div className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber-500">
@@ -133,6 +135,25 @@ export function MatchCard({ match, isFocused = false }: MatchCardProps) {
       </div>
 
       <TeamNames team1={match.team1} team2={match.team2} timeLabel={timeLabel} />
+
+      {hasResult && (
+        <div className="mt-5 flex w-full flex-col items-center gap-1 border-t border-border pt-4">
+          {match.score && (
+            <div className="text-3xl font-black tracking-wider text-foreground drop-shadow-[0_0_10px_rgba(255,255,255,0.15)]">
+              {match.score}
+            </div>
+          )}
+          {match.winner && (
+            <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber-500">
+              {match.winner === 'Ничья' ? (
+                <span>Ничья</span>
+              ) : (
+                <span>Победитель: {match.winner}</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </CardShell>
   );
 }

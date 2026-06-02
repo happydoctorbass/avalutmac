@@ -6,6 +6,8 @@ export interface Match {
   team1: string;
   team2: string;
   time: string;
+  score?: string; // e.g. "2:1"
+  winner?: string; // team name of the winner
 }
 
 export interface CasinoSettings {
