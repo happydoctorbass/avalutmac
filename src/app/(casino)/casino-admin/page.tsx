@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SettingsCard } from './components/SettingsCard';
 import { MatchForm } from './components/MatchForm';
 import { MatchList } from './components/MatchList';
-import { TestDataCard } from './components/TestDataCard';
+import { UpcomingMatchesCard } from './components/UpcomingMatchesCard';
 import { CarouselControls } from './components/CarouselControls';
-import { SlidersHorizontal, Clapperboard, PlusCircle, FlaskConical, ListOrdered } from 'lucide-react';
+import { SlidersHorizontal, Clapperboard, PlusCircle, CalendarClock, ListOrdered } from 'lucide-react';
 
 export default function CasinoAdminPage() {
   const {
@@ -92,13 +92,13 @@ export default function CasinoAdminPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FlaskConical className="h-5 w-5 text-amber-500" />
-              Тестовые данные
+              <CalendarClock className="h-5 w-5 text-amber-500" />
+              Предстоящие матчи
             </CardTitle>
-            <CardDescription>Сгенерировать случайные матчи и сразу вывести на дисплей.</CardDescription>
+            <CardDescription>Матчи чемпионата — добавьте все сразу или по одному.</CardDescription>
           </CardHeader>
           <CardContent>
-            <TestDataCard onAdd={addMatches} />
+            <UpcomingMatchesCard onAdd={addMatches} />
           </CardContent>
         </Card>
 
