@@ -60,6 +60,10 @@ export function useCasinoMatches() {
     syncState([...matches, match], focusMatchId);
   };
 
+  const addMatches = (newOnes: Match[]) => {
+    syncState([...matches, ...newOnes], focusMatchId);
+  };
+
   const removeMatch = (id: string) => {
     syncState(matches.filter(m => m.id !== id), focusMatchId === id ? null : focusMatchId);
   };
@@ -76,5 +80,5 @@ export function useCasinoMatches() {
     syncState(matches, focusMatchId, newSettings);
   };
 
-  return { matches, focusMatchId, settings, isConnected, addMatch, removeMatch, setFocus, updateMatch, updateSettings };
+  return { matches, focusMatchId, settings, isConnected, addMatch, addMatches, removeMatch, setFocus, updateMatch, updateSettings };
 }

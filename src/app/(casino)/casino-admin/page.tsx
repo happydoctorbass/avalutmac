@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SettingsCard } from './components/SettingsCard';
 import { MatchForm } from './components/MatchForm';
 import { MatchList } from './components/MatchList';
+import { TestDataCard } from './components/TestDataCard';
 
 export default function CasinoAdminPage() {
-  const { matches, focusMatchId, settings, addMatch, removeMatch, setFocus, updateMatch, updateSettings } = useCasinoMatches();
+  const { matches, focusMatchId, settings, addMatch, addMatches, removeMatch, setFocus, updateMatch, updateSettings } = useCasinoMatches();
 
   return (
     <AdminGuard>
@@ -35,6 +36,16 @@ export default function CasinoAdminPage() {
           </CardHeader>
           <CardContent>
             <MatchForm onAdd={addMatch} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Тестовые данные</CardTitle>
+            <CardDescription>Сгенерировать случайные матчи и сразу вывести на дисплей.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TestDataCard onAdd={addMatches} />
           </CardContent>
         </Card>
 

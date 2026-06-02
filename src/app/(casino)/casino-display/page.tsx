@@ -5,7 +5,7 @@ import { useCasinoMatches } from '../hooks/useCasinoMatches';
 import { motion } from 'framer-motion';
 
 export default function CasinoDisplayPage() {
-  const { matches, focusMatchId, settings, isConnected } = useCasinoMatches();
+  const { matches, focusMatchId, settings } = useCasinoMatches();
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center justify-center overflow-hidden bg-background text-foreground">
@@ -15,6 +15,8 @@ export default function CasinoDisplayPage() {
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-background/80" />
+      {/* Vignette on all four sides */}
+      <div className="pointer-events-none absolute inset-0 z-30 shadow-[inset_0_0_220px_70px_rgba(0,0,0,0.85)]" />
 
       {/* Logo */}
       <div className="absolute top-8 left-1/2 z-50 -translate-x-1/2">
@@ -30,13 +32,6 @@ export default function CasinoDisplayPage() {
 
       <div className="relative z-10 w-full">
         <MatchCarousel matches={matches} focusMatchId={focusMatchId} settings={settings} />
-      </div>
-
-      {/* Connection status */}
-      <div className="pointer-events-none absolute bottom-4 z-50 w-full text-center text-xs opacity-50">
-        <p className={isConnected ? 'text-green-500' : 'animate-pulse text-muted-foreground'}>
-          {isConnected ? 'LIVE SYNC ACTIVE' : 'CONNECTING...'}
-        </p>
       </div>
     </div>
   );

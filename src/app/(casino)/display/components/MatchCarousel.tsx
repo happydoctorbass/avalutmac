@@ -59,11 +59,11 @@ export function MatchCarousel({ matches, focusMatchId, settings }: MatchCarousel
     if (absI === 1) {
       x = i * 480;
       scale = 0.8;
-      opacity = 0.5;
+      opacity = 1;
     } else if (absI === 2) {
       x = i * 850;
       scale = 0.6;
-      opacity = 0.1;
+      opacity = 1;
     } else if (absI === 3) {
       x = i * 1150;
       scale = 0.4;
