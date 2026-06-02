@@ -46,15 +46,6 @@ export function SettingsCard({
           onChange={(e) => onChange({ ...settings, rotateInterval: Math.max(2, Number(e.target.value || 15)) })}
         />
       </div>
-      <label className="flex items-center gap-2 pb-2 text-sm">
-        <input
-          type="checkbox"
-          className="h-4 w-4 accent-amber-500"
-          checked={settings.autoRotate}
-          onChange={(e) => onChange({ ...settings, autoRotate: e.target.checked })}
-        />
-        Авто-вращение
-      </label>
     </div>
   );
 }

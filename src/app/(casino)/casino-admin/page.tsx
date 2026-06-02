@@ -8,6 +8,7 @@ import { MatchForm } from './components/MatchForm';
 import { MatchList } from './components/MatchList';
 import { TestDataCard } from './components/TestDataCard';
 import { CarouselControls } from './components/CarouselControls';
+import { SlidersHorizontal, Clapperboard, PlusCircle, FlaskConical, ListOrdered } from 'lucide-react';
 
 export default function CasinoAdminPage() {
   const {
@@ -24,18 +25,32 @@ export default function CasinoAdminPage() {
     prevCard,
   } = useCasinoMatches();
 
+  const matchCount = matches.length;
+
   return (
     <AdminGuard>
       <div className="mx-auto max-w-5xl p-6 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Admiral Casino</h1>
-          <p className="text-sm text-muted-foreground">Управление матчами и отображением карусели.</p>
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card/60 p-5 backdrop-blur-sm">
+          <div className="flex items-center gap-4">
+            <img src="/logo/admiral.svg" alt="Admiral Casino" className="h-12 w-auto drop-shadow-[0_0_14px_rgba(245,158,11,0.25)]" />
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Admiral Casino</h1>
+              <p className="text-sm text-muted-foreground">Управление матчами и табло.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-border bg-muted/30 px-4 py-2 text-sm">
+            <span className="font-semibold text-amber-500">{matchCount}</span>
+            <span className="text-muted-foreground">{matchCount === 1 ? 'матч' : 'матчей'} в эфире</span>
+          </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Настройки экрана</CardTitle>
-            <CardDescription>Количество карточек без лимита и масштаб.</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <SlidersHorizontal className="h-5 w-5 text-amber-500" />
+              Настройки экрана
+            </CardTitle>
+            <CardDescription>Количество карточек, масштаб и интервал авто-смены.</CardDescription>
           </CardHeader>
           <CardContent>
             <SettingsCard settings={settings} onChange={updateSettings} />
@@ -44,17 +59,29 @@ export default function CasinoAdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Управление каруселью</CardTitle>
-            <CardDescription>Двигайте карточки вручную вперёд и назад.</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Clapperboard className="h-5 w-5 text-amber-500" />
+              Управление каруселью
+            </CardTitle>
+            <CardDescription>Листайте вручную и ставьте на стоп.</CardDescription>
           </CardHeader>
           <CardContent>
-            <CarouselControls onPrev={prevCard} onNext={nextCard} disabled={matches.length < 2} />
+            <CarouselControls
+              onPrev={prevCard}
+              onNext={nextCard}
+              isPlaying={settings.autoRotate}
+              onToggle={() => updateSettings({ ...settings, autoRotate: !settings.autoRotate })}
+              disabled={matchCount < 2}
+            />
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Добавить матч</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <PlusCircle className="h-5 w-5 text-amber-500" />
+              Добавить матч
+            </CardTitle>
             <CardDescription>Ручной ввод (команды, дата/время, спорт).</CardDescription>
           </CardHeader>
           <CardContent>
@@ -64,7 +91,10 @@ export default function CasinoAdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Тестовые данные</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <FlaskConical className="h-5 w-5 text-amber-500" />
+              Тестовые данные
+            </CardTitle>
             <CardDescription>Сгенерировать случайные матчи и сразу вывести на дисплей.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -74,8 +104,11 @@ export default function CasinoAdminPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Список матчей</CardTitle>
-            <CardDescription>Можно удалять, выводить в центр и редактировать прямо тут.</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <ListOrdered className="h-5 w-5 text-amber-500" />
+              Список матчей
+            </CardTitle>
+            <CardDescription>Удаляйте, выводите в центр, задавайте счёт и редактируйте прямо тут.</CardDescription>
           </CardHeader>
           <CardContent>
             <MatchList
