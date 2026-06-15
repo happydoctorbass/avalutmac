@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useMemo, useState } from 'react';
 import { Match, FlagSize } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
-import { mergeTableDisplay, safeInsetCss } from '@/lib/table-display-settings';
+import { mergeTableDisplay, safeInsetCss, computeTableRowFillScale } from '@/lib/table-display-settings';
 import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
@@ -107,14 +107,19 @@ function TableTeamBlock({
   maxTeamPx,
   flagSize,
   flagScale,
+  contentScale,
 }: {
   team: string;
   maxTeamPx: number;
   flagSize: FlagSize;
   flagScale: number;
+  contentScale: number;
 }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-[clamp(0.1rem,0.35vw,0.3rem)]">
+    <div
+      className="flex min-w-0 flex-1 flex-col items-center"
+      style={{ gap: `calc(clamp(0.1rem, 0.35vw, 0.3rem) * ${contentScale})` }}
+    >
       <CountryFlag team={team} size={flagSize} scale={flagScale} className="shrink-0" />
       <AutoShrinkText
         text={team}
@@ -133,6 +138,7 @@ function TableMatchCell({
   maxTeamPx,
   flagSize,
   flagScale,
+  contentScale,
 }: {
   team1: string;
   team2: string;
@@ -140,16 +146,44 @@ function TableMatchCell({
   maxTeamPx: number;
   flagSize: FlagSize;
   flagScale: number;
+  contentScale: number;
 }) {
   return (
-    <div className="flex min-w-0 items-center gap-[clamp(0.15rem,0.5vw,0.4rem)]">
-      <TableTeamBlock team={team1} maxTeamPx={maxTeamPx} flagSize={flagSize} flagScale={flagScale} />
-      <span className="shrink-0 px-[clamp(0.05rem,0.25vw,0.2rem)] text-[clamp(0.5rem,1vw,1rem)] font-bold text-muted-foreground">
+    <div
+      className="flex min-w-0 items-center"
+      style={{ gap: `calc(clamp(0.15rem, 0.5vw, 0.4rem) * ${contentScale})` }}
+    >
+      <TableTeamBlock
+        team={team1}
+        maxTeamPx={maxTeamPx}
+        flagSize={flagSize}
+        flagScale={flagScale}
+        contentScale={contentScale}
+      />
+      <span
+        className="shrink-0 font-bold text-muted-foreground"
+        style={{
+          paddingInline: `calc(clamp(0.05rem, 0.25vw, 0.2rem) * ${contentScale})`,
+          fontSize: scaledFont(8, 1, 16, contentScale),
+        }}
+      >
         VS
       </span>
-      <TableTeamBlock team={team2} maxTeamPx={maxTeamPx} flagSize={flagSize} flagScale={flagScale} />
+      <TableTeamBlock
+        team={team2}
+        maxTeamPx={maxTeamPx}
+        flagSize={flagSize}
+        flagScale={flagScale}
+        contentScale={contentScale}
+      />
       {finished && (
-        <span className="ml-0.5 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1 py-0.5 text-[clamp(0.4rem,0.8vw,0.6rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
+        <span
+          className="ml-0.5 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 font-bold uppercase tracking-wider text-muted-foreground sm:inline"
+          style={{
+            padding: `calc(0.125rem * ${contentScale}) calc(0.25rem * ${contentScale})`,
+            fontSize: scaledFont(7, 0.8, 10, contentScale),
+          }}
+        >
           FT
         </span>
       )}
@@ -163,7 +197,6 @@ export default function CasinoDisplayTablePage() {
   const vw = useViewportWidth();
   const heroMaxPx = heroTeamMaxPx(vw) * td.heroTeamFontScale;
   const teamMaxPx = tableTeamMaxPx(vw) * td.tableTeamFontScale;
-  const pad = cellPad(td.tableCellPaddingScale);
   const pageSize = td.pageSize;
   const pageIntervalMs = td.pageIntervalSec * 1000;
 
@@ -213,6 +246,13 @@ export default function CasinoDisplayTablePage() {
 
   const pageRows = rest.slice(page * pageSize, page * pageSize + pageSize);
   const countdownText = activeStart && !isLive ? formatCountdown(activeStart - now) : '';
+
+  const rowFillScale = computeTableRowFillScale(pageRows.length, td);
+  const rowTeamMaxPx = teamMaxPx * rowFillScale;
+  const rowMetaScale = td.tableMetaFontScale * rowFillScale;
+  const rowHeaderScale = td.tableHeaderFontScale * rowFillScale;
+  const rowFlagScale = td.tableFlagScale * rowFillScale;
+  const rowPad = cellPad(td.tableCellPaddingScale * rowFillScale);
 
   return (
     <div className="relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-background text-foreground">
@@ -392,8 +432,8 @@ export default function CasinoDisplayTablePage() {
                             label === 'Score' ? 'text-center' : 'text-left'
                           }`}
                           style={{
-                            ...pad,
-                            fontSize: scaledFont(10, 2.2, 36, td.tableHeaderFontScale),
+                            ...rowPad,
+                            fontSize: scaledFont(10, 2.2, 36, rowHeaderScale),
                           }}
                         >
                           {label}
@@ -416,39 +456,40 @@ export default function CasinoDisplayTablePage() {
                         >
                           <td
                             className="whitespace-nowrap align-middle font-semibold text-muted-foreground"
-                            style={{ ...pad, fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
+                            style={{ ...rowPad, fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
                           >
                             {dateLabel(m)}
                           </td>
                           <td
                             className="whitespace-nowrap align-middle font-black text-amber-500"
-                            style={{ ...pad, fontSize: scaledFont(11, 2.2, 36, td.tableMetaFontScale) }}
+                            style={{ ...rowPad, fontSize: scaledFont(11, 2.2, 36, rowMetaScale) }}
                           >
                             {timeLabel(m)}
                           </td>
-                          <td className="min-w-0 align-middle" style={pad}>
+                          <td className="min-w-0 align-middle" style={rowPad}>
                             <TableMatchCell
                               team1={m.team1}
                               team2={m.team2}
                               finished={finished}
-                              maxTeamPx={teamMaxPx}
+                              maxTeamPx={rowTeamMaxPx}
                               flagSize={td.tableFlagSize}
-                              flagScale={td.tableFlagScale}
+                              flagScale={rowFlagScale}
+                              contentScale={rowFillScale}
                             />
                           </td>
                           <td
                             className="whitespace-nowrap align-middle text-center font-black leading-none"
-                            style={{ ...pad, fontSize: scaledFont(12, 2.8, 48, td.tableMetaFontScale) }}
+                            style={{ ...rowPad, fontSize: scaledFont(12, 2.8, 48, rowMetaScale) }}
                           >
                             {m.score ?? '—'}
                           </td>
-                          <td className="min-w-0 align-middle" style={pad}>
+                          <td className="min-w-0 align-middle" style={rowPad}>
                             {m.winner ? (
                               <span
                                 className={`block truncate font-bold uppercase ${
                                   m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
                                 }`}
-                                style={{ fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
+                                style={{ fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
                                 title={m.winner === 'Ничья' ? 'Draw' : m.winner}
                               >
                                 {m.winner === 'Ничья' ? 'Draw' : m.winner}
@@ -456,7 +497,7 @@ export default function CasinoDisplayTablePage() {
                             ) : (
                               <span
                                 className="font-semibold uppercase text-emerald-400"
-                                style={{ fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
+                                style={{ fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
                               >
                                 Soon
                               </span>

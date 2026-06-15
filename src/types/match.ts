@@ -55,6 +55,12 @@ export interface TableDisplaySettings {
   /** Layout */
   narrowBreakpoint: number;
   safeInsetScale: number;
+  /** Auto-scale row content when fewer matches visible (fills empty space) */
+  tableRowFillEnabled: boolean;
+  /** Row count at fill scale 1.0 (e.g. 6 = designed for 6 rows) */
+  tableRowFillBaseline: number;
+  /** Max multiplier when very few rows */
+  tableRowFillMaxScale: number;
 }
 
 export const DEFAULT_TABLE_DISPLAY: TableDisplaySettings = {
@@ -81,6 +87,9 @@ export const DEFAULT_TABLE_DISPLAY: TableDisplaySettings = {
   pageIntervalSec: 8,
   narrowBreakpoint: 768,
   safeInsetScale: 1,
+  tableRowFillEnabled: true,
+  tableRowFillBaseline: 6,
+  tableRowFillMaxScale: 3,
 };
 
 export const DEFAULT_SETTINGS: CasinoSettings = {

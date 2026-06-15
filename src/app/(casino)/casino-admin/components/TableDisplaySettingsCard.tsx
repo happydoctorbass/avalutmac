@@ -6,7 +6,7 @@ import {
   FlagSize,
   TableDisplaySettings,
 } from '@/types/match';
-import { normalizeColWidths } from '@/lib/table-display-settings';
+import { normalizeColWidths, computeTableRowFillScale } from '@/lib/table-display-settings';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -137,6 +137,9 @@ export function TableDisplaySettingsCard({
 
   const colSum =
     td.colDate + td.colTime + td.colMatch + td.colScore + td.colResult;
+
+  const fillPreview2 = computeTableRowFillScale(2, td);
+  const fillPreview6 = computeTableRowFillScale(6, td);
 
   return (
     <div className="space-y-5">
@@ -285,6 +288,51 @@ export function TableDisplaySettingsCard({
           defaultValue={DEFAULT_TABLE_DISPLAY.tableFlagScale}
           onChange={(v) => patch({ tableFlagScale: v })}
         />
+      </Section>
+
+      <Section
+        title="Заполнение таблицы"
+        description="Меньше строк на экране — крупнее шрифты, флаги и отступы, чтобы занять свободное место."
+      >
+        <div className="sm:col-span-2 flex items-center gap-3 rounded-lg border border-border/60 bg-muted/20 p-3">
+          <input
+            id="table-row-fill"
+            type="checkbox"
+            checked={td.tableRowFillEnabled}
+            onChange={(e) => patch({ tableRowFillEnabled: e.target.checked })}
+            className="h-4 w-4 accent-amber-500"
+          />
+          <Label htmlFor="table-row-fill" className="cursor-pointer text-sm font-medium">
+            Автомасштаб по количеству строк
+          </Label>
+        </div>
+        <SliderRow
+          label="Эталон строк (масштаб 1×)"
+          hint="При таком числе строк размер обычный. Меньше строк — крупнее."
+          value={td.tableRowFillBaseline}
+          min={3}
+          max={12}
+          step={1}
+          defaultValue={DEFAULT_TABLE_DISPLAY.tableRowFillBaseline}
+          onChange={(v) => patch({ tableRowFillBaseline: Math.round(v) })}
+        />
+        <SliderRow
+          label="Максимальное увеличение"
+          hint="Верхний предел масштаба при 1–2 строках"
+          value={td.tableRowFillMaxScale}
+          min={1}
+          max={4}
+          step={0.1}
+          unit="×"
+          defaultValue={DEFAULT_TABLE_DISPLAY.tableRowFillMaxScale}
+          onChange={(v) => patch({ tableRowFillMaxScale: v })}
+        />
+        <div className="sm:col-span-2 rounded-lg border border-dashed border-emerald-500/30 bg-emerald-500/5 px-3 py-2 text-sm text-muted-foreground">
+          Сейчас при <strong className="text-foreground">2 строках</strong> →{' '}
+          <strong className="text-emerald-400">×{fillPreview2.toFixed(1)}</strong>, при{' '}
+          <strong className="text-foreground">6 строках</strong> →{' '}
+          <strong className="text-emerald-400">×{fillPreview6.toFixed(1)}</strong>
+        </div>
       </Section>
 
       <Section

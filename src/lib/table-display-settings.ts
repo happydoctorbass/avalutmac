@@ -48,3 +48,17 @@ export function safeInsetCss(td: TableDisplaySettings): string {
   const s = td.safeInsetScale;
   return `clamp(${0.5 * s}rem, ${1.5 * s}vmin, ${1.25 * s}rem)`;
 }
+
+/**
+ * Scale table row content up when fewer rows are visible.
+ * 6 rows → 1×, 2 rows → 3× (capped by tableRowFillMaxScale).
+ */
+export function computeTableRowFillScale(
+  visibleRowCount: number,
+  td: TableDisplaySettings,
+): number {
+  if (!td.tableRowFillEnabled || visibleRowCount <= 0) return 1;
+  const baseline = Math.max(1, td.tableRowFillBaseline);
+  const raw = baseline / visibleRowCount;
+  return Math.min(td.tableRowFillMaxScale, Math.max(1, raw));
+}
