@@ -8,6 +8,7 @@ export interface Match {
   time: string;
   score?: string; // e.g. "2:1"
   winner?: string; // team name of the winner
+  finished?: boolean; // true если матч уже сыгран
   guestBetMessage?: string; // "Гость с ID #1234 победил, сделав ставку"
   bishkek?: {
     date_bishkek: string;

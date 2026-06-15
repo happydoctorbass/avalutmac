@@ -127,14 +127,22 @@ export function MatchCard({ match, isFocused = false }: MatchCardProps) {
   }
 
   const hasResult = Boolean(match.score || match.winner);
+  const isFinished = Boolean(match.finished || hasResult);
 
   return (
     <CardShell isFocused={isFocused} className="w-[32rem] min-h-[16rem] p-8">
-      <div className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-amber-500">
-        {match.sportType}
+      <div className="mb-4 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-amber-500">
+        <span>{match.sportType}</span>
+        {isFinished && (
+          <span className="rounded-full border border-muted-foreground/40 bg-muted/40 px-3 py-0.5 text-[11px] font-bold tracking-[0.2em] text-muted-foreground">
+            ЗАВЕРШЁН
+          </span>
+        )}
       </div>
 
-      <TeamNames team1={match.team1} team2={match.team2} timeLabel={timeLabel} />
+      <div className={isFinished ? 'w-full opacity-70 saturate-[0.85] transition' : 'w-full'}>
+        <TeamNames team1={match.team1} team2={match.team2} timeLabel={timeLabel} />
+      </div>
 
       {hasResult && (
         <div className="mt-5 flex w-full flex-col items-center gap-1 border-t border-border pt-4">

@@ -42,14 +42,38 @@ export async function GET() {
       return NextResponse.json({ matches: [] });
     }
 
-    const matches: Match[] = data.matches.map((match: any, index: number) => {
+    // Реальные команды не содержат цифр и слэшей (в отличие от заглушек "1A", "W99", "3E/H/I/J/K")
+    const isRealTeam = (name: string) => typeof name === 'string' && !/[\d/]/.test(name);
+
+    // Окно: от сегодня до +10 дней вперёд (для предстоящих матчей)
+    const now = new Date();
+    const windowStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const windowEnd = new Date(windowStart);
+    windowEnd.setDate(windowEnd.getDate() + 10);
+
+    const filtered = data.matches.filter((match: any) => {
+      if (!isRealTeam(match.team1) || !isRealTeam(match.team2)) return false;
+
+      const hasScore = Boolean(match.score && match.score.ft);
+
+      const [year, month, day] = String(match.date).split('-').map(Number);
+      const matchDate = new Date(year, month - 1, day);
+      const inWindow = matchDate >= windowStart && matchDate <= windowEnd;
+
+      // Прошедшие завершённые матчи (со счётом) показываем всегда,
+      // предстоящие — только в окне 10 дней
+      return hasScore || inWindow;
+    });
+
+    const matches: Match[] = filtered.map((match: any, index: number) => {
       const bishkek = convertToBishkek(match.date, match.time);
       
       let scoreStr;
       let winnerStr;
       let guestBetMessage;
+      const finished = Boolean(match.score && match.score.ft);
 
-      if (match.score && match.score.ft) {
+      if (finished) {
         const [score1, score2] = match.score.ft;
         scoreStr = `${score1}:${score2}`;
         if (score1 > score2) {
@@ -60,9 +84,8 @@ export async function GET() {
           winnerStr = 'Ничья';
         }
         
-        // Generate a random guest ID and amount for completed matches
+        // Generate a random guest ID for completed matches
         const randomGuestId = Math.floor(1000 + Math.random() * 9000);
-        const randomAmount = Math.floor(100 + Math.random() * 5000);
         guestBetMessage = `Гость с ID #${randomGuestId} победил, сделав ставку`;
       }
       
@@ -75,6 +98,7 @@ export async function GET() {
         score: scoreStr,
         winner: winnerStr,
         guestBetMessage,
+        finished,
         bishkek
       };
     });
