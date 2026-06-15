@@ -31,20 +31,8 @@ function timeLabel(m: Match) {
   return m.bishkek?.time_bishkek ?? '—';
 }
 
-function mergeUnique(base: Match[], extra: Match[]) {
-  const seen = new Set(base.map((m) => m.id));
-  const merged = [...base];
-  for (const m of extra) {
-    if (!seen.has(m.id)) {
-      seen.add(m.id);
-      merged.push(m);
-    }
-  }
-  return merged;
-}
-
 function CasinoTableContent() {
-  const { matches: boardMatches, addMatch, removeMatch, setMatchesBulk, clearMatches } = useCasinoMatches();
+  const { matches: boardMatches, addMatch, removeMatch, addMatchesUnique, clearMatches } = useCasinoMatches();
 
   const [catalog, setCatalog] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,7 +101,13 @@ function CasinoTableContent() {
             <Link href="/casino-display" target="_blank">
               <Button variant="ghost" size="sm" className="gap-2">
                 <ExternalLink className="h-4 w-4" />
-                Открыть табло
+                Табло (карточки)
+              </Button>
+            </Link>
+            <Link href="/casino-display-table" target="_blank">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Табло (таблица)
               </Button>
             </Link>
           </div>
@@ -121,15 +115,15 @@ function CasinoTableContent() {
 
         {/* Toolbar */}
         <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border bg-card/60 p-4 backdrop-blur-sm">
-          <Button className="gap-2" onClick={() => setMatchesBulk(mergeUnique(boardMatches, catalog))}>
+          <Button className="gap-2" onClick={() => addMatchesUnique(catalog)}>
             <ListPlus className="h-4 w-4" />
             Добавить все
           </Button>
-          <Button variant="secondary" className="gap-2" onClick={() => setMatchesBulk(mergeUnique(boardMatches, upcoming))}>
+          <Button variant="secondary" className="gap-2" onClick={() => addMatchesUnique(upcoming)}>
             <CalendarClock className="h-4 w-4" />
             Добавить предстоящие
           </Button>
-          <Button variant="secondary" className="gap-2" onClick={() => setMatchesBulk(mergeUnique(boardMatches, finished))}>
+          <Button variant="secondary" className="gap-2" onClick={() => addMatchesUnique(finished)}>
             <Trophy className="h-4 w-4" />
             Добавить прошедшие
           </Button>

@@ -16,7 +16,7 @@ export default function CasinoAdminPage() {
     focusMatchId,
     settings,
     addMatch,
-    addMatches,
+    addMatchesUnique,
     removeMatch,
     setFocus,
     updateMatch,
@@ -98,7 +98,7 @@ export default function CasinoAdminPage() {
             <CardDescription>Матчи чемпионата — добавьте все сразу или по одному.</CardDescription>
           </CardHeader>
           <CardContent>
-            <UpcomingMatchesCard onAdd={addMatches} />
+            <UpcomingMatchesCard onAdd={addMatchesUnique} />
           </CardContent>
         </Card>
 

@@ -15,10 +15,14 @@ export function useCasinoMatches() {
   const ref = useRef({ matches, focusMatchId, settings, currentIndex });
   ref.current = { matches, focusMatchId, settings, currentIndex };
 
+  // Последняя применённая версия состояния (для отсечения устаревших эхо-сообщений)
+  const lastVersionRef = useRef<number>(-1);
+
   const fetchInitialState = async () => {
     try {
       const res = await fetch('/api/casino/sync');
       const data = await res.json();
+      if (typeof data.version === 'number') lastVersionRef.current = data.version;
       if (data.matches) setMatches(data.matches);
       if (data.focusMatchId !== undefined) setFocusMatchId(data.focusMatchId);
       if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
@@ -40,7 +44,18 @@ export function useCasinoMatches() {
 
     channel.bind(
       'casino-sync',
-      (data: { matches: Match[]; focusMatchId: string | null; settings: CasinoSettings; currentIndex?: number }) => {
+      (data: {
+        matches: Match[];
+        focusMatchId: string | null;
+        settings: CasinoSettings;
+        currentIndex?: number;
+        version?: number;
+      }) => {
+        // Игнорируем устаревшие сообщения, пришедшие не по порядку
+        if (typeof data.version === 'number') {
+          if (data.version <= lastVersionRef.current) return;
+          lastVersionRef.current = data.version;
+        }
         setMatches(data.matches);
         setFocusMatchId(data.focusMatchId);
         if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
@@ -90,6 +105,19 @@ export function useCasinoMatches() {
   const addMatch = (match: Match) => syncState({ matches: [...ref.current.matches, match] });
   const addMatches = (newOnes: Match[]) => syncState({ matches: [...ref.current.matches, ...newOnes] });
 
+  // Добавить матчи без дублей (мерж по id на основе актуального состояния)
+  const addMatchesUnique = (newOnes: Match[]) => {
+    const seen = new Set(ref.current.matches.map((m) => m.id));
+    const merged = [...ref.current.matches];
+    for (const m of newOnes) {
+      if (!seen.has(m.id)) {
+        seen.add(m.id);
+        merged.push(m);
+      }
+    }
+    return syncState({ matches: merged });
+  };
+
   // Заменить весь список матчей одним вызовом (без гонок при массовых операциях)
   const setMatchesBulk = (next: Match[]) => syncState({ matches: next });
 
@@ -121,6 +149,7 @@ export function useCasinoMatches() {
     isConnected,
     addMatch,
     addMatches,
+    addMatchesUnique,
     setMatchesBulk,
     clearMatches,
     removeMatch,
