@@ -24,7 +24,7 @@ export function CountryFlag({ team, size = 'md', scale = 1, className = '' }: Co
   if (!code) return null;
 
   const sizeClass = SIZE_CLASS[size];
-  const rounded = 'rounded-[3px] shadow-[0_0_8px_rgba(0,0,0,0.35)] object-cover';
+  const rounded = 'rounded-[3px] object-cover';
   const scaleStyle =
     scale !== 1 ? { transform: `scale(${scale})`, transformOrigin: 'center' as const } : undefined;
 
