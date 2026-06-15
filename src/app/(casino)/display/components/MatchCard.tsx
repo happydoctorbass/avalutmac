@@ -152,6 +152,11 @@ export function MatchCard({ match, isFocused = false }: MatchCardProps) {
               )}
             </div>
           )}
+          {match.guestBetMessage && (
+            <div className="mt-2 text-xs font-medium tracking-wide text-muted-foreground bg-muted/30 px-3 py-1.5 rounded-full border border-border/50">
+              {match.guestBetMessage}
+            </div>
+          )}
         </div>
       )}
     </CardShell>

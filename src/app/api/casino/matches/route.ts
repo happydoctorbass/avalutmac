@@ -45,12 +45,36 @@ export async function GET() {
     const matches: Match[] = data.matches.map((match: any, index: number) => {
       const bishkek = convertToBishkek(match.date, match.time);
       
+      let scoreStr;
+      let winnerStr;
+      let guestBetMessage;
+
+      if (match.score && match.score.ft) {
+        const [score1, score2] = match.score.ft;
+        scoreStr = `${score1}:${score2}`;
+        if (score1 > score2) {
+          winnerStr = match.team1;
+        } else if (score2 > score1) {
+          winnerStr = match.team2;
+        } else {
+          winnerStr = 'Ничья';
+        }
+        
+        // Generate a random guest ID and amount for completed matches
+        const randomGuestId = Math.floor(1000 + Math.random() * 9000);
+        const randomAmount = Math.floor(100 + Math.random() * 5000);
+        guestBetMessage = `Гость с ID #${randomGuestId} победил, сделав ставку`;
+      }
+      
       return {
         id: `wc2026-${match.date}-${index}-${Math.random().toString(36).slice(2, 6)}`,
         sportType: 'football' as SportType,
         team1: match.team1,
         team2: match.team2,
         time: match.time, // preserve original time if needed elsewhere
+        score: scoreStr,
+        winner: winnerStr,
+        guestBetMessage,
         bishkek
       };
     });
