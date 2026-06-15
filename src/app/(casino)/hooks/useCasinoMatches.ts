@@ -83,6 +83,11 @@ export function useCasinoMatches() {
       const finalSettings = opts.settings ?? cur.settings;
       const finalIndex = opts.currentIndex !== undefined ? opts.currentIndex : cur.currentIndex;
 
+      // Монотонная версия на клиенте (по часам), строго возрастающая.
+      // Сразу помечаем её как применённую, чтобы устаревшие эхо-сообщения не затирали свежее состояние.
+      const version = Math.max(lastVersionRef.current + 1, Date.now());
+      lastVersionRef.current = version;
+
       setMatches(finalMatches);
       setFocusMatchId(finalFocus);
       setSettings(finalSettings);
@@ -96,6 +101,7 @@ export function useCasinoMatches() {
           focusMatchId: finalFocus,
           settings: finalSettings,
           currentIndex: finalIndex,
+          version,
         }),
       });
     },

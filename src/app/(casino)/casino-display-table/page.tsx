@@ -39,9 +39,9 @@ function formatCountdown(ms: number) {
   const days = Math.floor(totalMin / 1440);
   const hours = Math.floor((totalMin % 1440) / 60);
   const mins = totalMin % 60;
-  if (days > 0) return `через ${days} дн ${hours} ч`;
-  if (hours > 0) return `через ${hours} ч ${mins} мин`;
-  return `через ${mins} мин`;
+  if (days > 0) return `in ${days}d ${hours}h`;
+  if (hours > 0) return `in ${hours}h ${mins}m`;
+  return `in ${mins}m`;
 }
 
 const LIVE_WINDOW_MS = 130 * 60 * 1000; // ~2 часа 10 минут — матч считается «идёт сейчас»
@@ -130,7 +130,7 @@ export default function CasinoDisplayTablePage() {
             className="h-24 w-auto opacity-90 drop-shadow-[0_0_18px_rgba(197,160,89,0.45)]"
           />
           <span className="mt-6 animate-pulse text-lg font-bold tracking-[0.3em] text-amber-500">
-            ОЖИДАНИЕ МАТЧЕЙ...
+            WAITING FOR MATCHES...
           </span>
         </div>
       ) : (
@@ -154,11 +154,11 @@ export default function CasinoDisplayTablePage() {
                   {isLive ? (
                     <span className="mb-4 flex items-center gap-2 rounded-full bg-red-600/90 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-white shadow-[0_0_20px_rgba(220,38,38,0.6)]">
                       <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
-                      Сейчас идёт
+                      Live now
                     </span>
                   ) : (
                     <span className="mb-4 rounded-full border border-amber-500/60 bg-amber-500/15 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-amber-400">
-                      Следующий матч
+                      Next match
                     </span>
                   )}
 
@@ -194,7 +194,7 @@ export default function CasinoDisplayTablePage() {
                   )}
                   {activeMatch.winner && (
                     <span className="mt-3 text-sm font-bold uppercase tracking-[0.2em] text-amber-500">
-                      {activeMatch.winner === 'Ничья' ? 'Ничья' : `Победитель: ${activeMatch.winner}`}
+                      {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
                     </span>
                   )}
                 </div>
@@ -208,11 +208,11 @@ export default function CasinoDisplayTablePage() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
-                    <th className="px-6 py-3">Дата</th>
-                    <th className="px-6 py-3">Время</th>
-                    <th className="px-6 py-3">Матч</th>
-                    <th className="px-6 py-3 text-center">Счёт</th>
-                    <th className="px-6 py-3">Результат</th>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Time</th>
+                    <th className="px-6 py-3">Match</th>
+                    <th className="px-6 py-3 text-center">Score</th>
+                    <th className="px-6 py-3">Result</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -238,7 +238,7 @@ export default function CasinoDisplayTablePage() {
                           </span>
                           {finished && (
                             <span className="ml-2 rounded-full border border-muted-foreground/40 bg-muted/40 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                              Завершён
+                              Finished
                             </span>
                           )}
                         </td>
@@ -252,10 +252,10 @@ export default function CasinoDisplayTablePage() {
                                 m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-500'
                               }`}
                             >
-                              {m.winner === 'Ничья' ? 'Ничья' : m.winner}
+                              {m.winner === 'Ничья' ? 'Draw' : m.winner}
                             </span>
                           ) : (
-                            <span className="text-base font-semibold uppercase tracking-wide text-emerald-400">Скоро</span>
+                            <span className="text-base font-semibold uppercase tracking-wide text-emerald-400">Soon</span>
                           )}
                         </td>
                       </motion.tr>

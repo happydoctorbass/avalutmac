@@ -7,7 +7,7 @@ let globalMatches: any[] = [];
 let globalFocusId: string | null = null;
 let globalSettings: any = { ...DEFAULT_SETTINGS };
 let globalIndex = 0;
-// Монотонная версия состояния — нужна, чтобы клиенты игнорировали устаревшие эхо-сообщения
+// Версия состояния приходит от клиента (монотонная по времени) — пробрасываем её дальше
 let globalVersion = 0;
 
 function payload() {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       globalFocusId = body.focusMatchId !== undefined ? body.focusMatchId : globalFocusId;
       globalSettings = body.settings ? { ...DEFAULT_SETTINGS, ...body.settings } : globalSettings;
       if (body.currentIndex !== undefined) globalIndex = body.currentIndex;
-      globalVersion += 1;
+      if (typeof body.version === 'number') globalVersion = body.version;
 
       await broadcast('casino-sync', payload());
     }
