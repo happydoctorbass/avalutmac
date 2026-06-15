@@ -47,3 +47,6 @@ export const DISPLAY_NARROW_BREAKPOINT = 768;
 export function isDisplayNarrow(vw: number) {
   return vw < DISPLAY_NARROW_BREAKPOINT;
 }
+
+/** Small invisible safe-area inset on all sides (vmin scales with LED / portrait) */
+export const DISPLAY_SAFE_INSET = 'clamp(0.5rem, 1.5vmin, 1.25rem)';

@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Match } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
 import {
+  DISPLAY_SAFE_INSET,
   heroTeamMaxPx,
   isDisplayNarrow,
   tableTeamMaxPx,
@@ -273,7 +274,7 @@ export default function CasinoDisplayTablePage() {
   const countdownText = activeStart && !isLive ? formatCountdown(activeStart - now) : '';
 
   return (
-    <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col items-center overflow-x-hidden bg-background text-foreground">
+    <div className="relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-background text-foreground">
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
@@ -281,19 +282,23 @@ export default function CasinoDisplayTablePage() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background/90" />
       <div className="pointer-events-none absolute inset-0 z-30 shadow-[inset_0_0_180px_60px_rgba(0,0,0,0.8)]" />
 
-      <div className="relative z-50 mt-[clamp(0.75rem,2vh,1.25rem)] mb-[clamp(0.5rem,1.5vh,0.75rem)] shrink-0">
-        <motion.img
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          src="/logo/admiral.svg"
-          alt="Admiral Casino"
-          className="h-[clamp(2.5rem,6vw,4rem)] w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.3)]"
-        />
-      </div>
+      <div
+        className="relative z-10 box-border flex h-full min-h-0 w-full flex-col items-center overflow-hidden"
+        style={{ padding: DISPLAY_SAFE_INSET }}
+      >
+        <div className="mb-[clamp(0.35rem,1vh,0.75rem)] shrink-0">
+          <motion.img
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            src="/logo/admiral.svg"
+            alt="Admiral Casino"
+            className="h-[clamp(2.5rem,6vw,4rem)] w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.3)]"
+          />
+        </div>
 
       {matches.length === 0 ? (
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-2">
           <img
             src="/logo/main.svg"
             alt="Admiral"
@@ -304,7 +309,7 @@ export default function CasinoDisplayTablePage() {
           </span>
         </div>
       ) : (
-        <div className="relative z-10 box-border flex w-full min-h-0 min-w-0 max-w-[100vw] flex-1 flex-col gap-[clamp(0.75rem,2vh,2rem)] px-[clamp(0.5rem,2vw,1.5rem)] pb-[clamp(0.75rem,2vh,1.5rem)]">
+        <div className="box-border flex min-h-0 w-full max-w-full flex-1 flex-col gap-[clamp(0.5rem,1.5vh,1.5rem)] overflow-hidden">
           {activeMatch && (
             <AnimatePresence mode="wait">
               <motion.div
@@ -390,7 +395,7 @@ export default function CasinoDisplayTablePage() {
 
           {rest.length > 0 && (
             <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
-              <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-auto">
+              <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
                     <col className="w-[10%]" />
@@ -473,7 +478,7 @@ export default function CasinoDisplayTablePage() {
               </div>
 
               {pageCount > 1 && (
-                <div className="flex items-center justify-center gap-2.5 py-[clamp(0.75rem,2vh,1.25rem)]">
+                <div className="flex shrink-0 items-center justify-center gap-2.5 py-[clamp(0.35rem,1vh,0.75rem)]">
                   {Array.from({ length: pageCount }).map((_, idx) => (
                     <span
                       key={idx}
@@ -488,6 +493,7 @@ export default function CasinoDisplayTablePage() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
