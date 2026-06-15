@@ -1,8 +1,21 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
 import { Match } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
+
+// Бишкек = UTC+6. По полям bishkek получаем абсолютное время старта матча.
+function getStartMs(m: Match): number | null {
+  if (m.bishkek?.date_bishkek && m.bishkek?.time_bishkek) {
+    const [Y, Mo, D] = m.bishkek.date_bishkek.split('-').map(Number);
+    const [H, Mi] = m.bishkek.time_bishkek.split(':').map(Number);
+    if ([Y, Mo, D, H, Mi].every((n) => !Number.isNaN(n))) {
+      return Date.UTC(Y, Mo - 1, D, H, Mi) - 6 * 3600 * 1000;
+    }
+  }
+  return null;
+}
 
 function dateLabel(m: Match) {
   if (m.bishkek) {
@@ -13,25 +26,79 @@ function dateLabel(m: Match) {
     }
     return m.bishkek.date_bishkek;
   }
-  if (m.time?.includes('T')) {
-    const [d] = m.time.split('T');
-    const parts = d.split('-');
-    if (parts.length === 3) {
-      const [, mm, dd] = parts;
-      return `${dd}.${mm}`;
-    }
-  }
   return '';
 }
 
 function timeLabel(m: Match) {
-  if (m.bishkek?.time_bishkek) return m.bishkek.time_bishkek;
-  if (m.time?.includes('T')) return m.time.split('T')[1]?.slice(0, 5) ?? m.time;
-  return m.time ?? '';
+  return m.bishkek?.time_bishkek ?? (m.time?.includes('T') ? m.time.split('T')[1]?.slice(0, 5) : m.time) ?? '';
 }
+
+function formatCountdown(ms: number) {
+  if (ms <= 0) return '';
+  const totalMin = Math.floor(ms / 60000);
+  const days = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins = totalMin % 60;
+  if (days > 0) return `через ${days} дн ${hours} ч`;
+  if (hours > 0) return `через ${hours} ч ${mins} мин`;
+  return `через ${mins} мин`;
+}
+
+const LIVE_WINDOW_MS = 130 * 60 * 1000; // ~2 часа 10 минут — матч считается «идёт сейчас»
+const PAGE_SIZE = 6;
+const PAGE_INTERVAL_MS = 8000;
 
 export default function CasinoDisplayTablePage() {
   const { matches } = useCasinoMatches();
+
+  // Текущее время — обновляем периодически, чтобы акцент и обратный отсчёт менялись сами
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 10000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Определяем активный матч: идущий сейчас, иначе ближайший предстоящий
+  const { activeId, isLive, activeStart } = useMemo(() => {
+    const withStart = matches
+      .map((m) => ({ m, start: getStartMs(m) }))
+      .filter((x): x is { m: Match; start: number } => x.start !== null);
+
+    const live = withStart
+      .filter((x) => now >= x.start && now <= x.start + LIVE_WINDOW_MS)
+      .sort((a, b) => a.start - b.start)[0];
+
+    const next = withStart
+      .filter((x) => x.start > now)
+      .sort((a, b) => a.start - b.start)[0];
+
+    const chosen = live ?? next;
+    return {
+      activeId: chosen?.m.id ?? null,
+      isLive: Boolean(live),
+      activeStart: chosen?.start ?? null,
+    };
+  }, [matches, now]);
+
+  const activeMatch = matches.find((m) => m.id === activeId) ?? null;
+  const rest = matches.filter((m) => m.id !== activeId);
+
+  // Авто-листание оставшихся матчей
+  const pageCount = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+  const [page, setPage] = useState(0);
+  useEffect(() => {
+    if (pageCount <= 1) {
+      setPage(0);
+      return;
+    }
+    const id = setInterval(() => setPage((p) => (p + 1) % pageCount), PAGE_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [pageCount]);
+  useEffect(() => {
+    if (page >= pageCount) setPage(0);
+  }, [page, pageCount]);
+
+  const pageRows = rest.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
 
   return (
     <div className="relative flex h-screen w-full flex-col items-center overflow-hidden bg-background text-foreground">
@@ -44,101 +111,176 @@ export default function CasinoDisplayTablePage() {
       <div className="pointer-events-none absolute inset-0 z-30 shadow-[inset_0_0_220px_70px_rgba(0,0,0,0.85)]" />
 
       {/* Logo */}
-      <div className="relative z-50 mt-8 mb-6 shrink-0">
+      <div className="relative z-50 mt-6 mb-4 shrink-0">
         <motion.img
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           src="/logo/admiral.svg"
           alt="Admiral Casino"
-          className="h-16 w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.25)] md:h-20"
+          className="h-14 w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.25)] md:h-16"
         />
       </div>
 
-      {/* Table */}
-      <div className="relative z-10 flex w-full flex-1 items-start justify-center overflow-hidden px-6 pb-10">
-        {matches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center pt-24">
-            <img
-              src="/logo/main.svg"
-              alt="Admiral"
-              className="h-24 w-auto opacity-90 drop-shadow-[0_0_18px_rgba(197,160,89,0.45)]"
-            />
-            <span className="mt-6 animate-pulse text-lg font-bold tracking-[0.3em] text-amber-500">
-              ОЖИДАНИЕ МАТЧЕЙ...
-            </span>
-          </div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="w-full max-w-6xl overflow-hidden rounded-3xl border border-amber-500/30 bg-[hsl(222_47%_5%)]/90 shadow-[0_0_40px_rgba(245,158,11,0.12)] backdrop-blur-md"
-          >
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-sm font-bold uppercase tracking-[0.2em] text-amber-500">
-                  <th className="px-6 py-4">Дата</th>
-                  <th className="px-6 py-4">Время</th>
-                  <th className="px-6 py-4">Матч</th>
-                  <th className="px-6 py-4 text-center">Счёт</th>
-                  <th className="px-6 py-4">Результат</th>
-                </tr>
-              </thead>
-              <tbody>
-                {matches.map((m, i) => {
-                  const finished = Boolean(m.finished || m.score || m.winner);
-                  return (
-                    <tr
-                      key={m.id}
-                      className={`border-b border-border/40 text-foreground ${
-                        i % 2 === 0 ? 'bg-white/[0.02]' : ''
-                      } ${finished ? 'opacity-80' : ''}`}
-                    >
-                      <td className="whitespace-nowrap px-6 py-5 text-xl font-semibold text-muted-foreground">
-                        {dateLabel(m)}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-5 text-2xl font-black text-amber-500 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]">
-                        {timeLabel(m)}
-                      </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-3 text-2xl font-black md:text-3xl">
-                          <span>{m.team1}</span>
-                          <span className="text-base font-bold text-muted-foreground">VS</span>
-                          <span>{m.team2}</span>
-                        </div>
-                        {finished && (
-                          <span className="mt-1 inline-block rounded-full border border-muted-foreground/40 bg-muted/40 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                            Завершён
+      {matches.length === 0 ? (
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center">
+          <img
+            src="/logo/main.svg"
+            alt="Admiral"
+            className="h-24 w-auto opacity-90 drop-shadow-[0_0_18px_rgba(197,160,89,0.45)]"
+          />
+          <span className="mt-6 animate-pulse text-lg font-bold tracking-[0.3em] text-amber-500">
+            ОЖИДАНИЕ МАТЧЕЙ...
+          </span>
+        </div>
+      ) : (
+        <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col gap-5 overflow-hidden px-6 pb-8">
+          {/* Hero — активный матч */}
+          {activeMatch && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeMatch.id}
+                initial={{ opacity: 0, scale: 0.97, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.97, y: -10 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="relative overflow-hidden rounded-3xl border-2 border-amber-500/70 bg-[hsl(222_47%_5%)]/95 p-8 shadow-[0_0_60px_rgba(245,158,11,0.35)] backdrop-blur-md"
+              >
+                <div
+                  className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.06]"
+                  style={{ backgroundImage: "url('/logo/main.svg')" }}
+                />
+                <div className="relative z-10 flex flex-col items-center">
+                  {isLive ? (
+                    <span className="mb-4 flex items-center gap-2 rounded-full bg-red-600/90 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-white shadow-[0_0_20px_rgba(220,38,38,0.6)]">
+                      <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
+                      Сейчас идёт
+                    </span>
+                  ) : (
+                    <span className="mb-4 rounded-full border border-amber-500/60 bg-amber-500/15 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-amber-400">
+                      Следующий матч
+                    </span>
+                  )}
+
+                  <div className="flex w-full items-center justify-between gap-6">
+                    <div className="flex flex-1 items-center justify-end text-right">
+                      <span className="text-4xl font-black leading-tight md:text-6xl">{activeMatch.team1}</span>
+                    </div>
+
+                    <div className="flex shrink-0 flex-col items-center px-4">
+                      {activeMatch.score ? (
+                        <span className="text-5xl font-black tracking-wider text-foreground drop-shadow-[0_0_14px_rgba(255,255,255,0.25)] md:text-7xl">
+                          {activeMatch.score}
+                        </span>
+                      ) : (
+                        <span className="text-5xl font-black text-amber-500 drop-shadow-[0_0_16px_rgba(245,158,11,0.6)] md:text-7xl">
+                          {timeLabel(activeMatch)}
+                        </span>
+                      )}
+                      <span className="mt-1 text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">
+                        {dateLabel(activeMatch)}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-start text-left">
+                      <span className="text-4xl font-black leading-tight md:text-6xl">{activeMatch.team2}</span>
+                    </div>
+                  </div>
+
+                  {!isLive && activeStart && (
+                    <span className="mt-4 text-base font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                      {formatCountdown(activeStart - now)}
+                    </span>
+                  )}
+                  {activeMatch.winner && (
+                    <span className="mt-3 text-sm font-bold uppercase tracking-[0.2em] text-amber-500">
+                      {activeMatch.winner === 'Ничья' ? 'Ничья' : `Победитель: ${activeMatch.winner}`}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+
+          {/* Остальные матчи — авто-листание */}
+          {rest.length > 0 && (
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
+                    <th className="px-6 py-3">Дата</th>
+                    <th className="px-6 py-3">Время</th>
+                    <th className="px-6 py-3">Матч</th>
+                    <th className="px-6 py-3 text-center">Счёт</th>
+                    <th className="px-6 py-3">Результат</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pageRows.map((m, i) => {
+                    const finished = Boolean(m.finished || m.score || m.winner);
+                    return (
+                      <motion.tr
+                        key={`${page}-${m.id}`}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.35, delay: i * 0.04 }}
+                        className={`border-b border-border/40 ${finished ? 'opacity-70' : ''}`}
+                      >
+                        <td className="whitespace-nowrap px-6 py-4 text-lg font-semibold text-muted-foreground">
+                          {dateLabel(m)}
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4 text-xl font-black text-amber-500">
+                          {timeLabel(m)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xl font-black md:text-2xl">
+                            {m.team1} <span className="text-sm font-bold text-muted-foreground">VS</span> {m.team2}
                           </span>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-6 py-5 text-center text-3xl font-black tracking-wider">
-                        {m.score ?? '—'}
-                      </td>
-                      <td className="px-6 py-5">
-                        {m.winner ? (
-                          <span
-                            className={`text-lg font-bold uppercase tracking-wide ${
-                              m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-500'
-                            }`}
-                          >
-                            {m.winner === 'Ничья' ? 'Ничья' : m.winner}
-                          </span>
-                        ) : (
-                          <span className="text-lg font-semibold uppercase tracking-wide text-emerald-400">
-                            Скоро
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </motion.div>
-        )}
-      </div>
+                          {finished && (
+                            <span className="ml-2 rounded-full border border-muted-foreground/40 bg-muted/40 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                              Завершён
+                            </span>
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4 text-center text-2xl font-black tracking-wider">
+                          {m.score ?? '—'}
+                        </td>
+                        <td className="px-6 py-4">
+                          {m.winner ? (
+                            <span
+                              className={`text-base font-bold uppercase tracking-wide ${
+                                m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-500'
+                              }`}
+                            >
+                              {m.winner === 'Ничья' ? 'Ничья' : m.winner}
+                            </span>
+                          ) : (
+                            <span className="text-base font-semibold uppercase tracking-wide text-emerald-400">Скоро</span>
+                          )}
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {/* Индикатор страниц */}
+              {pageCount > 1 && (
+                <div className="mt-auto flex items-center justify-center gap-2 py-4">
+                  {Array.from({ length: pageCount }).map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`h-2 rounded-full transition-all duration-300 ${
+                        idx === page ? 'w-6 bg-amber-500' : 'w-2 bg-muted-foreground/40'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
