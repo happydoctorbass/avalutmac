@@ -21,11 +21,72 @@ export interface CasinoSettings {
   cardScale: number;
   rotateInterval: number; // seconds between auto-rotation
   autoRotate: boolean;
+  tableDisplay: TableDisplaySettings;
 }
+
+export type FlagSize = 'sm' | 'md' | 'lg' | 'xl';
+
+export interface TableDisplaySettings {
+  /** Column widths (%), should sum to ~100 */
+  colDate: number;
+  colTime: number;
+  colMatch: number;
+  colScore: number;
+  colResult: number;
+  /** Table typography & spacing */
+  tableTeamFontScale: number;
+  tableMetaFontScale: number;
+  tableHeaderFontScale: number;
+  tableCellPaddingScale: number;
+  tableFlagSize: FlagSize;
+  tableFlagScale: number;
+  /** Hero (active match) block */
+  heroTeamFontScale: number;
+  heroFlagSize: FlagSize;
+  heroFlagScale: number;
+  heroCenterFontScale: number;
+  heroBadgeFontScale: number;
+  heroCountdownFontScale: number;
+  heroPaddingScale: number;
+  heroGapScale: number;
+  /** Pagination */
+  pageSize: number;
+  pageIntervalSec: number;
+  /** Layout */
+  narrowBreakpoint: number;
+  safeInsetScale: number;
+}
+
+export const DEFAULT_TABLE_DISPLAY: TableDisplaySettings = {
+  colDate: 6,
+  colTime: 7,
+  colMatch: 62,
+  colScore: 8,
+  colResult: 17,
+  tableTeamFontScale: 1.15,
+  tableMetaFontScale: 1,
+  tableHeaderFontScale: 1,
+  tableCellPaddingScale: 0.65,
+  tableFlagSize: 'md',
+  tableFlagScale: 1.1,
+  heroTeamFontScale: 1.1,
+  heroFlagSize: 'xl',
+  heroFlagScale: 1.25,
+  heroCenterFontScale: 1,
+  heroBadgeFontScale: 1,
+  heroCountdownFontScale: 1,
+  heroPaddingScale: 1,
+  heroGapScale: 0.85,
+  pageSize: 6,
+  pageIntervalSec: 8,
+  narrowBreakpoint: 768,
+  safeInsetScale: 1,
+};
 
 export const DEFAULT_SETTINGS: CasinoSettings = {
   cardCount: 5,
   cardScale: 1.0,
   rotateInterval: 15,
   autoRotate: true,
+  tableDisplay: { ...DEFAULT_TABLE_DISPLAY },
 };

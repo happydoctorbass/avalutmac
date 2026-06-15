@@ -14,32 +14,44 @@ const SIZE_CLASS = {
 type CountryFlagProps = {
   team: string;
   size?: keyof typeof SIZE_CLASS;
+  /** Visual scale multiplier (0.5–2.5) */
+  scale?: number;
   className?: string;
 };
 
-export function CountryFlag({ team, size = 'md', className = '' }: CountryFlagProps) {
+export function CountryFlag({ team, size = 'md', scale = 1, className = '' }: CountryFlagProps) {
   const code = getTeamCountryCode(team);
   if (!code) return null;
 
   const sizeClass = SIZE_CLASS[size];
   const rounded = 'rounded-[3px] shadow-[0_0_8px_rgba(0,0,0,0.35)] object-cover';
+  const scaleStyle =
+    scale !== 1 ? { transform: `scale(${scale})`, transformOrigin: 'center' as const } : undefined;
 
-  if (isSubdivisionFlag(code)) {
-    return (
-      <img
-        src={`https://flagcdn.com/w80/${code}.png`}
-        alt=""
-        aria-hidden
-        className={`${sizeClass} ${rounded} shrink-0 ${className}`}
-      />
-    );
-  }
+  const flagEl = isSubdivisionFlag(code) ? (
+    <img
+      src={`https://flagcdn.com/w80/${code}.png`}
+      alt=""
+      aria-hidden
+      className={`${sizeClass} ${rounded} shrink-0 ${className}`}
+    />
+  ) : (
+    (() => {
+      const iso = code.toUpperCase();
+      if (!hasFlag(iso)) return null;
+      const FlagIcon = (Flags as Record<string, React.ComponentType<{ className?: string; title?: string }>>)[iso];
+      if (!FlagIcon) return null;
+      return <FlagIcon className={`${sizeClass} ${rounded} shrink-0 ${className}`} title={team} />;
+    })()
+  );
 
-  const iso = code.toUpperCase();
-  if (!hasFlag(iso)) return null;
+  if (!flagEl) return null;
 
-  const FlagIcon = (Flags as Record<string, React.ComponentType<{ className?: string; title?: string }>>)[iso];
-  if (!FlagIcon) return null;
+  if (scale === 1) return flagEl;
 
-  return <FlagIcon className={`${sizeClass} ${rounded} shrink-0 ${className}`} title={team} />;
+  return (
+    <span className="inline-flex shrink-0 items-center justify-center" style={scaleStyle}>
+      {flagEl}
+    </span>
+  );
 }

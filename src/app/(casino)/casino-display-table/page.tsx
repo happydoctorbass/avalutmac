@@ -1,16 +1,11 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Match } from '@/types/match';
+import { useEffect, useMemo, useState } from 'react';
+import { Match, FlagSize } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
-import {
-  DISPLAY_SAFE_INSET,
-  heroTeamMaxPx,
-  isDisplayNarrow,
-  tableTeamMaxPx,
-  useViewportWidth,
-} from '../hooks/useViewportWidth';
+import { mergeTableDisplay, safeInsetCss } from '@/lib/table-display-settings';
+import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
 
@@ -65,78 +60,68 @@ function formatCountdown(ms: number) {
 }
 
 const LIVE_WINDOW_MS = 130 * 60 * 1000;
-const PAGE_SIZE = 6;
-const PAGE_INTERVAL_MS = 8000;
 
-const MIN_TEAM_PX = 14;
+function cellPad(scale: number) {
+  return {
+    paddingLeft: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
+    paddingRight: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
+    paddingTop: `calc(clamp(0.35rem, 1.5vh, 1rem) * ${scale})`,
+    paddingBottom: `calc(clamp(0.35rem, 1.5vh, 1rem) * ${scale})`,
+  };
+}
+
+function scaledFont(min: number, vwFactor: number, max: number, scale: number) {
+  return `clamp(${min * scale}px, ${vwFactor * scale}vw, ${max * scale}px)`;
+}
 
 function HeroTeamName({
   name,
   align,
   maxPx,
   stacked,
+  flagSize,
+  flagScale,
+  gapScale,
 }: {
   name: string;
   align: 'left' | 'right';
   maxPx: number;
   stacked: boolean;
+  flagSize: FlagSize;
+  flagScale: number;
+  gapScale: number;
 }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [size, setSize] = useState(maxPx);
-
-  useLayoutEffect(() => {
-    setSize(maxPx);
-  }, [name, maxPx]);
-
-  useLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (el.scrollWidth > el.clientWidth + 2 && size > MIN_TEAM_PX) {
-      setSize((s) => s - 1);
-    }
-  }, [size, name]);
-
-  const nameEl = (
-    <span
-      ref={ref}
-      className="min-w-0 overflow-hidden whitespace-nowrap font-black leading-none text-foreground"
-      style={{ fontSize: `${size}px` }}
-      title={name}
-    >
-      {name}
-    </span>
-  );
+  const gap = `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${gapScale})`;
 
   if (stacked) {
     return (
       <div
-        className={`flex min-w-0 flex-col gap-[clamp(0.25rem,0.8vw,0.75rem)] ${
-          align === 'right' ? 'items-end' : 'items-start'
-        }`}
+        className={`flex min-w-0 w-full flex-col ${align === 'right' ? 'items-end' : 'items-start'}`}
+        style={{ gap }}
       >
-        <CountryFlag team={name} size="xl" />
-        {nameEl}
+        <CountryFlag team={name} size={flagSize} scale={flagScale} />
+        <AutoShrinkText
+          text={name}
+          maxPx={maxPx}
+          minPx={12}
+          className={`min-w-0 w-full font-black leading-none ${align === 'right' ? 'text-right' : 'text-left'}`}
+        />
       </div>
     );
   }
 
   return (
     <div
-      className={`flex min-w-0 items-center gap-[clamp(0.35rem,1.2vw,1.25rem)] ${
-        align === 'right' ? 'flex-row justify-end' : 'flex-row justify-start'
-      }`}
+      className={`flex min-w-0 w-full items-center ${align === 'right' ? 'flex-row-reverse' : 'flex-row'}`}
+      style={{ gap: `calc(clamp(0.35rem, 1vw, 1rem) * ${gapScale})` }}
     >
-      {align === 'right' ? (
-        <>
-          {nameEl}
-          <CountryFlag team={name} size="xl" />
-        </>
-      ) : (
-        <>
-          <CountryFlag team={name} size="xl" />
-          {nameEl}
-        </>
-      )}
+      <CountryFlag team={name} size={flagSize} scale={flagScale} className="shrink-0" />
+      <AutoShrinkText
+        text={name}
+        maxPx={maxPx}
+        minPx={12}
+        className={`min-w-0 flex-1 font-black leading-none ${align === 'right' ? 'text-right' : 'text-left'}`}
+      />
     </div>
   );
 }
@@ -144,13 +129,17 @@ function HeroTeamName({
 function TableTeamBlock({
   team,
   maxTeamPx,
+  flagSize,
+  flagScale,
 }: {
   team: string;
   maxTeamPx: number;
+  flagSize: FlagSize;
+  flagScale: number;
 }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col items-center gap-[clamp(0.15rem,0.5vw,0.35rem)]">
-      <CountryFlag team={team} size="sm" className="shrink-0" />
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-[clamp(0.1rem,0.35vw,0.3rem)]">
+      <CountryFlag team={team} size={flagSize} scale={flagScale} className="shrink-0" />
       <AutoShrinkText
         text={team}
         maxPx={maxTeamPx}
@@ -167,23 +156,27 @@ function TableMatchCell({
   finished,
   maxTeamPx,
   stacked,
+  flagSize,
+  flagScale,
 }: {
   team1: string;
   team2: string;
   finished: boolean;
   maxTeamPx: number;
   stacked: boolean;
+  flagSize: FlagSize;
+  flagScale: number;
 }) {
   if (stacked) {
     return (
-      <div className="flex min-w-0 items-center gap-[clamp(0.2rem,0.8vw,0.6rem)]">
-        <TableTeamBlock team={team1} maxTeamPx={maxTeamPx} />
-        <span className="shrink-0 px-[clamp(0.1rem,0.4vw,0.35rem)] text-[clamp(0.55rem,1.2vw,1.25rem)] font-bold text-muted-foreground">
+      <div className="flex min-w-0 items-center gap-[clamp(0.15rem,0.5vw,0.4rem)]">
+        <TableTeamBlock team={team1} maxTeamPx={maxTeamPx} flagSize={flagSize} flagScale={flagScale} />
+        <span className="shrink-0 px-[clamp(0.05rem,0.25vw,0.2rem)] text-[clamp(0.5rem,1vw,1rem)] font-bold text-muted-foreground">
           VS
         </span>
-        <TableTeamBlock team={team2} maxTeamPx={maxTeamPx} />
+        <TableTeamBlock team={team2} maxTeamPx={maxTeamPx} flagSize={flagSize} flagScale={flagScale} />
         {finished && (
-          <span className="ml-1 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1.5 py-0.5 text-[clamp(0.45rem,0.9vw,0.65rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
+          <span className="ml-0.5 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1 py-0.5 text-[clamp(0.4rem,0.8vw,0.6rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
             FT
           </span>
         )}
@@ -192,15 +185,15 @@ function TableMatchCell({
   }
 
   return (
-    <div className="flex min-w-0 items-center gap-[clamp(0.2rem,0.8vw,0.6rem)] whitespace-nowrap">
-      <CountryFlag team={team1} size="sm" className="shrink-0" />
+    <div className="flex min-w-0 items-center gap-[clamp(0.1rem,0.4vw,0.35rem)] whitespace-nowrap">
+      <CountryFlag team={team1} size={flagSize} scale={flagScale} className="shrink-0" />
       <AutoShrinkText
         text={team1}
         maxPx={maxTeamPx}
         minPx={9}
         className="min-w-0 flex-1 font-black leading-none"
       />
-      <span className="shrink-0 px-[clamp(0.1rem,0.4vw,0.35rem)] text-[clamp(0.55rem,1.2vw,1.25rem)] font-bold text-muted-foreground">
+      <span className="shrink-0 px-[clamp(0.05rem,0.2vw,0.2rem)] text-[clamp(0.5rem,1vw,1rem)] font-bold text-muted-foreground">
         VS
       </span>
       <AutoShrinkText
@@ -209,9 +202,9 @@ function TableMatchCell({
         minPx={9}
         className="min-w-0 flex-1 font-black leading-none"
       />
-      <CountryFlag team={team2} size="sm" className="shrink-0" />
+      <CountryFlag team={team2} size={flagSize} scale={flagScale} className="shrink-0" />
       {finished && (
-        <span className="ml-1 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1.5 py-0.5 text-[clamp(0.45rem,0.9vw,0.65rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
+        <span className="ml-0.5 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1 py-0.5 text-[clamp(0.4rem,0.8vw,0.6rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
           FT
         </span>
       )}
@@ -220,11 +213,15 @@ function TableMatchCell({
 }
 
 export default function CasinoDisplayTablePage() {
-  const { matches } = useCasinoMatches({ pollIntervalMs: 4000 });
+  const { matches, settings } = useCasinoMatches({ pollIntervalMs: 4000 });
+  const td = mergeTableDisplay(settings.tableDisplay);
   const vw = useViewportWidth();
-  const narrow = isDisplayNarrow(vw);
-  const heroMaxPx = heroTeamMaxPx(vw);
-  const teamMaxPx = tableTeamMaxPx(vw);
+  const narrow = vw < td.narrowBreakpoint;
+  const heroMaxPx = heroTeamMaxPx(vw) * td.heroTeamFontScale;
+  const teamMaxPx = tableTeamMaxPx(vw) * td.tableTeamFontScale;
+  const pad = cellPad(td.tableCellPaddingScale);
+  const pageSize = td.pageSize;
+  const pageIntervalMs = td.pageIntervalSec * 1000;
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -256,21 +253,21 @@ export default function CasinoDisplayTablePage() {
   const activeMatch = matches.find((m) => m.id === activeId) ?? null;
   const rest = matches.filter((m) => m.id !== activeId);
 
-  const pageCount = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+  const pageCount = Math.max(1, Math.ceil(rest.length / pageSize));
   const [page, setPage] = useState(0);
   useEffect(() => {
     if (pageCount <= 1) {
       setPage(0);
       return;
     }
-    const id = setInterval(() => setPage((p) => (p + 1) % pageCount), PAGE_INTERVAL_MS);
+    const id = setInterval(() => setPage((p) => (p + 1) % pageCount), pageIntervalMs);
     return () => clearInterval(id);
-  }, [pageCount]);
+  }, [pageCount, pageIntervalMs]);
   useEffect(() => {
     if (page >= pageCount) setPage(0);
   }, [page, pageCount]);
 
-  const pageRows = rest.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
+  const pageRows = rest.slice(page * pageSize, page * pageSize + pageSize);
   const countdownText = activeStart && !isLive ? formatCountdown(activeStart - now) : '';
 
   return (
@@ -284,7 +281,7 @@ export default function CasinoDisplayTablePage() {
 
       <div
         className="relative z-10 box-border flex h-full min-h-0 w-full flex-col items-center overflow-hidden"
-        style={{ padding: DISPLAY_SAFE_INSET }}
+        style={{ padding: safeInsetCss(td) }}
       >
         <div className="mb-[clamp(0.35rem,1vh,0.75rem)] shrink-0">
           <motion.img
@@ -318,7 +315,13 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 px-[clamp(0.75rem,2.5vw,2.5rem)] py-[clamp(1.5rem,4vh,3rem)] shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
+                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
+                style={{
+                  paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
+                  paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
+                  paddingTop: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
+                  paddingBottom: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
+                }}
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                 <div
@@ -328,47 +331,80 @@ export default function CasinoDisplayTablePage() {
 
                 <div className="relative z-10 flex flex-col items-center">
                   {isLive ? (
-                    <span className="mb-[clamp(0.75rem,2vh,1.25rem)] flex items-center gap-2 rounded-full bg-red-600 px-[clamp(1rem,3vw,1.75rem)] py-[clamp(0.4rem,1vh,0.625rem)] text-[clamp(0.75rem,2.2vw,1.5rem)] font-black uppercase tracking-[0.2em] text-white shadow-[0_0_40px_rgba(220,38,38,0.65)] sm:tracking-[0.35em]">
-                      <span className="h-[clamp(0.5rem,1.2vw,0.875rem)] w-[clamp(0.5rem,1.2vw,0.875rem)] animate-pulse rounded-full bg-white" />
+                    <span
+                      className="mb-[clamp(0.5rem,1.5vh,1rem)] flex items-center gap-2 rounded-full bg-red-600 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-white shadow-[0_0_40px_rgba(220,38,38,0.65)] sm:tracking-[0.35em]"
+                      style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                    >
+                      <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
                       Live now
                     </span>
                   ) : (
-                    <span className="mb-[clamp(0.75rem,2vh,1.25rem)] rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(1rem,3vw,1.75rem)] py-[clamp(0.4rem,1vh,0.625rem)] text-[clamp(0.75rem,2.2vw,1.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]">
+                    <span
+                      className="mb-[clamp(0.5rem,1.5vh,1rem)] rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
+                      style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                    >
                       Next match
                     </span>
                   )}
 
-                  <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[clamp(0.35rem,1.5vw,2rem)]">
-                    <div className="min-w-0 border-r border-amber-500/20 pr-[clamp(0.35rem,1.5vw,2rem)]">
+                  <div
+                    className="flex w-full min-w-0 items-center"
+                    style={{ gap: `calc(clamp(0.25rem, 1.2vw, 1.5rem) * ${td.heroGapScale})` }}
+                  >
+                    <div
+                      className="flex min-w-0 flex-1 border-r border-amber-500/20"
+                      style={{ paddingRight: `calc(clamp(0.25rem, 1vw, 1.25rem) * ${td.heroGapScale})` }}
+                    >
                       <HeroTeamName
                         name={activeMatch.team1}
                         align="right"
                         maxPx={heroMaxPx}
                         stacked={narrow}
+                        flagSize={td.heroFlagSize}
+                        flagScale={td.heroFlagScale}
+                        gapScale={td.heroGapScale}
                       />
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-center px-[clamp(0.25rem,1vw,1.5rem)]">
+                    <div
+                      className="flex shrink-0 flex-col items-center"
+                      style={{ paddingInline: `calc(clamp(0.15rem, 0.6vw, 1rem) * ${td.heroGapScale})` }}
+                    >
                       {activeMatch.score ? (
-                        <span className="whitespace-nowrap text-[clamp(2.25rem,10vw,7.5rem)] font-black leading-none tracking-wider text-foreground drop-shadow-[0_0_24px_rgba(255,255,255,0.35)]">
+                        <span
+                          className="whitespace-nowrap font-black leading-none tracking-wider text-foreground drop-shadow-[0_0_24px_rgba(255,255,255,0.35)]"
+                          style={{ fontSize: scaledFont(36, 10, 120, td.heroCenterFontScale) }}
+                        >
                           {activeMatch.score}
                         </span>
                       ) : (
-                        <span className="whitespace-nowrap text-[clamp(2.25rem,10vw,7.5rem)] font-black leading-none text-amber-500 drop-shadow-[0_0_28px_rgba(245,158,11,0.75)]">
+                        <span
+                          className="whitespace-nowrap font-black leading-none text-amber-500 drop-shadow-[0_0_28px_rgba(245,158,11,0.75)]"
+                          style={{ fontSize: scaledFont(36, 10, 120, td.heroCenterFontScale) }}
+                        >
                           {timeLabel(activeMatch)}
                         </span>
                       )}
-                      <span className="mt-1 whitespace-nowrap text-[clamp(0.65rem,1.8vw,1.5rem)] font-bold uppercase tracking-[0.25em] text-muted-foreground sm:tracking-[0.45em]">
+                      <span
+                        className="mt-1 whitespace-nowrap font-bold uppercase tracking-[0.2em] text-muted-foreground sm:tracking-[0.35em]"
+                        style={{ fontSize: scaledFont(10, 1.8, 24, td.heroCenterFontScale * 0.35) }}
+                      >
                         {dateLabel(activeMatch)}
                       </span>
                     </div>
 
-                    <div className="min-w-0 border-l border-amber-500/20 pl-[clamp(0.35rem,1.5vw,2rem)]">
+                    <div
+                      className="flex min-w-0 flex-1 border-l border-amber-500/20"
+                      style={{ paddingLeft: `calc(clamp(0.25rem, 1vw, 1.25rem) * ${td.heroGapScale})` }}
+                    >
                       <HeroTeamName
                         name={activeMatch.team2}
                         align="left"
                         maxPx={heroMaxPx}
                         stacked={narrow}
+                        flagSize={td.heroFlagSize}
+                        flagScale={td.heroFlagScale}
+                        gapScale={td.heroGapScale}
                       />
                     </div>
                   </div>
@@ -377,14 +413,18 @@ export default function CasinoDisplayTablePage() {
                     <motion.p
                       animate={{ opacity: [0.55, 1, 0.55], scale: [0.98, 1.02, 0.98] }}
                       transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                      className="mt-[clamp(1rem,3vh,2rem)] max-w-full px-2 text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black uppercase leading-snug tracking-[0.06em] text-emerald-400 drop-shadow-[0_0_16px_rgba(52,211,153,0.45)] sm:tracking-[0.12em]"
+                      className="mt-[clamp(0.75rem,2vh,1.5rem)] max-w-full px-2 text-center font-black uppercase leading-snug tracking-[0.06em] text-emerald-400 drop-shadow-[0_0_16px_rgba(52,211,153,0.45)] sm:tracking-[0.12em]"
+                      style={{ fontSize: scaledFont(13, 2.8, 48, td.heroCountdownFontScale) }}
                     >
                       {countdownText}
                     </motion.p>
                   )}
 
                   {activeMatch.winner && (
-                    <p className="mt-4 text-center text-[clamp(0.75rem,2vw,1.5rem)] font-black uppercase tracking-[0.15em] text-amber-500 sm:tracking-[0.25em]">
+                    <p
+                      className="mt-3 text-center font-black uppercase tracking-[0.15em] text-amber-500 sm:tracking-[0.25em]"
+                      style={{ fontSize: scaledFont(12, 2, 24, td.heroBadgeFontScale) }}
+                    >
                       {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
                     </p>
                   )}
@@ -398,29 +438,28 @@ export default function CasinoDisplayTablePage() {
               <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
-                    <col className="w-[10%]" />
-                    <col className="w-[12%]" />
-                    <col className="w-[46%]" />
-                    <col className="w-[12%]" />
-                    <col className="w-[20%]" />
+                    <col style={{ width: `${td.colDate}%` }} />
+                    <col style={{ width: `${td.colTime}%` }} />
+                    <col style={{ width: `${td.colMatch}%` }} />
+                    <col style={{ width: `${td.colScore}%` }} />
+                    <col style={{ width: `${td.colResult}%` }} />
                   </colgroup>
                   <thead className="shrink-0">
                     <tr className="table w-full table-fixed border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
-                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
-                        Date
-                      </th>
-                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
-                        Time
-                      </th>
-                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
-                        Match
-                      </th>
-                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-center text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
-                        Score
-                      </th>
-                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
-                        Result
-                      </th>
+                      {(['Date', 'Time', 'Match', 'Score', 'Result'] as const).map((label) => (
+                        <th
+                          key={label}
+                          className={`font-black tracking-[0.06em] sm:tracking-[0.12em] ${
+                            label === 'Score' ? 'text-center' : 'text-left'
+                          }`}
+                          style={{
+                            ...pad,
+                            fontSize: scaledFont(10, 2.2, 36, td.tableHeaderFontScale),
+                          }}
+                        >
+                          {label}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="flex min-h-0 flex-1 flex-col">
@@ -436,36 +475,51 @@ export default function CasinoDisplayTablePage() {
                             i % 2 === 0 ? 'bg-white/[0.02]' : ''
                           } ${finished ? 'opacity-75' : ''}`}
                         >
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold text-muted-foreground">
+                          <td
+                            className="whitespace-nowrap align-middle font-semibold text-muted-foreground"
+                            style={{ ...pad, fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
+                          >
                             {dateLabel(m)}
                           </td>
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-[clamp(0.7rem,2.2vw,2.25rem)] font-black text-amber-500">
+                          <td
+                            className="whitespace-nowrap align-middle font-black text-amber-500"
+                            style={{ ...pad, fontSize: scaledFont(11, 2.2, 36, td.tableMetaFontScale) }}
+                          >
                             {timeLabel(m)}
                           </td>
-                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle">
+                          <td className="min-w-0 align-middle" style={pad}>
                             <TableMatchCell
                               team1={m.team1}
                               team2={m.team2}
                               finished={finished}
                               maxTeamPx={teamMaxPx}
                               stacked={narrow}
+                              flagSize={td.tableFlagSize}
+                              flagScale={td.tableFlagScale}
                             />
                           </td>
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black leading-none">
+                          <td
+                            className="whitespace-nowrap align-middle text-center font-black leading-none"
+                            style={{ ...pad, fontSize: scaledFont(12, 2.8, 48, td.tableMetaFontScale) }}
+                          >
                             {m.score ?? '—'}
                           </td>
-                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle">
+                          <td className="min-w-0 align-middle" style={pad}>
                             {m.winner ? (
                               <span
-                                className={`block truncate text-[clamp(0.6rem,1.8vw,1.875rem)] font-bold uppercase ${
+                                className={`block truncate font-bold uppercase ${
                                   m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
                                 }`}
+                                style={{ fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
                                 title={m.winner === 'Ничья' ? 'Draw' : m.winner}
                               >
                                 {m.winner === 'Ничья' ? 'Draw' : m.winner}
                               </span>
                             ) : (
-                              <span className="text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold uppercase text-emerald-400">
+                              <span
+                                className="font-semibold uppercase text-emerald-400"
+                                style={{ fontSize: scaledFont(9, 1.8, 30, td.tableMetaFontScale) }}
+                              >
                                 Soon
                               </span>
                             )}

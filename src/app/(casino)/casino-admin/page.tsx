@@ -8,7 +8,8 @@ import { MatchForm } from './components/MatchForm';
 import { MatchList } from './components/MatchList';
 import { UpcomingMatchesCard } from './components/UpcomingMatchesCard';
 import { CarouselControls } from './components/CarouselControls';
-import { SlidersHorizontal, Clapperboard, PlusCircle, CalendarClock, ListOrdered } from 'lucide-react';
+import { TableDisplaySettingsCard } from './components/TableDisplaySettingsCard';
+import { SlidersHorizontal, Clapperboard, PlusCircle, CalendarClock, ListOrdered, Monitor } from 'lucide-react';
 
 export default function CasinoAdminPage() {
   const {
@@ -54,6 +55,21 @@ export default function CasinoAdminPage() {
           </CardHeader>
           <CardContent>
             <SettingsCard settings={settings} onChange={updateSettings} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Monitor className="h-5 w-5 text-amber-500" />
+              Настройки табло (таблица)
+            </CardTitle>
+            <CardDescription>
+              Колонки, шрифты, флаги, главный блок и пагинация для /casino-display-table.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TableDisplaySettingsCard settings={settings} onChange={updateSettings} />
           </CardContent>
         </Card>
 

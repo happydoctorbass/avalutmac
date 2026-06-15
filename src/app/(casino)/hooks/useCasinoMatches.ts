@@ -1,6 +1,7 @@
 'use client';
 
 import { Match, CasinoSettings, DEFAULT_SETTINGS } from '@/types/match';
+import { mergeCasinoSettings } from '@/lib/table-display-settings';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { type Channel } from 'pusher-js';
 import { getPusherClient, GAME_CHANNEL } from '@/lib/pusher';
@@ -32,7 +33,7 @@ function applyPayload(
     localStorage.setItem('casino_matches', JSON.stringify(data.matches));
   }
   if (data.focusMatchId !== undefined) setters.setFocusMatchId(data.focusMatchId);
-  if (data.settings) setters.setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
+  if (data.settings) setters.setSettings(mergeCasinoSettings(data.settings));
   if (data.currentIndex !== undefined) setters.setCurrentIndex(data.currentIndex);
 }
 

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { broadcast } from '@/lib/pusher-broadcast';
 import { DEFAULT_SETTINGS } from '@/types/match';
+import { mergeCasinoSettings } from '@/lib/table-display-settings';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -38,7 +39,7 @@ async function loadStateFromDisk() {
     const data = JSON.parse(raw) as Partial<BoardState>;
     globalMatches = Array.isArray(data.matches) ? data.matches : [];
     globalFocusId = data.focusMatchId ?? null;
-    globalSettings = data.settings ? { ...DEFAULT_SETTINGS, ...data.settings } : { ...DEFAULT_SETTINGS };
+    globalSettings = data.settings ? mergeCasinoSettings(data.settings) : { ...DEFAULT_SETTINGS };
     globalIndex = typeof data.currentIndex === 'number' ? data.currentIndex : 0;
     globalVersion = typeof data.version === 'number' ? data.version : 0;
   } catch {
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
 
       globalMatches = body.matches || [];
       globalFocusId = body.focusMatchId !== undefined ? body.focusMatchId : globalFocusId;
-      globalSettings = body.settings ? { ...DEFAULT_SETTINGS, ...body.settings } : globalSettings;
+      globalSettings = body.settings ? mergeCasinoSettings(body.settings) : globalSettings;
       if (body.currentIndex !== undefined) globalIndex = body.currentIndex;
       globalVersion = incomingVersion;
 
