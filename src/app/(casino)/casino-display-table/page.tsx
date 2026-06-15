@@ -4,7 +4,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Match } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
+import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
+import { AutoShrinkText } from '../display/components/AutoShrinkText';
 
 function getStartMs(m: Match): number | null {
   if (m.bishkek?.date_bishkek && m.bishkek?.time_bishkek) {
@@ -60,22 +62,29 @@ const LIVE_WINDOW_MS = 130 * 60 * 1000;
 const PAGE_SIZE = 6;
 const PAGE_INTERVAL_MS = 8000;
 
-const MAX_TEAM_PX = 88;
-const MIN_TEAM_PX = 28;
+const MIN_TEAM_PX = 14;
 
-function HeroTeamName({ name, align }: { name: string; align: 'left' | 'right' }) {
+function HeroTeamName({
+  name,
+  align,
+  maxPx,
+}: {
+  name: string;
+  align: 'left' | 'right';
+  maxPx: number;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [size, setSize] = useState(MAX_TEAM_PX);
+  const [size, setSize] = useState(maxPx);
 
   useLayoutEffect(() => {
-    setSize(MAX_TEAM_PX);
-  }, [name]);
+    setSize(maxPx);
+  }, [name, maxPx]);
 
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
     if (el.scrollWidth > el.clientWidth + 2 && size > MIN_TEAM_PX) {
-      setSize((s) => s - 2);
+      setSize((s) => s - 1);
     }
   }, [size, name]);
 
@@ -92,7 +101,7 @@ function HeroTeamName({ name, align }: { name: string; align: 'left' | 'right' }
 
   return (
     <div
-      className={`flex min-w-0 items-center gap-3 md:gap-5 ${
+      className={`flex min-w-0 items-center gap-[clamp(0.35rem,1.2vw,1.25rem)] ${
         align === 'right' ? 'flex-row justify-end' : 'flex-row justify-start'
       }`}
     >
@@ -111,8 +120,50 @@ function HeroTeamName({ name, align }: { name: string; align: 'left' | 'right' }
   );
 }
 
+function TableMatchCell({
+  team1,
+  team2,
+  finished,
+  maxTeamPx,
+}: {
+  team1: string;
+  team2: string;
+  finished: boolean;
+  maxTeamPx: number;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-[clamp(0.2rem,0.8vw,0.6rem)] whitespace-nowrap">
+      <CountryFlag team={team1} size="sm" className="shrink-0" />
+      <AutoShrinkText
+        text={team1}
+        maxPx={maxTeamPx}
+        minPx={9}
+        className="min-w-0 flex-1 font-black leading-none"
+      />
+      <span className="shrink-0 px-[clamp(0.1rem,0.4vw,0.35rem)] text-[clamp(0.55rem,1.2vw,1.25rem)] font-bold text-muted-foreground">
+        VS
+      </span>
+      <AutoShrinkText
+        text={team2}
+        maxPx={maxTeamPx}
+        minPx={9}
+        className="min-w-0 flex-1 font-black leading-none"
+      />
+      <CountryFlag team={team2} size="sm" className="shrink-0" />
+      {finished && (
+        <span className="ml-1 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1.5 py-0.5 text-[clamp(0.45rem,0.9vw,0.65rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
+          FT
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function CasinoDisplayTablePage() {
   const { matches } = useCasinoMatches({ pollIntervalMs: 4000 });
+  const vw = useViewportWidth();
+  const heroMaxPx = heroTeamMaxPx(vw);
+  const teamMaxPx = tableTeamMaxPx(vw);
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -162,7 +213,7 @@ export default function CasinoDisplayTablePage() {
   const countdownText = activeStart && !isLive ? formatCountdown(activeStart - now) : '';
 
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center overflow-x-hidden bg-background text-foreground">
+    <div className="relative flex min-h-screen w-full max-w-[100vw] flex-col items-center overflow-x-hidden bg-background text-foreground">
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
@@ -170,30 +221,30 @@ export default function CasinoDisplayTablePage() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background/90" />
       <div className="pointer-events-none absolute inset-0 z-30 shadow-[inset_0_0_180px_60px_rgba(0,0,0,0.8)]" />
 
-      <div className="relative z-50 mt-5 mb-3 shrink-0">
+      <div className="relative z-50 mt-[clamp(0.75rem,2vh,1.25rem)] mb-[clamp(0.5rem,1.5vh,0.75rem)] shrink-0">
         <motion.img
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           src="/logo/admiral.svg"
           alt="Admiral Casino"
-          className="h-14 w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.3)] md:h-16"
+          className="h-[clamp(2.5rem,6vw,4rem)] w-auto drop-shadow-[0_0_18px_rgba(245,158,11,0.3)]"
         />
       </div>
 
       {matches.length === 0 ? (
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center">
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4">
           <img
             src="/logo/main.svg"
             alt="Admiral"
-            className="h-24 w-auto opacity-90 drop-shadow-[0_0_18px_rgba(197,160,89,0.45)]"
+            className="h-[clamp(4rem,12vw,6rem)] w-auto opacity-90 drop-shadow-[0_0_18px_rgba(197,160,89,0.45)]"
           />
-          <span className="mt-6 animate-pulse text-lg font-bold tracking-[0.3em] text-amber-500">
+          <span className="mt-6 animate-pulse text-[clamp(0.75rem,2.5vw,1.125rem)] font-bold tracking-[0.25em] text-amber-500 sm:tracking-[0.3em]">
             WAITING FOR MATCHES...
           </span>
         </div>
       ) : (
-        <div className="relative z-10 flex w-full flex-col gap-6 px-3 pb-6 md:px-6 md:gap-8">
+        <div className="relative z-10 box-border flex w-full min-w-0 max-w-[100vw] flex-col gap-[clamp(0.75rem,2vh,2rem)] px-[clamp(0.5rem,2vw,1.5rem)] pb-[clamp(0.75rem,2vh,1.5rem)]">
           {activeMatch && (
             <AnimatePresence mode="wait">
               <motion.div
@@ -202,7 +253,7 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="relative w-full overflow-hidden rounded-[2rem] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 px-4 py-10 shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl md:rounded-[2.5rem] md:px-10 md:py-12"
+                className="relative box-border w-full min-w-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 px-[clamp(0.75rem,2.5vw,2.5rem)] py-[clamp(1.5rem,4vh,3rem)] shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                 <div
@@ -212,38 +263,38 @@ export default function CasinoDisplayTablePage() {
 
                 <div className="relative z-10 flex flex-col items-center">
                   {isLive ? (
-                    <span className="mb-5 flex items-center gap-3 rounded-full bg-red-600 px-7 py-2.5 text-xl font-black uppercase tracking-[0.35em] text-white shadow-[0_0_40px_rgba(220,38,38,0.65)] md:text-2xl">
-                      <span className="h-3.5 w-3.5 animate-pulse rounded-full bg-white" />
+                    <span className="mb-[clamp(0.75rem,2vh,1.25rem)] flex items-center gap-2 rounded-full bg-red-600 px-[clamp(1rem,3vw,1.75rem)] py-[clamp(0.4rem,1vh,0.625rem)] text-[clamp(0.75rem,2.2vw,1.5rem)] font-black uppercase tracking-[0.2em] text-white shadow-[0_0_40px_rgba(220,38,38,0.65)] sm:tracking-[0.35em]">
+                      <span className="h-[clamp(0.5rem,1.2vw,0.875rem)] w-[clamp(0.5rem,1.2vw,0.875rem)] animate-pulse rounded-full bg-white" />
                       Live now
                     </span>
                   ) : (
-                    <span className="mb-5 rounded-full border border-amber-500/50 bg-amber-500/10 px-7 py-2.5 text-xl font-black uppercase tracking-[0.35em] text-amber-400 md:text-2xl">
+                    <span className="mb-[clamp(0.75rem,2vh,1.25rem)] rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(1rem,3vw,1.75rem)] py-[clamp(0.4rem,1vh,0.625rem)] text-[clamp(0.75rem,2.2vw,1.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]">
                       Next match
                     </span>
                   )}
 
-                  <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-8">
-                    <div className="min-w-0 border-r border-amber-500/20 pr-3 md:pr-8">
-                      <HeroTeamName name={activeMatch.team1} align="right" />
+                  <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[clamp(0.35rem,1.5vw,2rem)]">
+                    <div className="min-w-0 border-r border-amber-500/20 pr-[clamp(0.35rem,1.5vw,2rem)]">
+                      <HeroTeamName name={activeMatch.team1} align="right" maxPx={heroMaxPx} />
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-center px-2 md:px-6">
+                    <div className="flex shrink-0 flex-col items-center px-[clamp(0.25rem,1vw,1.5rem)]">
                       {activeMatch.score ? (
-                        <span className="whitespace-nowrap text-6xl font-black tracking-wider text-foreground drop-shadow-[0_0_24px_rgba(255,255,255,0.35)] md:text-8xl xl:text-[120px]">
+                        <span className="whitespace-nowrap text-[clamp(2.25rem,10vw,7.5rem)] font-black leading-none tracking-wider text-foreground drop-shadow-[0_0_24px_rgba(255,255,255,0.35)]">
                           {activeMatch.score}
                         </span>
                       ) : (
-                        <span className="whitespace-nowrap text-6xl font-black text-amber-500 drop-shadow-[0_0_28px_rgba(245,158,11,0.75)] md:text-8xl xl:text-[120px]">
+                        <span className="whitespace-nowrap text-[clamp(2.25rem,10vw,7.5rem)] font-black leading-none text-amber-500 drop-shadow-[0_0_28px_rgba(245,158,11,0.75)]">
                           {timeLabel(activeMatch)}
                         </span>
                       )}
-                      <span className="mt-2 whitespace-nowrap text-base font-bold uppercase tracking-[0.45em] text-muted-foreground md:text-2xl">
+                      <span className="mt-1 whitespace-nowrap text-[clamp(0.65rem,1.8vw,1.5rem)] font-bold uppercase tracking-[0.25em] text-muted-foreground sm:tracking-[0.45em]">
                         {dateLabel(activeMatch)}
                       </span>
                     </div>
 
-                    <div className="min-w-0 border-l border-amber-500/20 pl-3 md:pl-8">
-                      <HeroTeamName name={activeMatch.team2} align="left" />
+                    <div className="min-w-0 border-l border-amber-500/20 pl-[clamp(0.35rem,1.5vw,2rem)]">
+                      <HeroTeamName name={activeMatch.team2} align="left" maxPx={heroMaxPx} />
                     </div>
                   </div>
 
@@ -251,14 +302,14 @@ export default function CasinoDisplayTablePage() {
                     <motion.p
                       animate={{ opacity: [0.55, 1, 0.55], scale: [0.98, 1.02, 0.98] }}
                       transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                      className="mt-8 text-center text-2xl font-black uppercase tracking-[0.12em] text-emerald-400 drop-shadow-[0_0_16px_rgba(52,211,153,0.45)] md:text-4xl xl:text-5xl"
+                      className="mt-[clamp(1rem,3vh,2rem)] max-w-full px-2 text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black uppercase leading-snug tracking-[0.06em] text-emerald-400 drop-shadow-[0_0_16px_rgba(52,211,153,0.45)] sm:tracking-[0.12em]"
                     >
                       {countdownText}
                     </motion.p>
                   )}
 
                   {activeMatch.winner && (
-                    <p className="mt-5 text-xl font-black uppercase tracking-[0.25em] text-amber-500 md:text-2xl">
+                    <p className="mt-4 text-center text-[clamp(0.75rem,2vw,1.5rem)] font-black uppercase tracking-[0.15em] text-amber-500 sm:tracking-[0.25em]">
                       {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
                     </p>
                   )}
@@ -268,78 +319,90 @@ export default function CasinoDisplayTablePage() {
           )}
 
           {rest.length > 0 && (
-            <div className="w-full overflow-hidden rounded-2xl border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md md:rounded-3xl">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 text-left uppercase text-amber-400">
-                    <th className="px-5 py-5 text-2xl font-black tracking-[0.15em] md:px-8 md:py-6 md:text-4xl">Date</th>
-                    <th className="px-5 py-5 text-2xl font-black tracking-[0.15em] md:px-8 md:py-6 md:text-4xl">Time</th>
-                    <th className="px-5 py-5 text-2xl font-black tracking-[0.15em] md:px-8 md:py-6 md:text-4xl">Match</th>
-                    <th className="px-5 py-5 text-center text-2xl font-black tracking-[0.15em] md:px-8 md:py-6 md:text-4xl">Score</th>
-                    <th className="px-5 py-5 text-2xl font-black tracking-[0.15em] md:px-8 md:py-6 md:text-4xl">Result</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pageRows.map((m, i) => {
-                    const finished = Boolean(m.finished || m.score || m.winner);
-                    return (
-                      <motion.tr
-                        key={`${page}-${m.id}`}
-                        initial={{ opacity: 0, x: -6 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.3, delay: i * 0.03 }}
-                        className={`border-b border-white/5 ${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${
-                          finished ? 'opacity-75' : ''
-                        }`}
-                      >
-                        <td className="whitespace-nowrap px-5 py-4 text-xl font-semibold text-muted-foreground md:px-8 md:py-5 md:text-3xl">
-                          {dateLabel(m)}
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4 text-2xl font-black text-amber-500 md:px-8 md:py-5 md:text-4xl">
-                          {timeLabel(m)}
-                        </td>
-                        <td className="px-5 py-4 md:px-8 md:py-5">
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                            <span className="inline-flex items-center gap-2 whitespace-nowrap text-2xl font-black md:text-4xl">
-                              <CountryFlag team={m.team1} size="md" />
-                              {m.team1}
-                            </span>
-                            <span className="text-lg font-bold text-muted-foreground md:text-2xl">VS</span>
-                            <span className="inline-flex items-center gap-2 whitespace-nowrap text-2xl font-black md:text-4xl">
-                              <CountryFlag team={m.team2} size="md" />
-                              {m.team2}
-                            </span>
-                            {finished && (
-                              <span className="rounded-full border border-muted-foreground/30 bg-muted/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">
-                                Finished
+            <div className="box-border w-full min-w-0 max-w-full overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
+              <div className="w-full min-w-0 overflow-x-auto">
+                <table className="w-full min-w-full table-fixed border-collapse">
+                  <colgroup>
+                    <col className="w-[10%]" />
+                    <col className="w-[12%]" />
+                    <col className="w-[46%]" />
+                    <col className="w-[12%]" />
+                    <col className="w-[20%]" />
+                  </colgroup>
+                  <thead>
+                    <tr className="border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
+                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
+                        Date
+                      </th>
+                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
+                        Time
+                      </th>
+                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
+                        Match
+                      </th>
+                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-center text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
+                        Score
+                      </th>
+                      <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
+                        Result
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageRows.map((m, i) => {
+                      const finished = Boolean(m.finished || m.score || m.winner);
+                      return (
+                        <motion.tr
+                          key={`${page}-${m.id}`}
+                          initial={{ opacity: 0, x: -6 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.3, delay: i * 0.03 }}
+                          className={`border-b border-white/5 ${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${
+                            finished ? 'opacity-75' : ''
+                          }`}
+                        >
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold text-muted-foreground">
+                            {dateLabel(m)}
+                          </td>
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-[clamp(0.7rem,2.2vw,2.25rem)] font-black text-amber-500">
+                            {timeLabel(m)}
+                          </td>
+                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)]">
+                            <TableMatchCell
+                              team1={m.team1}
+                              team2={m.team2}
+                              finished={finished}
+                              maxTeamPx={teamMaxPx}
+                            />
+                          </td>
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black leading-none">
+                            {m.score ?? '—'}
+                          </td>
+                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)]">
+                            {m.winner ? (
+                              <span
+                                className={`block truncate text-[clamp(0.6rem,1.8vw,1.875rem)] font-bold uppercase ${
+                                  m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
+                                }`}
+                                title={m.winner === 'Ничья' ? 'Draw' : m.winner}
+                              >
+                                {m.winner === 'Ничья' ? 'Draw' : m.winner}
+                              </span>
+                            ) : (
+                              <span className="text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold uppercase text-emerald-400">
+                                Soon
                               </span>
                             )}
-                          </div>
-                        </td>
-                        <td className="whitespace-nowrap px-5 py-4 text-center text-3xl font-black md:px-8 md:py-5 md:text-5xl">
-                          {m.score ?? '—'}
-                        </td>
-                        <td className="px-5 py-4 md:px-8 md:py-5">
-                          {m.winner ? (
-                            <span
-                              className={`text-xl font-bold uppercase md:text-3xl ${
-                                m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
-                              }`}
-                            >
-                              {m.winner === 'Ничья' ? 'Draw' : m.winner}
-                            </span>
-                          ) : (
-                            <span className="text-xl font-semibold uppercase text-emerald-400 md:text-3xl">Soon</span>
-                          )}
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
 
               {pageCount > 1 && (
-                <div className="flex items-center justify-center gap-2.5 py-5">
+                <div className="flex items-center justify-center gap-2.5 py-[clamp(0.75rem,2vh,1.25rem)]">
                   {Array.from({ length: pageCount }).map((_, idx) => (
                     <span
                       key={idx}

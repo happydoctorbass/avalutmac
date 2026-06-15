@@ -5,10 +5,10 @@ import * as Flags from 'country-flag-icons/react/3x2';
 import { getTeamCountryCode, isSubdivisionFlag } from '@/lib/team-flags';
 
 const SIZE_CLASS = {
-  sm: 'h-5 w-7 md:h-6 md:w-9',
-  md: 'h-7 w-10 md:h-8 md:w-12',
-  lg: 'h-10 w-14 md:h-14 md:w-20',
-  xl: 'h-14 w-20 md:h-20 md:w-28',
+  sm: 'h-[clamp(0.65rem,1.8vw,1.5rem)] w-[clamp(0.9rem,2.5vw,2.25rem)]',
+  md: 'h-[clamp(0.85rem,2.2vw,2rem)] w-[clamp(1.2rem,3vw,3rem)]',
+  lg: 'h-[clamp(1.1rem,3vw,3.5rem)] w-[clamp(1.6rem,4.2vw,5rem)]',
+  xl: 'h-[clamp(1.4rem,4vw,5rem)] w-[clamp(2rem,5.6vw,7rem)]',
 } as const;
 
 type CountryFlagProps = {
