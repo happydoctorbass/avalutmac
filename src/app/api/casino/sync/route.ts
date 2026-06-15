@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from 'next/server';
 import { broadcast } from '@/lib/pusher-broadcast';
 import { DEFAULT_SETTINGS } from '@/types/match';

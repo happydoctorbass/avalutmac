@@ -134,7 +134,7 @@ export default function CasinoDisplayTablePage() {
           </span>
         </div>
       ) : (
-        <div className="relative z-10 flex w-full max-w-6xl flex-1 flex-col gap-5 overflow-hidden px-6 pb-8">
+        <div className="relative z-10 flex w-full max-w-[1600px] flex-1 flex-col gap-8 overflow-hidden px-8 pb-8">
           {/* Hero — активный матч */}
           {activeMatch && (
             <AnimatePresence mode="wait">
@@ -144,7 +144,7 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97, y: -10 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="relative overflow-hidden rounded-[2.5rem] border-2 border-amber-500/70 bg-[hsl(222_47%_5%)]/95 p-12 shadow-[0_0_80px_rgba(245,158,11,0.4)] backdrop-blur-md"
+                className="relative overflow-hidden rounded-[3rem] border-2 border-amber-500/70 bg-[hsl(222_47%_5%)]/95 p-14 shadow-[0_0_80px_rgba(245,158,11,0.4)] backdrop-blur-md shrink-0"
               >
                 <div
                   className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.08]"
@@ -152,48 +152,48 @@ export default function CasinoDisplayTablePage() {
                 />
                 <div className="relative z-10 flex flex-col items-center">
                   {isLive ? (
-                    <span className="mb-6 flex items-center gap-3 rounded-full bg-red-600/90 px-6 py-2 text-lg font-black uppercase tracking-[0.3em] text-white shadow-[0_0_30px_rgba(220,38,38,0.7)]">
-                      <span className="h-3 w-3 animate-pulse rounded-full bg-white" />
+                    <span className="mb-6 flex items-center gap-4 rounded-full bg-red-600/90 px-8 py-3 text-2xl font-black uppercase tracking-[0.3em] text-white shadow-[0_0_30px_rgba(220,38,38,0.7)]">
+                      <span className="h-4 w-4 animate-pulse rounded-full bg-white" />
                       Live now
                     </span>
                   ) : (
-                    <span className="mb-6 rounded-full border-2 border-amber-500/60 bg-amber-500/15 px-6 py-2 text-lg font-black uppercase tracking-[0.3em] text-amber-400">
+                    <span className="mb-6 rounded-full border-2 border-amber-500/60 bg-amber-500/15 px-8 py-3 text-2xl font-black uppercase tracking-[0.3em] text-amber-400">
                       Next match
                     </span>
                   )}
 
                   <div className="flex w-full items-center justify-between gap-8">
-                    <div className="flex flex-1 items-center justify-end text-right">
-                      <span className="text-6xl font-black leading-none tracking-tight md:text-[100px]">{activeMatch.team1}</span>
+                    <div className="flex flex-1 items-center justify-end text-right min-w-0">
+                      <span className="text-6xl font-black leading-tight tracking-tight md:text-[90px] xl:text-[110px] break-words break-all">{activeMatch.team1}</span>
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-center px-10">
+                    <div className="flex shrink-0 flex-col items-center px-12">
                       {activeMatch.score ? (
-                        <span className="text-7xl font-black tracking-wider text-foreground drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] md:text-[130px]">
+                        <span className="text-7xl font-black tracking-wider text-foreground drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] md:text-[120px] xl:text-[150px]">
                           {activeMatch.score}
                         </span>
                       ) : (
-                        <span className="text-7xl font-black text-amber-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.8)] md:text-[130px]">
+                        <span className="text-7xl font-black text-amber-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.8)] md:text-[120px] xl:text-[150px]">
                           {timeLabel(activeMatch)}
                         </span>
                       )}
-                      <span className="mt-4 text-lg font-black uppercase tracking-[0.5em] text-muted-foreground md:text-2xl">
+                      <span className="mt-4 text-2xl font-black uppercase tracking-[0.5em] text-muted-foreground md:text-3xl">
                         {dateLabel(activeMatch)}
                       </span>
                     </div>
 
-                    <div className="flex flex-1 items-center justify-start text-left">
-                      <span className="text-6xl font-black leading-none tracking-tight md:text-[100px]">{activeMatch.team2}</span>
+                    <div className="flex flex-1 items-center justify-start text-left min-w-0">
+                      <span className="text-6xl font-black leading-tight tracking-tight md:text-[90px] xl:text-[110px] break-words break-all">{activeMatch.team2}</span>
                     </div>
                   </div>
 
                   {!isLive && activeStart && (
-                    <span className="mt-8 text-xl font-black uppercase tracking-[0.25em] text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]">
+                    <span className="mt-8 text-3xl font-black uppercase tracking-[0.25em] text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]">
                       {formatCountdown(activeStart - now)}
                     </span>
                   )}
                   {activeMatch.winner && (
-                    <span className="mt-6 text-xl font-black uppercase tracking-[0.3em] text-amber-500">
+                    <span className="mt-6 text-2xl font-black uppercase tracking-[0.3em] text-amber-500">
                       {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
                     </span>
                   )}
@@ -207,12 +207,12 @@ export default function CasinoDisplayTablePage() {
             <div className="mb-8 w-full overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
               <table className="w-full border-collapse">
                 <thead>
-                  <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
-                    <th className="px-6 py-3">Date</th>
-                    <th className="px-6 py-3">Time</th>
-                    <th className="px-6 py-3">Match</th>
-                    <th className="px-6 py-3 text-center">Score</th>
-                    <th className="px-6 py-3">Result</th>
+                  <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-lg font-bold uppercase tracking-[0.2em] text-amber-500 md:text-xl">
+                    <th className="px-6 py-4">Date</th>
+                    <th className="px-6 py-4">Time</th>
+                    <th className="px-6 py-4">Match</th>
+                    <th className="px-6 py-4 text-center">Score</th>
+                    <th className="px-6 py-4">Result</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -226,36 +226,36 @@ export default function CasinoDisplayTablePage() {
                         transition={{ duration: 0.35, delay: i * 0.04 }}
                         className={`border-b border-border/40 ${finished ? 'opacity-70' : ''}`}
                       >
-                        <td className="whitespace-nowrap px-6 py-4 text-lg font-semibold text-muted-foreground">
+                        <td className="whitespace-nowrap px-6 py-5 text-2xl font-semibold text-muted-foreground md:text-3xl">
                           {dateLabel(m)}
                         </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-xl font-black text-amber-500">
+                        <td className="whitespace-nowrap px-6 py-5 text-3xl font-black text-amber-500 md:text-4xl">
                           {timeLabel(m)}
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="text-xl font-black md:text-2xl">
-                            {m.team1} <span className="text-sm font-bold text-muted-foreground">VS</span> {m.team2}
+                        <td className="px-6 py-5">
+                          <span className="text-3xl font-black md:text-4xl">
+                            {m.team1} <span className="text-xl font-bold text-muted-foreground">VS</span> {m.team2}
                           </span>
                           {finished && (
-                            <span className="ml-2 rounded-full border border-muted-foreground/40 bg-muted/40 px-2 py-0.5 align-middle text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                            <span className="ml-3 rounded-full border border-muted-foreground/40 bg-muted/40 px-3 py-1 align-middle text-[12px] font-bold uppercase tracking-widest text-muted-foreground">
                               Finished
                             </span>
                           )}
                         </td>
-                        <td className="whitespace-nowrap px-6 py-4 text-center text-2xl font-black tracking-wider">
+                        <td className="whitespace-nowrap px-6 py-5 text-center text-4xl font-black tracking-wider">
                           {m.score ?? '—'}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-5">
                           {m.winner ? (
                             <span
-                              className={`text-base font-bold uppercase tracking-wide ${
+                              className={`text-2xl font-bold uppercase tracking-wide md:text-3xl ${
                                 m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-500'
                               }`}
                             >
                               {m.winner === 'Ничья' ? 'Draw' : m.winner}
                             </span>
                           ) : (
-                            <span className="text-base font-semibold uppercase tracking-wide text-emerald-400">Soon</span>
+                            <span className="text-2xl font-semibold uppercase tracking-wide text-emerald-400 md:text-3xl">Soon</span>
                           )}
                         </td>
                       </motion.tr>

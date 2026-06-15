@@ -20,10 +20,13 @@ export function useCasinoMatches() {
 
   const fetchInitialState = async () => {
     try {
-      const res = await fetch('/api/casino/sync');
+      const res = await fetch(`/api/casino/sync?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (typeof data.version === 'number') lastVersionRef.current = data.version;
-      if (data.matches) setMatches(data.matches);
+      if (data.matches) {
+        setMatches(data.matches);
+        localStorage.setItem('casino_matches', JSON.stringify(data.matches));
+      }
       if (data.focusMatchId !== undefined) setFocusMatchId(data.focusMatchId);
       if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
       if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
