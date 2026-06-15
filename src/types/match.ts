@@ -8,6 +8,10 @@ export interface Match {
   time: string;
   score?: string; // e.g. "2:1"
   winner?: string; // team name of the winner
+  bishkek?: {
+    date_bishkek: string;
+    time_bishkek: string;
+  };
 }
 
 export interface CasinoSettings {

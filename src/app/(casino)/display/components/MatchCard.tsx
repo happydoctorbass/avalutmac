@@ -113,7 +113,7 @@ function CardShell({
 
 export function MatchCard({ match, isFocused = false }: MatchCardProps) {
   const isPromo = match.id.startsWith('promo');
-  const timeLabel = match.time?.includes?.('T') ? match.time.split('T')[1]?.slice(0, 5) || match.time : match.time;
+  const timeLabel = match.bishkek?.time_bishkek || (match.time?.includes?.('T') ? match.time.split('T')[1]?.slice(0, 5) || match.time : match.time);
 
   if (isPromo) {
     return (
