@@ -45,7 +45,8 @@ export function useCasinoMatches() {
     channel.bind(
       'casino-sync',
       (data: {
-        matches: Match[];
+        type?: string;
+        matches?: Match[];
         focusMatchId: string | null;
         settings: CasinoSettings;
         currentIndex?: number;
@@ -56,11 +57,22 @@ export function useCasinoMatches() {
           if (data.version <= lastVersionRef.current) return;
           lastVersionRef.current = data.version;
         }
-        setMatches(data.matches);
+
+        if (data.type === 'INVALIDATE') {
+          // Сервер прислал только пинг (payload с матчами слишком велик для Pusher).
+          // Запрашиваем полное состояние.
+          fetchInitialState();
+          return;
+        }
+
+        if (data.matches) {
+          setMatches(data.matches);
+          localStorage.setItem('casino_matches', JSON.stringify(data.matches));
+        }
+        
         setFocusMatchId(data.focusMatchId);
         if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
         if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
-        localStorage.setItem('casino_matches', JSON.stringify(data.matches));
       },
     );
 

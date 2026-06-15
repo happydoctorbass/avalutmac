@@ -31,7 +31,16 @@ export async function POST(req: Request) {
       if (body.currentIndex !== undefined) globalIndex = body.currentIndex;
       if (typeof body.version === 'number') globalVersion = body.version;
 
-      await broadcast('casino-sync', payload());
+      // НЕ отправляем массив матчей через Pusher, так как при добавлении "Все"
+      // размер payload превышает лимит Pusher в 10 КБ, что вызывает ошибку 500.
+      // Отправляем только пинг с версией. Клиенты сами заберут полное состояние через GET.
+      await broadcast('casino-sync', {
+        type: 'INVALIDATE',
+        version: globalVersion,
+        focusMatchId: globalFocusId,
+        currentIndex: globalIndex,
+        settings: globalSettings,
+      });
     }
 
     if (body.type === 'REQUEST_STATE') {

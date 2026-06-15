@@ -164,26 +164,26 @@ export default function CasinoDisplayTablePage() {
 
                   <div className="flex w-full items-center justify-between gap-8">
                     <div className="flex flex-1 items-center justify-end text-right">
-                      <span className="text-5xl font-black leading-tight tracking-tight md:text-[80px]">{activeMatch.team1}</span>
+                      <span className="text-6xl font-black leading-none tracking-tight md:text-[100px]">{activeMatch.team1}</span>
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-center px-8">
+                    <div className="flex shrink-0 flex-col items-center px-10">
                       {activeMatch.score ? (
-                        <span className="text-6xl font-black tracking-wider text-foreground drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] md:text-[100px]">
+                        <span className="text-7xl font-black tracking-wider text-foreground drop-shadow-[0_0_30px_rgba(255,255,255,0.4)] md:text-[130px]">
                           {activeMatch.score}
                         </span>
                       ) : (
-                        <span className="text-6xl font-black text-amber-500 drop-shadow-[0_0_24px_rgba(245,158,11,0.7)] md:text-[100px]">
+                        <span className="text-7xl font-black text-amber-500 drop-shadow-[0_0_30px_rgba(245,158,11,0.8)] md:text-[130px]">
                           {timeLabel(activeMatch)}
                         </span>
                       )}
-                      <span className="mt-4 text-sm font-bold uppercase tracking-[0.4em] text-muted-foreground md:text-xl">
+                      <span className="mt-4 text-lg font-black uppercase tracking-[0.5em] text-muted-foreground md:text-2xl">
                         {dateLabel(activeMatch)}
                       </span>
                     </div>
 
                     <div className="flex flex-1 items-center justify-start text-left">
-                      <span className="text-5xl font-black leading-tight tracking-tight md:text-[80px]">{activeMatch.team2}</span>
+                      <span className="text-6xl font-black leading-none tracking-tight md:text-[100px]">{activeMatch.team2}</span>
                     </div>
                   </div>
 
@@ -204,7 +204,7 @@ export default function CasinoDisplayTablePage() {
 
           {/* Остальные матчи — авто-листание */}
           {rest.length > 0 && (
-            <div className="mb-8 flex min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
+            <div className="mb-8 w-full overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-xs font-bold uppercase tracking-[0.2em] text-amber-500">
