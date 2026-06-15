@@ -144,56 +144,56 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.97, y: -10 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="relative overflow-hidden rounded-3xl border-2 border-amber-500/70 bg-[hsl(222_47%_5%)]/95 p-8 shadow-[0_0_60px_rgba(245,158,11,0.35)] backdrop-blur-md"
+                className="relative overflow-hidden rounded-[2.5rem] border-2 border-amber-500/70 bg-[hsl(222_47%_5%)]/95 p-12 shadow-[0_0_80px_rgba(245,158,11,0.4)] backdrop-blur-md"
               >
                 <div
-                  className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.06]"
+                  className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.08]"
                   style={{ backgroundImage: "url('/logo/main.svg')" }}
                 />
                 <div className="relative z-10 flex flex-col items-center">
                   {isLive ? (
-                    <span className="mb-4 flex items-center gap-2 rounded-full bg-red-600/90 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-white shadow-[0_0_20px_rgba(220,38,38,0.6)]">
-                      <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
+                    <span className="mb-6 flex items-center gap-3 rounded-full bg-red-600/90 px-6 py-2 text-lg font-black uppercase tracking-[0.3em] text-white shadow-[0_0_30px_rgba(220,38,38,0.7)]">
+                      <span className="h-3 w-3 animate-pulse rounded-full bg-white" />
                       Live now
                     </span>
                   ) : (
-                    <span className="mb-4 rounded-full border border-amber-500/60 bg-amber-500/15 px-4 py-1.5 text-sm font-black uppercase tracking-[0.25em] text-amber-400">
+                    <span className="mb-6 rounded-full border-2 border-amber-500/60 bg-amber-500/15 px-6 py-2 text-lg font-black uppercase tracking-[0.3em] text-amber-400">
                       Next match
                     </span>
                   )}
 
-                  <div className="flex w-full items-center justify-between gap-6">
+                  <div className="flex w-full items-center justify-between gap-8">
                     <div className="flex flex-1 items-center justify-end text-right">
-                      <span className="text-4xl font-black leading-tight md:text-6xl">{activeMatch.team1}</span>
+                      <span className="text-5xl font-black leading-tight tracking-tight md:text-[80px]">{activeMatch.team1}</span>
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-center px-4">
+                    <div className="flex shrink-0 flex-col items-center px-8">
                       {activeMatch.score ? (
-                        <span className="text-5xl font-black tracking-wider text-foreground drop-shadow-[0_0_14px_rgba(255,255,255,0.25)] md:text-7xl">
+                        <span className="text-6xl font-black tracking-wider text-foreground drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] md:text-[100px]">
                           {activeMatch.score}
                         </span>
                       ) : (
-                        <span className="text-5xl font-black text-amber-500 drop-shadow-[0_0_16px_rgba(245,158,11,0.6)] md:text-7xl">
+                        <span className="text-6xl font-black text-amber-500 drop-shadow-[0_0_24px_rgba(245,158,11,0.7)] md:text-[100px]">
                           {timeLabel(activeMatch)}
                         </span>
                       )}
-                      <span className="mt-1 text-xs font-bold uppercase tracking-[0.3em] text-muted-foreground">
+                      <span className="mt-4 text-sm font-bold uppercase tracking-[0.4em] text-muted-foreground md:text-xl">
                         {dateLabel(activeMatch)}
                       </span>
                     </div>
 
                     <div className="flex flex-1 items-center justify-start text-left">
-                      <span className="text-4xl font-black leading-tight md:text-6xl">{activeMatch.team2}</span>
+                      <span className="text-5xl font-black leading-tight tracking-tight md:text-[80px]">{activeMatch.team2}</span>
                     </div>
                   </div>
 
                   {!isLive && activeStart && (
-                    <span className="mt-4 text-base font-semibold uppercase tracking-[0.2em] text-emerald-400">
+                    <span className="mt-8 text-xl font-black uppercase tracking-[0.25em] text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.3)]">
                       {formatCountdown(activeStart - now)}
                     </span>
                   )}
                   {activeMatch.winner && (
-                    <span className="mt-3 text-sm font-bold uppercase tracking-[0.2em] text-amber-500">
+                    <span className="mt-6 text-xl font-black uppercase tracking-[0.3em] text-amber-500">
                       {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
                     </span>
                   )}
@@ -204,7 +204,7 @@ export default function CasinoDisplayTablePage() {
 
           {/* Остальные матчи — авто-листание */}
           {rest.length > 0 && (
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
+            <div className="mb-8 flex min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-[hsl(222_47%_5%)]/80 backdrop-blur-md">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-amber-500/30 bg-amber-500/10 text-left text-xs font-bold uppercase tracking-[0.2em] text-amber-500">

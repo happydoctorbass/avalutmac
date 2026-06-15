@@ -93,6 +93,15 @@ export function useCasinoMatches() {
       setSettings(finalSettings);
       setCurrentIndex(finalIndex);
 
+      // Сразу обновляем ref, чтобы следующие синхронные вызовы (например, быстрое нажатие кнопок)
+      // видели актуальное состояние ещё до того, как React завершит рендер.
+      ref.current = {
+        matches: finalMatches,
+        focusMatchId: finalFocus,
+        settings: finalSettings,
+        currentIndex: finalIndex,
+      };
+
       await fetch('/api/casino/sync', {
         method: 'POST',
         body: JSON.stringify({
