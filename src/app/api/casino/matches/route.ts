@@ -65,7 +65,7 @@ export async function GET() {
       return hasScore || inWindow;
     });
 
-    const matches: Match[] = filtered.map((match: any, index: number) => {
+    const matches: Match[] = filtered.map((match: any) => {
       const bishkek = convertToBishkek(match.date, match.time);
       
       let scoreStr;
@@ -88,9 +88,13 @@ export async function GET() {
         const randomGuestId = Math.floor(1000 + Math.random() * 9000);
         guestBetMessage = `Гость с ID #${randomGuestId} победил, сделав ставку`;
       }
+
+      // Стабильный id, чтобы можно было определять, какой матч уже на табло
+      const slug = (s: string) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const id = `wc2026-${match.date}-${slug(match.team1)}-vs-${slug(match.team2)}`;
       
       return {
-        id: `wc2026-${match.date}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+        id,
         sportType: 'football' as SportType,
         team1: match.team1,
         team2: match.team2,

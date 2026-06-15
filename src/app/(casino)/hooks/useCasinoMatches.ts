@@ -90,6 +90,12 @@ export function useCasinoMatches() {
   const addMatch = (match: Match) => syncState({ matches: [...ref.current.matches, match] });
   const addMatches = (newOnes: Match[]) => syncState({ matches: [...ref.current.matches, ...newOnes] });
 
+  // Заменить весь список матчей одним вызовом (без гонок при массовых операциях)
+  const setMatchesBulk = (next: Match[]) => syncState({ matches: next });
+
+  // Полная очистка табло
+  const clearMatches = () => syncState({ matches: [], focusMatchId: null });
+
   const removeMatch = (id: string) =>
     syncState({
       matches: ref.current.matches.filter((m) => m.id !== id),
@@ -115,6 +121,8 @@ export function useCasinoMatches() {
     isConnected,
     addMatch,
     addMatches,
+    setMatchesBulk,
+    clearMatches,
     removeMatch,
     setFocus,
     updateMatch,
