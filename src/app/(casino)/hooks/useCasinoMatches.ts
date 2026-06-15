@@ -2,6 +2,7 @@
 
 import { Match, CasinoSettings, DEFAULT_SETTINGS } from '@/types/match';
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { type Channel } from 'pusher-js';
 import { getPusherClient, GAME_CHANNEL } from '@/lib/pusher';
 
 type SyncPayload = {
@@ -10,6 +11,11 @@ type SyncPayload = {
   settings?: CasinoSettings;
   currentIndex?: number;
   version?: number;
+};
+
+type UseCasinoMatchesOptions = {
+  /** Периодический опрос сервера (мс). Для гостевых табло — 3–5 с. */
+  pollIntervalMs?: number;
 };
 
 function applyPayload(
@@ -30,8 +36,22 @@ function applyPayload(
   if (data.currentIndex !== undefined) setters.setCurrentIndex(data.currentIndex);
 }
 
-export function useCasinoMatches() {
-  const [matches, setMatches] = useState<Match[]>([]);
+function readCachedMatches(): Match[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem('casino_matches');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
+  const pollIntervalMs = options?.pollIntervalMs;
+
+  const [matches, setMatches] = useState<Match[]>(() => readCachedMatches());
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
   const [settings, setSettings] = useState<CasinoSettings>({ ...DEFAULT_SETTINGS });
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,7 +65,7 @@ export function useCasinoMatches() {
 
   const setters = { setMatches, setFocusMatchId, setSettings, setCurrentIndex };
 
-  const fetchInitialState = useCallback(async () => {
+  const fetchFromServer = useCallback(async (force = false) => {
     const seq = ++fetchSeqRef.current;
 
     try {
@@ -55,46 +75,63 @@ export function useCasinoMatches() {
       if (seq !== fetchSeqRef.current) return;
 
       const serverVersion = typeof data.version === 'number' ? data.version : 0;
-      // Сравниваем с актуальной версией на момент ответа (не на момент старта запроса)
-      if (serverVersion <= lastVersionRef.current) return;
+      if (!force && serverVersion <= lastVersionRef.current) return;
 
       lastVersionRef.current = serverVersion;
       applyPayload(data, setters);
     } catch (e) {
-      console.log('Failed to fetch initial state', e);
+      console.log('Failed to fetch casino state', e);
     }
   }, []);
 
   useEffect(() => {
-    fetchInitialState();
+    fetchFromServer();
 
     const pusher = getPusherClient();
-    if (!pusher) return;
+    let channel: Channel | null = null;
 
-    const channel = pusher.subscribe(GAME_CHANNEL);
-    channel.bind('pusher:subscription_succeeded', () => setIsConnected(true));
-    channel.bind('pusher:subscription_error', () => setIsConnected(false));
+    if (pusher) {
+      channel = pusher.subscribe(GAME_CHANNEL);
+      channel.bind('pusher:subscription_succeeded', () => setIsConnected(true));
+      channel.bind('pusher:subscription_error', () => setIsConnected(false));
 
-    channel.bind('casino-sync', (data: SyncPayload & { type?: string }) => {
-      if (data.type === 'INVALIDATE') {
-        if (typeof data.version === 'number' && data.version <= lastVersionRef.current) return;
-        fetchInitialState();
-        return;
-      }
+      channel.bind('casino-sync', (data: SyncPayload & { type?: string }) => {
+        if (data.type === 'INVALIDATE') {
+          if (typeof data.version === 'number' && data.version <= lastVersionRef.current) return;
+          fetchFromServer(true);
+          return;
+        }
 
-      if (typeof data.version === 'number') {
-        if (data.version <= lastVersionRef.current) return;
-        lastVersionRef.current = data.version;
-      }
+        if (typeof data.version === 'number') {
+          if (data.version <= lastVersionRef.current) return;
+          lastVersionRef.current = data.version;
+        }
 
-      applyPayload(data, setters);
-    });
+        applyPayload(data, setters);
+      });
+    }
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') fetchFromServer(true);
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onVisible);
+
+    let pollId: ReturnType<typeof setInterval> | undefined;
+    if (pollIntervalMs && pollIntervalMs > 0) {
+      pollId = setInterval(() => fetchFromServer(), pollIntervalMs);
+    }
 
     return () => {
-      channel.unbind('casino-sync');
-      pusher.unsubscribe(GAME_CHANNEL);
+      if (channel) {
+        channel.unbind('casino-sync');
+        pusher?.unsubscribe(GAME_CHANNEL);
+      }
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onVisible);
+      if (pollId) clearInterval(pollId);
     };
-  }, [fetchInitialState]);
+  }, [fetchFromServer, pollIntervalMs]);
 
   const syncState = useCallback(
     async (opts: {
@@ -112,7 +149,6 @@ export function useCasinoMatches() {
       const version = Math.max(lastVersionRef.current + 1, Date.now());
       lastVersionRef.current = version;
 
-      // Инвалидируем любые in-flight GET, чтобы они не перезаписали свежее состояние
       fetchSeqRef.current += 1;
 
       setMatches(finalMatches);
@@ -195,6 +231,7 @@ export function useCasinoMatches() {
     settings,
     currentIndex,
     isConnected,
+    refetch: () => fetchFromServer(true),
     addMatch,
     addMatches,
     addMatchesUnique,

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Match } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
+import { CountryFlag } from '@/components/CountryFlag';
 
 function getStartMs(m: Match): number | null {
   if (m.bishkek?.date_bishkek && m.bishkek?.time_bishkek) {
@@ -78,22 +79,40 @@ function HeroTeamName({ name, align }: { name: string; align: 'left' | 'right' }
     }
   }, [size, name]);
 
-  return (
+  const nameEl = (
     <span
       ref={ref}
-      className={`block w-full overflow-hidden whitespace-nowrap font-black leading-none text-foreground ${
-        align === 'right' ? 'text-right' : 'text-left'
-      }`}
+      className="min-w-0 overflow-hidden whitespace-nowrap font-black leading-none text-foreground"
       style={{ fontSize: `${size}px` }}
       title={name}
     >
       {name}
     </span>
   );
+
+  return (
+    <div
+      className={`flex min-w-0 items-center gap-3 md:gap-5 ${
+        align === 'right' ? 'flex-row justify-end' : 'flex-row justify-start'
+      }`}
+    >
+      {align === 'right' ? (
+        <>
+          {nameEl}
+          <CountryFlag team={name} size="xl" />
+        </>
+      ) : (
+        <>
+          <CountryFlag team={name} size="xl" />
+          {nameEl}
+        </>
+      )}
+    </div>
+  );
 }
 
 export default function CasinoDisplayTablePage() {
-  const { matches } = useCasinoMatches();
+  const { matches } = useCasinoMatches({ pollIntervalMs: 4000 });
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -280,16 +299,22 @@ export default function CasinoDisplayTablePage() {
                           {timeLabel(m)}
                         </td>
                         <td className="px-5 py-4 md:px-8 md:py-5">
-                          <span className="whitespace-nowrap text-2xl font-black md:text-4xl">
-                            {m.team1}{' '}
-                            <span className="mx-1 text-lg font-bold text-muted-foreground md:text-2xl">VS</span>{' '}
-                            {m.team2}
-                          </span>
-                          {finished && (
-                            <span className="ml-2 inline-block rounded-full border border-muted-foreground/30 bg-muted/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">
-                              Finished
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span className="inline-flex items-center gap-2 whitespace-nowrap text-2xl font-black md:text-4xl">
+                              <CountryFlag team={m.team1} size="md" />
+                              {m.team1}
                             </span>
-                          )}
+                            <span className="text-lg font-bold text-muted-foreground md:text-2xl">VS</span>
+                            <span className="inline-flex items-center gap-2 whitespace-nowrap text-2xl font-black md:text-4xl">
+                              <CountryFlag team={m.team2} size="md" />
+                              {m.team2}
+                            </span>
+                            {finished && (
+                              <span className="rounded-full border border-muted-foreground/30 bg-muted/30 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground md:text-xs">
+                                Finished
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="whitespace-nowrap px-5 py-4 text-center text-3xl font-black md:px-8 md:py-5 md:text-5xl">
                           {m.score ?? '—'}
