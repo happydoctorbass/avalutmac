@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Match, SportType } from '@/types/match';
+import fs from 'fs/promises';
+import path from 'path';
 
 function convertToBishkek(dateStr: string, timeStr: string) {
   const match = timeStr.match(/(\d{1,2}):(\d{2})\s*UTC([+-]?\d+)/);
@@ -32,12 +34,9 @@ function convertToBishkek(dateStr: string, timeStr: string) {
 
 export async function GET() {
   try {
-    const res = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json', { next: { revalidate: 3600 } });
-    if (!res.ok) {
-      throw new Error(`Failed to fetch: ${res.status}`);
-    }
-    
-    const data = await res.json();
+    const filePath = path.join(process.cwd(), 'data', 'worldcup2026.json');
+    const fileContents = await fs.readFile(filePath, 'utf8');
+    const data = JSON.parse(fileContents);
     
     if (!data || !data.matches) {
       return NextResponse.json({ matches: [] });
@@ -58,7 +57,7 @@ export async function GET() {
 
     return NextResponse.json({ matches });
   } catch (error) {
-    console.error('Failed to fetch matches:', error);
+    console.error('Failed to read matches from local JSON:', error);
     return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 });
   }
 }
