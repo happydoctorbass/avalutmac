@@ -40,3 +40,10 @@ export function tableTeamMaxPx(vw: number) {
   if (vw < 1280) return 28;
   return 36;
 }
+
+/** Below this width: flags stack above team names in hero + table */
+export const DISPLAY_NARROW_BREAKPOINT = 768;
+
+export function isDisplayNarrow(vw: number) {
+  return vw < DISPLAY_NARROW_BREAKPOINT;
+}

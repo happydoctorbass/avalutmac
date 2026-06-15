@@ -4,7 +4,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Match } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
-import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
+import {
+  heroTeamMaxPx,
+  isDisplayNarrow,
+  tableTeamMaxPx,
+  useViewportWidth,
+} from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
 
@@ -68,10 +73,12 @@ function HeroTeamName({
   name,
   align,
   maxPx,
+  stacked,
 }: {
   name: string;
   align: 'left' | 'right';
   maxPx: number;
+  stacked: boolean;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [size, setSize] = useState(maxPx);
@@ -99,6 +106,19 @@ function HeroTeamName({
     </span>
   );
 
+  if (stacked) {
+    return (
+      <div
+        className={`flex min-w-0 flex-col gap-[clamp(0.25rem,0.8vw,0.75rem)] ${
+          align === 'right' ? 'items-end' : 'items-start'
+        }`}
+      >
+        <CountryFlag team={name} size="xl" />
+        {nameEl}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`flex min-w-0 items-center gap-[clamp(0.35rem,1.2vw,1.25rem)] ${
@@ -120,17 +140,56 @@ function HeroTeamName({
   );
 }
 
+function TableTeamBlock({
+  team,
+  maxTeamPx,
+}: {
+  team: string;
+  maxTeamPx: number;
+}) {
+  return (
+    <div className="flex min-w-0 flex-1 flex-col items-center gap-[clamp(0.15rem,0.5vw,0.35rem)]">
+      <CountryFlag team={team} size="sm" className="shrink-0" />
+      <AutoShrinkText
+        text={team}
+        maxPx={maxTeamPx}
+        minPx={9}
+        className="min-w-0 w-full text-center font-black leading-none"
+      />
+    </div>
+  );
+}
+
 function TableMatchCell({
   team1,
   team2,
   finished,
   maxTeamPx,
+  stacked,
 }: {
   team1: string;
   team2: string;
   finished: boolean;
   maxTeamPx: number;
+  stacked: boolean;
 }) {
+  if (stacked) {
+    return (
+      <div className="flex min-w-0 items-center gap-[clamp(0.2rem,0.8vw,0.6rem)]">
+        <TableTeamBlock team={team1} maxTeamPx={maxTeamPx} />
+        <span className="shrink-0 px-[clamp(0.1rem,0.4vw,0.35rem)] text-[clamp(0.55rem,1.2vw,1.25rem)] font-bold text-muted-foreground">
+          VS
+        </span>
+        <TableTeamBlock team={team2} maxTeamPx={maxTeamPx} />
+        {finished && (
+          <span className="ml-1 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 px-1.5 py-0.5 text-[clamp(0.45rem,0.9vw,0.65rem)] font-bold uppercase tracking-wider text-muted-foreground sm:inline">
+            FT
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex min-w-0 items-center gap-[clamp(0.2rem,0.8vw,0.6rem)] whitespace-nowrap">
       <CountryFlag team={team1} size="sm" className="shrink-0" />
@@ -162,6 +221,7 @@ function TableMatchCell({
 export default function CasinoDisplayTablePage() {
   const { matches } = useCasinoMatches({ pollIntervalMs: 4000 });
   const vw = useViewportWidth();
+  const narrow = isDisplayNarrow(vw);
   const heroMaxPx = heroTeamMaxPx(vw);
   const teamMaxPx = tableTeamMaxPx(vw);
 
@@ -244,7 +304,7 @@ export default function CasinoDisplayTablePage() {
           </span>
         </div>
       ) : (
-        <div className="relative z-10 box-border flex w-full min-w-0 max-w-[100vw] flex-col gap-[clamp(0.75rem,2vh,2rem)] px-[clamp(0.5rem,2vw,1.5rem)] pb-[clamp(0.75rem,2vh,1.5rem)]">
+        <div className="relative z-10 box-border flex w-full min-h-0 min-w-0 max-w-[100vw] flex-1 flex-col gap-[clamp(0.75rem,2vh,2rem)] px-[clamp(0.5rem,2vw,1.5rem)] pb-[clamp(0.75rem,2vh,1.5rem)]">
           {activeMatch && (
             <AnimatePresence mode="wait">
               <motion.div
@@ -253,7 +313,7 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="relative box-border w-full min-w-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 px-[clamp(0.75rem,2.5vw,2.5rem)] py-[clamp(1.5rem,4vh,3rem)] shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
+                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95 px-[clamp(0.75rem,2.5vw,2.5rem)] py-[clamp(1.5rem,4vh,3rem)] shadow-[0_0_100px_rgba(245,158,11,0.25),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl"
               >
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
                 <div
@@ -275,7 +335,12 @@ export default function CasinoDisplayTablePage() {
 
                   <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-[clamp(0.35rem,1.5vw,2rem)]">
                     <div className="min-w-0 border-r border-amber-500/20 pr-[clamp(0.35rem,1.5vw,2rem)]">
-                      <HeroTeamName name={activeMatch.team1} align="right" maxPx={heroMaxPx} />
+                      <HeroTeamName
+                        name={activeMatch.team1}
+                        align="right"
+                        maxPx={heroMaxPx}
+                        stacked={narrow}
+                      />
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center px-[clamp(0.25rem,1vw,1.5rem)]">
@@ -294,7 +359,12 @@ export default function CasinoDisplayTablePage() {
                     </div>
 
                     <div className="min-w-0 border-l border-amber-500/20 pl-[clamp(0.35rem,1.5vw,2rem)]">
-                      <HeroTeamName name={activeMatch.team2} align="left" maxPx={heroMaxPx} />
+                      <HeroTeamName
+                        name={activeMatch.team2}
+                        align="left"
+                        maxPx={heroMaxPx}
+                        stacked={narrow}
+                      />
                     </div>
                   </div>
 
@@ -319,9 +389,9 @@ export default function CasinoDisplayTablePage() {
           )}
 
           {rest.length > 0 && (
-            <div className="box-border w-full min-w-0 max-w-full overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
-              <div className="w-full min-w-0 overflow-x-auto">
-                <table className="w-full min-w-full table-fixed border-collapse">
+            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 shadow-[0_8px_40px_rgba(0,0,0,0.45)] backdrop-blur-md">
+              <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-auto">
+                <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
                     <col className="w-[10%]" />
                     <col className="w-[12%]" />
@@ -329,8 +399,8 @@ export default function CasinoDisplayTablePage() {
                     <col className="w-[12%]" />
                     <col className="w-[20%]" />
                   </colgroup>
-                  <thead>
-                    <tr className="border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
+                  <thead className="shrink-0">
+                    <tr className="table w-full table-fixed border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
                       <th className="px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.5rem,1.5vh,1.5rem)] text-left text-[clamp(0.65rem,2.2vw,2.25rem)] font-black tracking-[0.08em] sm:tracking-[0.15em]">
                         Date
                       </th>
@@ -348,7 +418,7 @@ export default function CasinoDisplayTablePage() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="flex min-h-0 flex-1 flex-col">
                     {pageRows.map((m, i) => {
                       const finished = Boolean(m.finished || m.score || m.winner);
                       return (
@@ -357,28 +427,29 @@ export default function CasinoDisplayTablePage() {
                           initial={{ opacity: 0, x: -6 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.3, delay: i * 0.03 }}
-                          className={`border-b border-white/5 ${i % 2 === 0 ? 'bg-white/[0.02]' : ''} ${
-                            finished ? 'opacity-75' : ''
-                          }`}
+                          className={`table w-full table-fixed flex-1 border-b border-white/5 ${
+                            i % 2 === 0 ? 'bg-white/[0.02]' : ''
+                          } ${finished ? 'opacity-75' : ''}`}
                         >
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold text-muted-foreground">
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-[clamp(0.6rem,1.8vw,1.875rem)] font-semibold text-muted-foreground">
                             {dateLabel(m)}
                           </td>
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-[clamp(0.7rem,2.2vw,2.25rem)] font-black text-amber-500">
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-[clamp(0.7rem,2.2vw,2.25rem)] font-black text-amber-500">
                             {timeLabel(m)}
                           </td>
-                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)]">
+                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle">
                             <TableMatchCell
                               team1={m.team1}
                               team2={m.team2}
                               finished={finished}
                               maxTeamPx={teamMaxPx}
+                              stacked={narrow}
                             />
                           </td>
-                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)] text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black leading-none">
+                          <td className="whitespace-nowrap px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle text-center text-[clamp(0.8rem,2.8vw,3rem)] font-black leading-none">
                             {m.score ?? '—'}
                           </td>
-                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,1.2vh,1.25rem)]">
+                          <td className="min-w-0 px-[clamp(0.35rem,1.2vw,2rem)] py-[clamp(0.35rem,2vh,1.25rem)] align-middle">
                             {m.winner ? (
                               <span
                                 className={`block truncate text-[clamp(0.6rem,1.8vw,1.875rem)] font-bold uppercase ${
