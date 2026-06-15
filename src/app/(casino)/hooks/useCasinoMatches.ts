@@ -4,6 +4,32 @@ import { Match, CasinoSettings, DEFAULT_SETTINGS } from '@/types/match';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { getPusherClient, GAME_CHANNEL } from '@/lib/pusher';
 
+type SyncPayload = {
+  matches?: Match[];
+  focusMatchId?: string | null;
+  settings?: CasinoSettings;
+  currentIndex?: number;
+  version?: number;
+};
+
+function applyPayload(
+  data: SyncPayload,
+  setters: {
+    setMatches: (m: Match[]) => void;
+    setFocusMatchId: (id: string | null) => void;
+    setSettings: (s: CasinoSettings) => void;
+    setCurrentIndex: (i: number) => void;
+  },
+) {
+  if (data.matches) {
+    setters.setMatches(data.matches);
+    localStorage.setItem('casino_matches', JSON.stringify(data.matches));
+  }
+  if (data.focusMatchId !== undefined) setters.setFocusMatchId(data.focusMatchId);
+  if (data.settings) setters.setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
+  if (data.currentIndex !== undefined) setters.setCurrentIndex(data.currentIndex);
+}
+
 export function useCasinoMatches() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [focusMatchId, setFocusMatchId] = useState<string | null>(null);
@@ -11,29 +37,33 @@ export function useCasinoMatches() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Keep latest values for callbacks/timers without re-binding
   const ref = useRef({ matches, focusMatchId, settings, currentIndex });
   ref.current = { matches, focusMatchId, settings, currentIndex };
 
-  // Последняя применённая версия состояния (для отсечения устаревших эхо-сообщений)
   const lastVersionRef = useRef<number>(-1);
+  const fetchSeqRef = useRef(0);
 
-  const fetchInitialState = async () => {
+  const setters = { setMatches, setFocusMatchId, setSettings, setCurrentIndex };
+
+  const fetchInitialState = useCallback(async () => {
+    const seq = ++fetchSeqRef.current;
+
     try {
       const res = await fetch(`/api/casino/sync?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
-      if (typeof data.version === 'number') lastVersionRef.current = data.version;
-      if (data.matches) {
-        setMatches(data.matches);
-        localStorage.setItem('casino_matches', JSON.stringify(data.matches));
-      }
-      if (data.focusMatchId !== undefined) setFocusMatchId(data.focusMatchId);
-      if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
-      if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
+
+      if (seq !== fetchSeqRef.current) return;
+
+      const serverVersion = typeof data.version === 'number' ? data.version : 0;
+      // Сравниваем с актуальной версией на момент ответа (не на момент старта запроса)
+      if (serverVersion <= lastVersionRef.current) return;
+
+      lastVersionRef.current = serverVersion;
+      applyPayload(data, setters);
     } catch (e) {
       console.log('Failed to fetch initial state', e);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchInitialState();
@@ -45,45 +75,26 @@ export function useCasinoMatches() {
     channel.bind('pusher:subscription_succeeded', () => setIsConnected(true));
     channel.bind('pusher:subscription_error', () => setIsConnected(false));
 
-    channel.bind(
-      'casino-sync',
-      (data: {
-        type?: string;
-        matches?: Match[];
-        focusMatchId: string | null;
-        settings: CasinoSettings;
-        currentIndex?: number;
-        version?: number;
-      }) => {
-        // Игнорируем устаревшие сообщения, пришедшие не по порядку
-        if (typeof data.version === 'number') {
-          if (data.version <= lastVersionRef.current) return;
-          lastVersionRef.current = data.version;
-        }
+    channel.bind('casino-sync', (data: SyncPayload & { type?: string }) => {
+      if (data.type === 'INVALIDATE') {
+        if (typeof data.version === 'number' && data.version <= lastVersionRef.current) return;
+        fetchInitialState();
+        return;
+      }
 
-        if (data.type === 'INVALIDATE') {
-          // Сервер прислал только пинг (payload с матчами слишком велик для Pusher).
-          // Запрашиваем полное состояние.
-          fetchInitialState();
-          return;
-        }
+      if (typeof data.version === 'number') {
+        if (data.version <= lastVersionRef.current) return;
+        lastVersionRef.current = data.version;
+      }
 
-        if (data.matches) {
-          setMatches(data.matches);
-          localStorage.setItem('casino_matches', JSON.stringify(data.matches));
-        }
-        
-        setFocusMatchId(data.focusMatchId);
-        if (data.settings) setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
-        if (data.currentIndex !== undefined) setCurrentIndex(data.currentIndex);
-      },
-    );
+      applyPayload(data, setters);
+    });
 
     return () => {
       channel.unbind('casino-sync');
       pusher.unsubscribe(GAME_CHANNEL);
     };
-  }, []);
+  }, [fetchInitialState]);
 
   const syncState = useCallback(
     async (opts: {
@@ -98,18 +109,17 @@ export function useCasinoMatches() {
       const finalSettings = opts.settings ?? cur.settings;
       const finalIndex = opts.currentIndex !== undefined ? opts.currentIndex : cur.currentIndex;
 
-      // Монотонная версия на клиенте (по часам), строго возрастающая.
-      // Сразу помечаем её как применённую, чтобы устаревшие эхо-сообщения не затирали свежее состояние.
       const version = Math.max(lastVersionRef.current + 1, Date.now());
       lastVersionRef.current = version;
+
+      // Инвалидируем любые in-flight GET, чтобы они не перезаписали свежее состояние
+      fetchSeqRef.current += 1;
 
       setMatches(finalMatches);
       setFocusMatchId(finalFocus);
       setSettings(finalSettings);
       setCurrentIndex(finalIndex);
 
-      // Сразу обновляем ref, чтобы следующие синхронные вызовы (например, быстрое нажатие кнопок)
-      // видели актуальное состояние ещё до того, как React завершит рендер.
       ref.current = {
         matches: finalMatches,
         focusMatchId: finalFocus,
@@ -117,17 +127,29 @@ export function useCasinoMatches() {
         currentIndex: finalIndex,
       };
 
-      await fetch('/api/casino/sync', {
-        method: 'POST',
-        body: JSON.stringify({
-          type: 'SYNC',
-          matches: finalMatches,
-          focusMatchId: finalFocus,
-          settings: finalSettings,
-          currentIndex: finalIndex,
-          version,
-        }),
-      });
+      localStorage.setItem('casino_matches', JSON.stringify(finalMatches));
+
+      try {
+        const res = await fetch('/api/casino/sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'SYNC',
+            matches: finalMatches,
+            focusMatchId: finalFocus,
+            settings: finalSettings,
+            currentIndex: finalIndex,
+            version,
+          }),
+        });
+
+        const data = await res.json();
+        if (data.success && !data.ignored && typeof data.version === 'number' && data.version >= version) {
+          lastVersionRef.current = data.version;
+        }
+      } catch (e) {
+        console.error('Failed to sync state', e);
+      }
     },
     [],
   );
@@ -135,7 +157,6 @@ export function useCasinoMatches() {
   const addMatch = (match: Match) => syncState({ matches: [...ref.current.matches, match] });
   const addMatches = (newOnes: Match[]) => syncState({ matches: [...ref.current.matches, ...newOnes] });
 
-  // Добавить матчи без дублей (мерж по id на основе актуального состояния)
   const addMatchesUnique = (newOnes: Match[]) => {
     const seen = new Set(ref.current.matches.map((m) => m.id));
     const merged = [...ref.current.matches];
@@ -148,10 +169,7 @@ export function useCasinoMatches() {
     return syncState({ matches: merged });
   };
 
-  // Заменить весь список матчей одним вызовом (без гонок при массовых операциях)
   const setMatchesBulk = (next: Match[]) => syncState({ matches: next });
-
-  // Полная очистка табло
   const clearMatches = () => syncState({ matches: [], focusMatchId: null });
 
   const removeMatch = (id: string) =>

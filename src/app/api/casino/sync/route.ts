@@ -3,16 +3,26 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { broadcast } from '@/lib/pusher-broadcast';
 import { DEFAULT_SETTINGS } from '@/types/match';
+import fs from 'fs/promises';
+import path from 'path';
 
-// Simple in-memory store for server-side initialization if needed
-let globalMatches: any[] = [];
+const STATE_FILE = path.join(process.cwd(), 'data', 'casino-board-state.json');
+
+type BoardState = {
+  matches: unknown[];
+  focusMatchId: string | null;
+  settings: typeof DEFAULT_SETTINGS;
+  currentIndex: number;
+  version: number;
+};
+
+let globalMatches: unknown[] = [];
 let globalFocusId: string | null = null;
-let globalSettings: any = { ...DEFAULT_SETTINGS };
+let globalSettings: typeof DEFAULT_SETTINGS = { ...DEFAULT_SETTINGS };
 let globalIndex = 0;
-// Версия состояния приходит от клиента (монотонная по времени) — пробрасываем её дальше
 let globalVersion = 0;
 
-function payload() {
+function payload(): BoardState {
   return {
     matches: globalMatches,
     focusMatchId: globalFocusId,
@@ -22,20 +32,46 @@ function payload() {
   };
 }
 
+async function loadStateFromDisk() {
+  try {
+    const raw = await fs.readFile(STATE_FILE, 'utf8');
+    const data = JSON.parse(raw) as Partial<BoardState>;
+    globalMatches = Array.isArray(data.matches) ? data.matches : [];
+    globalFocusId = data.focusMatchId ?? null;
+    globalSettings = data.settings ? { ...DEFAULT_SETTINGS, ...data.settings } : { ...DEFAULT_SETTINGS };
+    globalIndex = typeof data.currentIndex === 'number' ? data.currentIndex : 0;
+    globalVersion = typeof data.version === 'number' ? data.version : 0;
+  } catch {
+    // Файл ещё не создан — оставляем значения по умолчанию
+  }
+}
+
+async function saveStateToDisk() {
+  await fs.mkdir(path.dirname(STATE_FILE), { recursive: true });
+  await fs.writeFile(STATE_FILE, JSON.stringify(payload(), null, 2), 'utf8');
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
     if (body.type === 'SYNC') {
+      await loadStateFromDisk();
+
+      // Принимаем только более новую версию, чтобы старые запросы не откатывали состояние
+      const incomingVersion = typeof body.version === 'number' ? body.version : 0;
+      if (incomingVersion < globalVersion) {
+        return NextResponse.json({ success: true, ignored: true, ...payload() });
+      }
+
       globalMatches = body.matches || [];
       globalFocusId = body.focusMatchId !== undefined ? body.focusMatchId : globalFocusId;
       globalSettings = body.settings ? { ...DEFAULT_SETTINGS, ...body.settings } : globalSettings;
       if (body.currentIndex !== undefined) globalIndex = body.currentIndex;
-      if (typeof body.version === 'number') globalVersion = body.version;
+      globalVersion = incomingVersion;
 
-      // НЕ отправляем массив матчей через Pusher, так как при добавлении "Все"
-      // размер payload превышает лимит Pusher в 10 КБ, что вызывает ошибку 500.
-      // Отправляем только пинг с версией. Клиенты сами заберут полное состояние через GET.
+      await saveStateToDisk();
+
       await broadcast('casino-sync', {
         type: 'INVALIDATE',
         version: globalVersion,
@@ -43,9 +79,12 @@ export async function POST(req: Request) {
         currentIndex: globalIndex,
         settings: globalSettings,
       });
+
+      return NextResponse.json({ success: true, ...payload() });
     }
 
     if (body.type === 'REQUEST_STATE') {
+      await loadStateFromDisk();
       return NextResponse.json({ success: true, ...payload() });
     }
 
@@ -57,5 +96,6 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
+  await loadStateFromDisk();
   return NextResponse.json(payload());
 }
