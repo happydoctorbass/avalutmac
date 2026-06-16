@@ -180,7 +180,6 @@ function TableTeamBlock({
   flagScale,
   contentScale,
   lang,
-  reverse = false,
 }: {
   team: string;
   maxTeamPx: number;
@@ -188,14 +187,14 @@ function TableTeamBlock({
   flagScale: number;
   contentScale: number;
   lang: 'en' | 'zh';
-  reverse?: boolean;
 }) {
   const displayName = TEAM_NAMES[team]?.[lang] ?? team;
   return (
     <div
-      className={`flex min-w-0 flex-1 items-center justify-center ${reverse ? 'flex-row-reverse' : 'flex-row'}`}
-      style={{ gap: `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${contentScale})` }}
+      className="flex min-w-0 flex-1 flex-col items-center justify-center"
+      style={{ gap: `calc(clamp(0.15rem, 0.5vw, 0.4rem) * ${contentScale})` }}
     >
+      <CountryFlag team={team} size={flagSize} scale={flagScale} className="shrink-0 drop-shadow-lg" />
       <AnimatePresence mode="wait">
         <motion.div
           key={lang}
@@ -203,18 +202,16 @@ function TableTeamBlock({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="min-w-0 flex-1 flex"
-          style={{ justifyContent: reverse ? 'flex-start' : 'flex-end' }}
+          className="w-full flex justify-center"
         >
           <AutoShrinkText
             text={displayName}
             maxPx={maxTeamPx}
             minPx={9}
-            className={`min-w-0 font-black leading-none ${reverse ? 'text-left' : 'text-right'}`}
+            className="min-w-0 w-full text-center font-black leading-none text-muted-foreground/90"
           />
         </motion.div>
       </AnimatePresence>
-      <CountryFlag team={team} size={flagSize} scale={flagScale} className="shrink-0" />
     </div>
   );
 }
@@ -258,7 +255,7 @@ function TableMatchCell({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="shrink-0 font-bold text-muted-foreground whitespace-nowrap"
+          className="shrink-0 font-black text-amber-500/80 whitespace-nowrap"
           style={{
             paddingInline: `calc(clamp(0.1rem, 0.5vw, 0.4rem) * ${contentScale})`,
             fontSize: scaledFont(10, 1.5, 24, contentScale),
@@ -274,7 +271,6 @@ function TableMatchCell({
         flagScale={flagScale}
         contentScale={contentScale}
         lang={lang}
-        reverse
       />
     </div>
   );
@@ -363,12 +359,12 @@ export default function CasinoDisplayTablePage() {
   const rowPad = cellPad(td.tableCellPaddingScale * rowFillScale);
 
   return (
-    <div className={`relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-background text-foreground transition-all duration-300 ${lang === 'zh' ? 'font-zh leading-tight tracking-wide' : ''}`}>
+    <div className={`relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[hsl(222,47%,12%)] via-[hsl(222,47%,4%)] to-black text-foreground transition-all duration-300 ${lang === 'zh' ? 'font-zh leading-tight tracking-wide' : ''}`}>
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background/90" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/80" />
 
       <div
         className="relative z-10 box-border flex h-full min-h-0 w-full flex-col items-center overflow-hidden"
@@ -412,30 +408,28 @@ export default function CasinoDisplayTablePage() {
               <motion.div
                 key={activeMatch.id}
                 initial={{ opacity: 0, y: 12 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  boxShadow: ['0 0 10px rgba(245,158,11,0.1)', '0 0 25px rgba(245,158,11,0.3)', '0 0 10px rgba(245,158,11,0.1)']
-                }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
-                transition={{ 
-                  opacity: { duration: 0.45, ease: 'easeOut' },
-                  y: { duration: 0.45, ease: 'easeOut' },
-                  boxShadow: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
-                }}
-                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/40 bg-[hsl(222_47%_4%)]/95"
-                style={{
-                  paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
-                  paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
-                  paddingTop: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
-                  paddingBottom: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
-                }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
+                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] p-[2px]"
               >
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
+                {/* Snake border animated background */}
+                <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(245,158,11,1)_360deg)]" />
+                
                 <div
-                  className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.05]"
-                  style={{ backgroundImage: "url('/logo/main.svg')" }}
-                />
+                  className="relative z-10 flex flex-col items-center bg-[hsl(222_47%_4%)]/95 rounded-[calc(clamp(1rem,3vw,2.5rem)-2px)] overflow-hidden"
+                  style={{
+                    paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
+                    paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
+                    paddingTop: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
+                    paddingBottom: `calc(clamp(1rem, 3vh, 2.5rem) * ${td.heroPaddingScale})`,
+                  }}
+                >
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent opacity-80" />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.05]"
+                    style={{ backgroundImage: "url('/logo/main.svg')" }}
+                  />
 
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="flex flex-col items-center mb-[clamp(0.5rem,1.5vh,1rem)]">
@@ -522,42 +516,25 @@ export default function CasinoDisplayTablePage() {
                         >
                           <motion.div
                             className="flex flex-col items-center justify-center relative"
-                            animate={{ 
-                              scale: [1, 1.02, 1],
-                              filter: [
-                                'drop-shadow(0 0 10px rgba(250,204,21,0.4))',
-                                'drop-shadow(0 0 25px rgba(250,204,21,0.8))',
-                                'drop-shadow(0 0 10px rgba(250,204,21,0.4))'
-                              ]
-                            }}
+                            animate={{ scale: [1, 1.02, 1] }}
                             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                           >
-                            <span
-                              className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent relative overflow-hidden"
+                            <motion.span
+                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#fcd34d,45%,#fff,55%,#fcd34d)] bg-[length:200%_100%] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
                               style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                              animate={{ backgroundPosition: ['-100% 0', '100% 0'] }}
+                              transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
                             >
                               {DICT[lang].prize(activeMatch.prize)}
-                              {/* Shimmer effect overlay */}
-                              <motion.div 
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -skew-x-12"
-                                animate={{ x: ['-150%', '150%'] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
-                                style={{ mixBlendMode: 'overlay' }}
-                              />
-                            </span>
-                            <span
-                              className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-200 bg-clip-text text-transparent mt-1 relative overflow-hidden"
+                            </motion.span>
+                            <motion.span
+                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#f59e0b,45%,#fff,55%,#f59e0b)] bg-[length:200%_100%] bg-clip-text text-transparent mt-1 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
                               style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                              animate={{ backgroundPosition: ['-100% 0', '100% 0'] }}
+                              transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', delay: 0.2 }}
                             >
                               {DICT[lang].prize2}
-                              {/* Shimmer effect overlay */}
-                              <motion.div 
-                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -skew-x-12"
-                                animate={{ x: ['-150%', '150%'] }}
-                                transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
-                                style={{ mixBlendMode: 'overlay' }}
-                              />
-                            </span>
+                            </motion.span>
                           </motion.div>
                         </motion.div>
                       </AnimatePresence>
@@ -578,17 +555,19 @@ export default function CasinoDisplayTablePage() {
                     </div>
                   </div>
                 </div>
+                </div>
               </motion.div>
             </AnimatePresence>
           )}
 
           {rest.length > 0 && (
             <motion.div 
-              className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border-2 border-amber-500/40 bg-[hsl(222_47%_5%)]/90 mb-2 mx-auto"
-              animate={{ boxShadow: ['0 0 10px rgba(245,158,11,0.1)', '0 0 25px rgba(245,158,11,0.3)', '0 0 10px rgba(245,158,11,0.1)'] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] p-[2px] mb-2 mx-auto"
             >
-              <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
+              {/* Snake border animated background */}
+              <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(245,158,11,1)_360deg)]" />
+              
+              <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-[hsl(222_47%_5%)]/95 rounded-[calc(clamp(0.75rem,2vw,1.5rem)-2px)]">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
                     <col style={{ width: '25%' }} />
@@ -639,12 +618,12 @@ export default function CasinoDisplayTablePage() {
                             hidden: { opacity: 0, x: -10 },
                             show: { opacity: 1, x: 0, transition: { duration: 0.28, ease: 'easeOut' } },
                           }}
-                          className={`table w-full table-fixed flex-1 border-b border-white/5 ${
-                            i % 2 === 0 ? 'bg-white/[0.02]' : ''
+                          className={`table w-full table-fixed flex-1 border-b border-amber-500/10 ${
+                            i % 2 === 0 ? 'bg-white/[0.01]' : ''
                           } ${finished ? 'opacity-75' : ''}`}
                         >
                           <td
-                            className="whitespace-nowrap align-middle text-center font-semibold text-muted-foreground"
+                            className="whitespace-nowrap align-middle text-center font-semibold text-gray-400"
                             style={{ ...rowPad, fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
                           >
                             {dateLabel(m)}
@@ -662,7 +641,7 @@ export default function CasinoDisplayTablePage() {
                             />
                           </td>
                           <td
-                            className="whitespace-nowrap align-middle text-center font-black text-amber-500"
+                            className="whitespace-nowrap align-middle text-center font-black text-amber-500/90"
                             style={{ ...rowPad, fontSize: scaledFont(11, 2.2, 36, rowMetaScale) }}
                           >
                             {timeLabel(m)}
