@@ -80,3 +80,27 @@ export function getTeamCountryCode(team: string): string | null {
 export function isSubdivisionFlag(code: string) {
   return SUBDIVISION_CODES.has(code.toLowerCase());
 }
+
+export const TEAM_NAMES: Record<string, { en: string; zh: string }> = {
+  BEL: { en: 'BELGIUM', zh: '比利时' },
+  EGV: { en: 'EGYPT', zh: '埃及' },
+  FRA: { en: 'FRANCE', zh: '法国' },
+  SEN: { en: 'SENEGAL', zh: '塞内加尔' },
+  ENG: { en: 'ENGLAND', zh: '英格兰' },
+  CRO: { en: 'CROATIA', zh: '克罗地亚' },
+  SUI: { en: 'SWITZERLAND', zh: '瑞士' },
+  BIH: { en: 'BOSNIA & HERZEGOVINA', zh: '波黑' },
+  USA: { en: 'USA', zh: '美国' },
+  AUS: { en: 'AUSTRALIA', zh: '澳大利亚' },
+  GER: { en: 'GERMANY', zh: '德国' },
+  CIV: { en: 'IVORY COAST', zh: '科特迪瓦' },
+  IRN: { en: 'IRAN', zh: '伊朗' },
+  IRQ: { en: 'IRAQ', zh: '伊拉克' },
+  GHA: { en: 'GHANA', zh: '加纳' },
+  CAN: { en: 'CANADA', zh: '加拿大' },
+  QAT: { en: 'QATAR', zh: '卡塔尔' },
+  ECU: { en: 'ECUADOR', zh: '厄瓜多尔' },
+  CUW: { en: 'CURAÇAO', zh: '库拉索' },
+  NOR: { en: 'NORWAY', zh: '挪威' },
+  PAN: { en: 'PANAMA', zh: '巴拿马' },
+};

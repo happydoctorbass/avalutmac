@@ -13,6 +13,48 @@ import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useVie
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
 import { HARDCODED_MATCHES, HardcodedMatch } from '@/lib/hardcoded-matches';
+import { TEAM_NAMES } from '@/lib/team-flags';
+
+const DICT = {
+  en: {
+    promoBonus: "FIFA PROMO BONUS",
+    betAndWin: "BET AND WIN",
+    prize: (val: string) => `${val} or`,
+    prize2: "$50 Lucky Chips",
+    nextMatch: "NEXT MATCH",
+    liveNow: "LIVE NOW",
+    inTime: (h: number, m: number, d: number) => {
+      if (d > 0) return `IN ${d}D ${h}H`;
+      if (h > 0) return `IN ${h}H ${m}M`;
+      return `IN ${m}M`;
+    },
+    soon: "SOON",
+    date: "Date",
+    time: "Time",
+    match: "Match",
+    vs: "VS",
+    waiting: "WAITING FOR MATCHES..."
+  },
+  zh: {
+    promoBonus: "FIFA 促销奖金",
+    betAndWin: "投注赢大奖",
+    prize: (val: string) => `${val.replace('KGS', '索姆')}或`,
+    prize2: "50 美元幸运筹码",
+    nextMatch: "下一场比赛即将开始",
+    liveNow: "正在直播",
+    inTime: (h: number, m: number, d: number) => {
+      if (d > 0) return `${d}天${h}小时后`;
+      if (h > 0) return `${h}小时${m}分钟后`;
+      return `${m}分钟后`;
+    },
+    soon: "即将开始",
+    date: "日期",
+    time: "时间",
+    match: "匹配",
+    vs: "反对",
+    waiting: "等待比赛..."
+  }
+};
 
 function dateLabel(m: Match) {
   if (m.bishkek) {
@@ -30,17 +72,15 @@ function timeLabel(m: Match) {
   return m.bishkek?.time_bishkek ?? (m.time?.includes('T') ? m.time.split('T')[1]?.slice(0, 5) : m.time) ?? '';
 }
 
-function formatCountdownShort(ms: number) {
-  if (ms <= 0) return 'SOON';
+function formatCountdownShort(ms: number, lang: 'en' | 'zh') {
+  if (ms <= 0) return DICT[lang].soon;
 
   const totalMin = Math.max(1, Math.floor(ms / 60000));
   const days = Math.floor(totalMin / 1440);
   const hours = Math.floor((totalMin % 1440) / 60);
   const mins = totalMin % 60;
 
-  if (days > 0) return `IN ${days}D ${hours}H`;
-  if (hours > 0) return `IN ${hours}H ${mins}M`;
-  return `IN ${mins}M`;
+  return DICT[lang].inTime(hours, mins, days);
 }
 
 const FINISHED_HIDE_AFTER_MS = 2 * 60 * 60 * 1000; // 2 hours
@@ -82,8 +122,8 @@ function cellPad(scale: number) {
   return {
     paddingLeft: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
     paddingRight: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
-    paddingTop: `calc(clamp(0.25rem, 1vh, 0.75rem) * ${scale})`,
-    paddingBottom: `calc(clamp(0.25rem, 1vh, 0.75rem) * ${scale})`,
+    paddingTop: `calc(clamp(0.15rem, 0.6vh, 0.5rem) * ${scale})`,
+    paddingBottom: `calc(clamp(0.15rem, 0.6vh, 0.5rem) * ${scale})`,
   };
 }
 
@@ -97,24 +137,38 @@ function HeroTeamName({
   flagSize,
   flagScale,
   gapScale,
+  lang,
 }: {
   name: string;
   maxPx: number;
   flagSize: FlagSize;
   flagScale: number;
   gapScale: number;
+  lang: 'en' | 'zh';
 }) {
   const gap = `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${gapScale})`;
+  const displayName = TEAM_NAMES[name]?.[lang] ?? name;
 
   return (
     <div className="flex min-w-0 w-full flex-col items-center" style={{ gap }}>
       <CountryFlag team={name} size={flagSize} scale={flagScale} />
-      <AutoShrinkText
-        text={name}
-        maxPx={maxPx}
-        minPx={12}
-        className="min-w-0 w-full text-center font-black leading-none"
-      />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={lang}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full"
+        >
+          <AutoShrinkText
+            text={displayName}
+            maxPx={maxPx}
+            minPx={12}
+            className="min-w-0 w-full text-center font-black leading-none"
+          />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
@@ -125,25 +179,42 @@ function TableTeamBlock({
   flagSize,
   flagScale,
   contentScale,
+  lang,
+  reverse = false,
 }: {
   team: string;
   maxTeamPx: number;
   flagSize: FlagSize;
   flagScale: number;
   contentScale: number;
+  lang: 'en' | 'zh';
+  reverse?: boolean;
 }) {
+  const displayName = TEAM_NAMES[team]?.[lang] ?? team;
   return (
     <div
-      className="flex min-w-0 flex-1 flex-col items-center"
-      style={{ gap: `calc(clamp(0.1rem, 0.35vw, 0.3rem) * ${contentScale})` }}
+      className={`flex min-w-0 flex-1 items-center justify-center ${reverse ? 'flex-row-reverse' : 'flex-row'}`}
+      style={{ gap: `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${contentScale})` }}
     >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={lang}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="min-w-0 flex-1 flex"
+          style={{ justifyContent: reverse ? 'flex-start' : 'flex-end' }}
+        >
+          <AutoShrinkText
+            text={displayName}
+            maxPx={maxTeamPx}
+            minPx={9}
+            className={`min-w-0 font-black leading-none ${reverse ? 'text-left' : 'text-right'}`}
+          />
+        </motion.div>
+      </AnimatePresence>
       <CountryFlag team={team} size={flagSize} scale={flagScale} className="shrink-0" />
-      <AutoShrinkText
-        text={team}
-        maxPx={maxTeamPx}
-        minPx={9}
-        className="min-w-0 w-full text-center font-black leading-none"
-      />
     </div>
   );
 }
@@ -156,6 +227,7 @@ function TableMatchCell({
   flagSize,
   flagScale,
   contentScale,
+  lang,
 }: {
   team1: string;
   team2: string;
@@ -164,11 +236,12 @@ function TableMatchCell({
   flagSize: FlagSize;
   flagScale: number;
   contentScale: number;
+  lang: 'en' | 'zh';
 }) {
   return (
     <div
-      className="flex min-w-0 items-center justify-center"
-      style={{ gap: `calc(clamp(0.15rem, 0.5vw, 0.4rem) * ${contentScale})` }}
+      className="flex min-w-0 items-center justify-center w-full"
+      style={{ gap: `calc(clamp(0.25rem, 1vw, 1rem) * ${contentScale})` }}
     >
       <TableTeamBlock
         team={team1}
@@ -176,34 +249,33 @@ function TableMatchCell({
         flagSize={flagSize}
         flagScale={flagScale}
         contentScale={contentScale}
+        lang={lang}
       />
-      <span
-        className="shrink-0 font-bold text-muted-foreground"
-        style={{
-          paddingInline: `calc(clamp(0.05rem, 0.25vw, 0.2rem) * ${contentScale})`,
-          fontSize: scaledFont(8, 1, 16, contentScale),
-        }}
-      >
-        VS
-      </span>
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={lang}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="shrink-0 font-bold text-muted-foreground whitespace-nowrap"
+          style={{
+            paddingInline: `calc(clamp(0.1rem, 0.5vw, 0.4rem) * ${contentScale})`,
+            fontSize: scaledFont(10, 1.5, 24, contentScale),
+          }}
+        >
+          {DICT[lang].vs}
+        </motion.span>
+      </AnimatePresence>
       <TableTeamBlock
         team={team2}
         maxTeamPx={maxTeamPx}
         flagSize={flagSize}
         flagScale={flagScale}
         contentScale={contentScale}
+        lang={lang}
+        reverse
       />
-      {finished && (
-        <span
-          className="ml-0.5 hidden shrink-0 rounded-full border border-muted-foreground/30 bg-muted/30 font-bold uppercase tracking-wider text-muted-foreground sm:inline"
-          style={{
-            padding: `calc(0.125rem * ${contentScale}) calc(0.25rem * ${contentScale})`,
-            fontSize: scaledFont(7, 0.8, 10, contentScale),
-          }}
-        >
-          FT
-        </span>
-      )}
     </div>
   );
 }
@@ -216,6 +288,12 @@ export default function CasinoDisplayTablePage() {
   const teamMaxPx = tableTeamMaxPx(vw) * td.tableTeamFontScale;
   const pageSize = td.pageSize;
   const pageIntervalMs = td.pageIntervalSec * 1000;
+
+  const [lang, setLang] = useState<'en' | 'zh'>('en');
+  useEffect(() => {
+    const id = setInterval(() => setLang((l) => (l === 'en' ? 'zh' : 'en')), 20000);
+    return () => clearInterval(id);
+  }, []);
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -275,7 +353,7 @@ export default function CasinoDisplayTablePage() {
   }, [page, pageCount]);
 
   const pageRows = rest.slice(page * 9, page * 9 + 9);
-  const countdownText = activeStart && !isLive ? formatCountdownShort(activeStart - now) : '';
+  const countdownText = activeStart && !isLive ? formatCountdownShort(activeStart - now, lang) : '';
 
   const rowFillScale = computeTableRowFillScale(pageRows.length, td);
   const rowTeamMaxPx = teamMaxPx * rowFillScale;
@@ -314,9 +392,18 @@ export default function CasinoDisplayTablePage() {
             alt="Admiral"
             className="h-[clamp(4rem,12vw,6rem)] w-auto opacity-90"
           />
-          <span className="mt-6 animate-pulse text-[clamp(0.75rem,2.5vw,1.125rem)] font-bold tracking-[0.25em] text-amber-500 sm:tracking-[0.3em]">
-            WAITING FOR MATCHES...
-          </span>
+          <AnimatePresence mode="wait">
+            <motion.span 
+              key={lang}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mt-6 animate-pulse text-[clamp(0.75rem,2.5vw,1.125rem)] font-bold tracking-[0.25em] text-amber-500 sm:tracking-[0.3em]"
+            >
+              {DICT[lang].waiting}
+            </motion.span>
+          </AnimatePresence>
         </div>
       ) : (
         <div className="box-border flex min-h-0 w-full max-w-full flex-1 flex-col gap-[clamp(0.5rem,1.5vh,1.5rem)] overflow-hidden">
@@ -325,10 +412,18 @@ export default function CasinoDisplayTablePage() {
               <motion.div
                 key={activeMatch.id}
                 initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ 
+                  opacity: 1, 
+                  y: 0,
+                  boxShadow: ['0 0 10px rgba(245,158,11,0.1)', '0 0 25px rgba(245,158,11,0.3)', '0 0 10px rgba(245,158,11,0.1)']
+                }}
                 exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/60 bg-[hsl(222_47%_4%)]/95"
+                transition={{ 
+                  opacity: { duration: 0.45, ease: 'easeOut' },
+                  y: { duration: 0.45, ease: 'easeOut' },
+                  boxShadow: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+                }}
+                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] border-2 border-amber-500/40 bg-[hsl(222_47%_4%)]/95"
                 style={{
                   paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
                   paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
@@ -344,43 +439,54 @@ export default function CasinoDisplayTablePage() {
 
                 <div className="relative z-10 flex flex-col items-center">
                   <div className="flex flex-col items-center mb-[clamp(0.5rem,1.5vh,1rem)]">
-                    {isLive ? (
-                      <span
-                        className="mb-2 flex items-center gap-2 rounded-full bg-red-600 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-white sm:tracking-[0.35em]"
-                        style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={lang}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="flex flex-col items-center"
                       >
-                        <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
-                        LIVE NOW
-                      </span>
-                    ) : (
-                      <motion.span
-                        className="mb-2 rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
-                        style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
-                        animate={{ 
-                          opacity: [0.8, 1, 0.8], 
-                          boxShadow: [
-                            '0 0 0px rgba(245,158,11,0)',
-                            '0 0 15px rgba(245,158,11,0.3)',
-                            '0 0 0px rgba(245,158,11,0)'
-                          ]
-                        }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                      >
-                        NEXT MATCH {countdownText && `| ${countdownText}`}
-                      </motion.span>
-                    )}
-                    <span
-                      className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-foreground"
-                      style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
-                    >
-                      FIFA PROMO BONUS
-                    </span>
-                    <span
-                      className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-amber-400 mt-0.5"
-                      style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
-                    >
-                      BET AND WIN
-                    </span>
+                        {isLive ? (
+                          <span
+                            className="mb-2 flex items-center gap-2 rounded-full bg-red-600 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-white sm:tracking-[0.35em]"
+                            style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                          >
+                            <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
+                            {DICT[lang].liveNow}
+                          </span>
+                        ) : (
+                          <motion.span
+                            className="mb-2 rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
+                            style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                            animate={{ 
+                              opacity: [0.8, 1, 0.8], 
+                              boxShadow: [
+                                '0 0 0px rgba(245,158,11,0)',
+                                '0 0 15px rgba(245,158,11,0.3)',
+                                '0 0 0px rgba(245,158,11,0)'
+                              ]
+                            }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                          >
+                            {DICT[lang].nextMatch} {countdownText && `| ${countdownText}`}
+                          </motion.span>
+                        )}
+                        <span
+                          className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-foreground text-center"
+                          style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
+                        >
+                          {DICT[lang].promoBonus}
+                        </span>
+                        <span
+                          className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-amber-400 mt-0.5 text-center"
+                          style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
+                        >
+                          {DICT[lang].betAndWin}
+                        </span>
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
 
                   <div
@@ -397,6 +503,7 @@ export default function CasinoDisplayTablePage() {
                         flagSize={td.heroFlagSize}
                         flagScale={td.heroFlagScale}
                         gapScale={td.heroGapScale}
+                        lang={lang}
                       />
                     </div>
 
@@ -404,39 +511,56 @@ export default function CasinoDisplayTablePage() {
                       className="flex shrink-0 flex-col items-center justify-center scale-80"
                       style={{ paddingInline: `calc(clamp(0.15rem, 0.6vw, 1rem) * ${td.heroGapScale})` }}
                     >
-                      <motion.div
-                        className="flex flex-col items-center justify-center relative"
-                        animate={{ 
-                          scale: [1, 1.02, 1],
-                          filter: [
-                            'drop-shadow(0 0 10px rgba(250,204,21,0.4))',
-                            'drop-shadow(0 0 25px rgba(250,204,21,0.8))',
-                            'drop-shadow(0 0 10px rgba(250,204,21,0.4))'
-                          ]
-                        }}
-                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                      >
-                        <span
-                          className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent"
-                          style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={lang}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex flex-col items-center justify-center relative"
                         >
-                          {activeMatch.prize} or
-                        </span>
-                        <span
-                          className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-200 bg-clip-text text-transparent mt-1"
-                          style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
-                        >
-                          $50 Lucky Chips
-                        </span>
-                        
-                        {/* Shimmer effect overlay */}
-                        <motion.div 
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                          animate={{ x: ['-150%', '150%'] }}
-                          transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
-                          style={{ mixBlendMode: 'overlay' }}
-                        />
-                      </motion.div>
+                          <motion.div
+                            className="flex flex-col items-center justify-center relative"
+                            animate={{ 
+                              scale: [1, 1.02, 1],
+                              filter: [
+                                'drop-shadow(0 0 10px rgba(250,204,21,0.4))',
+                                'drop-shadow(0 0 25px rgba(250,204,21,0.8))',
+                                'drop-shadow(0 0 10px rgba(250,204,21,0.4))'
+                              ]
+                            }}
+                            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                          >
+                            <span
+                              className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent relative overflow-hidden"
+                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                            >
+                              {DICT[lang].prize(activeMatch.prize)}
+                              {/* Shimmer effect overlay */}
+                              <motion.div 
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -skew-x-12"
+                                animate={{ x: ['-150%', '150%'] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
+                                style={{ mixBlendMode: 'overlay' }}
+                              />
+                            </span>
+                            <span
+                              className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-200 bg-clip-text text-transparent mt-1 relative overflow-hidden"
+                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                            >
+                              {DICT[lang].prize2}
+                              {/* Shimmer effect overlay */}
+                              <motion.div 
+                                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent -skew-x-12"
+                                animate={{ x: ['-150%', '150%'] }}
+                                transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
+                                style={{ mixBlendMode: 'overlay' }}
+                              />
+                            </span>
+                          </motion.div>
+                        </motion.div>
+                      </AnimatePresence>
                     </div>
 
                     <div
@@ -449,6 +573,7 @@ export default function CasinoDisplayTablePage() {
                         flagSize={td.heroFlagSize}
                         flagScale={td.heroFlagScale}
                         gapScale={td.heroGapScale}
+                        lang={lang}
                       />
                     </div>
                   </div>
@@ -458,25 +583,37 @@ export default function CasinoDisplayTablePage() {
           )}
 
           {rest.length > 0 && (
-            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 mb-2 mx-auto">
+            <motion.div 
+              className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border-2 border-amber-500/40 bg-[hsl(222_47%_5%)]/90 mb-2 mx-auto"
+              animate={{ boxShadow: ['0 0 10px rgba(245,158,11,0.1)', '0 0 25px rgba(245,158,11,0.3)', '0 0 10px rgba(245,158,11,0.1)'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
               <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
-                    <col style={{ width: `${td.colDate}%` }} />
-                    <col style={{ width: `${td.colTime}%` }} />
-                    <col style={{ width: `${td.colMatch}%` }} />
-                    <col style={{ width: `${td.colScore}%` }} />
-                    <col style={{ width: `${td.colResult}%` }} />
+                    <col style={{ width: '25%' }} />
+                    <col style={{ width: '50%' }} />
+                    <col style={{ width: '25%' }} />
                   </colgroup>
                   <thead className="shrink-0">
                     <tr className="table w-full table-fixed border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
-                      {(['Date', 'Time', 'Match', 'Score', 'Result'] as const).map((label) => (
+                      {(['date', 'match', 'time'] as const).map((key) => (
                         <th
-                          key={label}
+                          key={key}
                           className="font-black tracking-[0.06em] sm:tracking-[0.12em] text-[12px] sm:text-xs text-center"
                           style={rowPad}
                         >
-                          {label}
+                          <AnimatePresence mode="wait">
+                            <motion.span
+                              key={lang}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              {DICT[lang][key]}
+                            </motion.span>
+                          </AnimatePresence>
                         </th>
                       ))}
                     </tr>
@@ -512,12 +649,6 @@ export default function CasinoDisplayTablePage() {
                           >
                             {dateLabel(m)}
                           </td>
-                          <td
-                            className="whitespace-nowrap align-middle text-center font-black text-amber-500"
-                            style={{ ...rowPad, fontSize: scaledFont(11, 2.2, 36, rowMetaScale) }}
-                          >
-                            {timeLabel(m)}
-                          </td>
                           <td className="min-w-0 align-middle" style={rowPad}>
                             <TableMatchCell
                               team1={m.team1}
@@ -527,33 +658,14 @@ export default function CasinoDisplayTablePage() {
                               flagSize={td.tableFlagSize}
                               flagScale={rowFlagScale}
                               contentScale={rowFillScale}
+                              lang={lang}
                             />
                           </td>
                           <td
-                            className="whitespace-nowrap align-middle text-center font-black leading-none"
-                            style={{ ...rowPad, fontSize: scaledFont(12, 2.8, 48, rowMetaScale) }}
+                            className="whitespace-nowrap align-middle text-center font-black text-amber-500"
+                            style={{ ...rowPad, fontSize: scaledFont(11, 2.2, 36, rowMetaScale) }}
                           >
-                            {m.score ?? '—'}
-                          </td>
-                          <td className="min-w-0 align-middle text-center" style={rowPad}>
-                            {m.winner ? (
-                              <span
-                                className={`block truncate text-center font-bold uppercase ${
-                                  m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
-                                }`}
-                                style={{ fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
-                                title={m.winner === 'Ничья' ? 'Draw' : m.winner}
-                              >
-                                {m.winner === 'Ничья' ? 'Draw' : m.winner}
-                              </span>
-                            ) : (
-                              <span
-                                className="font-semibold uppercase text-emerald-400"
-                                style={{ fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
-                              >
-                                Soon
-                              </span>
-                            )}
+                            {timeLabel(m)}
                           </td>
                         </motion.tr>
                       );
@@ -574,7 +686,7 @@ export default function CasinoDisplayTablePage() {
                   ))}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
         </div>
       )}
