@@ -167,7 +167,7 @@ function TableMatchCell({
 }) {
   return (
     <div
-      className="flex min-w-0 items-center"
+      className="flex min-w-0 items-center justify-center"
       style={{ gap: `calc(clamp(0.15rem, 0.5vw, 0.4rem) * ${contentScale})` }}
     >
       <TableTeamBlock
@@ -343,31 +343,45 @@ export default function CasinoDisplayTablePage() {
                 />
 
                 <div className="relative z-10 flex flex-col items-center">
-                  {isLive ? (
+                  <div className="flex flex-col items-center mb-[clamp(0.5rem,1.5vh,1rem)]">
+                    {isLive ? (
+                      <span
+                        className="mb-2 flex items-center gap-2 rounded-full bg-red-600 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-white sm:tracking-[0.35em]"
+                        style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                      >
+                        <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
+                        LIVE NOW
+                      </span>
+                    ) : (
+                      <motion.span
+                        className="mb-2 rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
+                        style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                        animate={{ 
+                          opacity: [0.8, 1, 0.8], 
+                          boxShadow: [
+                            '0 0 0px rgba(245,158,11,0)',
+                            '0 0 15px rgba(245,158,11,0.3)',
+                            '0 0 0px rgba(245,158,11,0)'
+                          ]
+                        }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                      >
+                        NEXT MATCH {countdownText && `| ${countdownText}`}
+                      </motion.span>
+                    )}
                     <span
-                      className="mb-[clamp(0.5rem,1.5vh,1rem)] flex items-center gap-2 rounded-full bg-red-600 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-white sm:tracking-[0.35em]"
-                      style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                      className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-foreground"
+                      style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
                     >
-                      <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
-                      LIVE NOW
+                      FIFA PROMO BONUS
                     </span>
-                  ) : (
-                    <motion.span
-                      className="mb-[clamp(0.5rem,1.5vh,1rem)] rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
-                      style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
-                      animate={{ 
-                        opacity: [0.8, 1, 0.8], 
-                        boxShadow: [
-                          '0 0 0px rgba(245,158,11,0)',
-                          '0 0 15px rgba(245,158,11,0.3)',
-                          '0 0 0px rgba(245,158,11,0)'
-                        ]
-                      }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    <span
+                      className="whitespace-nowrap font-black uppercase tracking-[0.12em] text-amber-400 mt-0.5"
+                      style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
                     >
-                      NEXT MATCH {countdownText && `| ${countdownText}`}
-                    </motion.span>
-                  )}
+                      BET AND WIN
+                    </span>
+                  </div>
 
                   <div
                     className="flex w-full min-w-0 items-center"
@@ -423,19 +437,6 @@ export default function CasinoDisplayTablePage() {
                           style={{ mixBlendMode: 'overlay' }}
                         />
                       </motion.div>
-
-                      <span
-                        className="mt-4 whitespace-nowrap font-black uppercase tracking-[0.12em] text-foreground"
-                        style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
-                      >
-                        FIFA PROMO BONUS
-                      </span>
-                      <span
-                        className="mt-1 whitespace-nowrap font-black uppercase tracking-[0.12em] text-amber-400"
-                        style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
-                      >
-                        BET AND WIN
-                      </span>
                     </div>
 
                     <div
@@ -457,7 +458,7 @@ export default function CasinoDisplayTablePage() {
           )}
 
           {rest.length > 0 && (
-            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 mb-2">
+            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 mb-2 mx-auto">
               <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
@@ -472,9 +473,7 @@ export default function CasinoDisplayTablePage() {
                       {(['Date', 'Time', 'Match', 'Score', 'Result'] as const).map((label) => (
                         <th
                           key={label}
-                          className={`font-black tracking-[0.06em] sm:tracking-[0.12em] text-[12px] sm:text-xs ${
-                            label === 'Score' ? 'text-center' : 'text-left'
-                          }`}
+                          className="font-black tracking-[0.06em] sm:tracking-[0.12em] text-[12px] sm:text-xs text-center"
                           style={rowPad}
                         >
                           {label}
@@ -508,13 +507,13 @@ export default function CasinoDisplayTablePage() {
                           } ${finished ? 'opacity-75' : ''}`}
                         >
                           <td
-                            className="whitespace-nowrap align-middle font-semibold text-muted-foreground"
+                            className="whitespace-nowrap align-middle text-center font-semibold text-muted-foreground"
                             style={{ ...rowPad, fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}
                           >
                             {dateLabel(m)}
                           </td>
                           <td
-                            className="whitespace-nowrap align-middle font-black text-amber-500"
+                            className="whitespace-nowrap align-middle text-center font-black text-amber-500"
                             style={{ ...rowPad, fontSize: scaledFont(11, 2.2, 36, rowMetaScale) }}
                           >
                             {timeLabel(m)}
@@ -536,10 +535,10 @@ export default function CasinoDisplayTablePage() {
                           >
                             {m.score ?? '—'}
                           </td>
-                          <td className="min-w-0 align-middle" style={rowPad}>
+                          <td className="min-w-0 align-middle text-center" style={rowPad}>
                             {m.winner ? (
                               <span
-                                className={`block truncate font-bold uppercase ${
+                                className={`block truncate text-center font-bold uppercase ${
                                   m.winner === 'Ничья' ? 'text-muted-foreground' : 'text-amber-400'
                                 }`}
                                 style={{ fontSize: scaledFont(9, 1.8, 30, rowMetaScale) }}

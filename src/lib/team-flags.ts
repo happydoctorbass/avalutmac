@@ -3,6 +3,7 @@ const TEAM_COUNTRY_CODE: Record<string, string> = {
   Algeria: 'DZ',
   Argentina: 'AR',
   Australia: 'AU',
+  AUS: 'AU',
   Austria: 'AT',
   Belgium: 'BE',
   BEL: 'BE',
