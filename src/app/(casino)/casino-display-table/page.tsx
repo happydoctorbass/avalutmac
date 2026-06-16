@@ -148,7 +148,8 @@ function HeroTeamName({
 }) {
   const gap = `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${gapScale})`;
   const displayName = TEAM_NAMES[name]?.[lang] ?? name;
-  const finalMaxPx = lang === 'en' ? maxPx * 0.8 : maxPx;
+  const baseMaxPx = maxPx * 0.72; // Уменьшаем еще на 15% для всех языков
+  const finalMaxPx = lang === 'en' ? baseMaxPx * 0.8 : baseMaxPx; // Дополнительно для английского
 
   return (
     <div className="flex min-w-0 w-full flex-col items-center" style={{ gap }}>
@@ -412,13 +413,23 @@ export default function CasinoDisplayTablePage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] p-[2px]"
+                className="relative box-border w-full min-w-0 shrink-0 rounded-[clamp(1rem,3vw,2.5rem)] mb-[clamp(0.5rem,1.5vh,1rem)] mx-auto"
               >
-                {/* Snake border animated background */}
-                <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
+                {/* Snake border animated background via mask */}
+                <div 
+                  className="pointer-events-none absolute inset-0 z-20 rounded-[clamp(1rem,3vw,2.5rem)] overflow-hidden"
+                  style={{
+                    padding: '1.5px',
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    maskComposite: 'exclude'
+                  }}
+                >
+                  <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
+                </div>
                 
                 <div
-                  className="relative z-10 flex flex-col items-center bg-black/60 backdrop-blur-xl rounded-[calc(clamp(1rem,3vw,2.5rem)-2px)] overflow-hidden"
+                  className="relative z-10 flex flex-col items-center bg-black/60 backdrop-blur-xl rounded-[clamp(1rem,3vw,2.5rem)] overflow-hidden"
                   style={{
                     paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
                     paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
@@ -489,7 +500,7 @@ export default function CasinoDisplayTablePage() {
                     style={{ gap: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                   >
                     <div
-                      className="flex min-w-0 flex-1 border-r border-amber-500/20 justify-end"
+                      className="flex min-w-0 flex-1 border-r border-amber-500/15 justify-end"
                       style={{ paddingRight: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                     >
                       <HeroTeamName
@@ -542,7 +553,7 @@ export default function CasinoDisplayTablePage() {
                     </div>
 
                     <div
-                      className="flex min-w-0 flex-1 border-l border-amber-500/20 justify-start"
+                      className="flex min-w-0 flex-1 border-l border-amber-500/15 justify-start"
                       style={{ paddingLeft: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                     >
                       <HeroTeamName
@@ -563,12 +574,22 @@ export default function CasinoDisplayTablePage() {
 
           {rest.length > 0 && (
             <motion.div 
-              className="relative box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] p-[2px] mb-2 mx-auto"
+              className="relative box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col rounded-[clamp(0.75rem,2vw,1.5rem)] mb-2 mx-auto"
             >
-              {/* Snake border animated background */}
-              <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
+              {/* Snake border animated background via mask */}
+              <div 
+                className="pointer-events-none absolute inset-0 z-20 rounded-[clamp(0.75rem,2vw,1.5rem)] overflow-hidden"
+                style={{
+                  padding: '1.5px',
+                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                  WebkitMaskComposite: 'xor',
+                  maskComposite: 'exclude'
+                }}
+              >
+                <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
+              </div>
               
-              <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-black/60 backdrop-blur-xl rounded-[calc(clamp(0.75rem,2vw,1.5rem)-2px)]">
+              <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-black/60 backdrop-blur-xl rounded-[clamp(0.75rem,2vw,1.5rem)]">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
                     <col style={{ width: '25%' }} />
@@ -576,7 +597,7 @@ export default function CasinoDisplayTablePage() {
                     <col style={{ width: '25%' }} />
                   </colgroup>
                   <thead className="shrink-0">
-                    <tr className="table w-full table-fixed border-b-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-amber-500/15 uppercase text-amber-400">
+                    <tr className="table w-full table-fixed border-b-2 border-amber-500/20 uppercase text-amber-400">
                       {(['date', 'match', 'time'] as const).map((key) => (
                         <th
                           key={key}
@@ -620,7 +641,7 @@ export default function CasinoDisplayTablePage() {
                             show: { opacity: 1, x: 0, transition: { duration: 0.28, ease: 'easeOut' } },
                           }}
                           className={`table w-full table-fixed flex-1 border-b border-amber-500/10 ${
-                            i % 2 === 0 ? 'bg-white/[0.01]' : ''
+                            i % 2 === 0 ? 'bg-white/[0.02]' : ''
                           } ${finished ? 'opacity-75' : ''}`}
                         >
                           <td
