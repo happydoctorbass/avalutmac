@@ -12,6 +12,7 @@ import {
 import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
+import { HARDCODED_MATCHES, HardcodedMatch } from '@/lib/hardcoded-matches';
 
 function dateLabel(m: Match) {
   if (m.bishkek) {
@@ -27,6 +28,31 @@ function dateLabel(m: Match) {
 
 function timeLabel(m: Match) {
   return m.bishkek?.time_bishkek ?? (m.time?.includes('T') ? m.time.split('T')[1]?.slice(0, 5) : m.time) ?? '';
+}
+
+function formatCountdownShort(ms: number) {
+  if (ms <= 0) return 'SOON';
+
+  const totalMin = Math.max(1, Math.floor(ms / 60000));
+  const days = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins = totalMin % 60;
+
+  if (days > 0) return `IN ${days}D ${hours}H`;
+  if (hours > 0) return `IN ${hours}H ${mins}M`;
+  return `IN ${mins}M`;
+}
+
+const FINISHED_HIDE_AFTER_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+function getStartOrInfinity(m: HardcodedMatch) {
+  return getMatchStartMs(m) ?? Number.POSITIVE_INFINITY;
+}
+
+function isHiddenFinished(m: HardcodedMatch, now: number) {
+  const start = getMatchStartMs(m);
+  if (start === null) return false;
+  return now > start + FINISHED_HIDE_AFTER_MS;
 }
 
 function plural(n: number, one: string, many: string) {
@@ -56,8 +82,8 @@ function cellPad(scale: number) {
   return {
     paddingLeft: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
     paddingRight: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
-    paddingTop: `calc(clamp(0.35rem, 1.5vh, 1rem) * ${scale})`,
-    paddingBottom: `calc(clamp(0.35rem, 1.5vh, 1rem) * ${scale})`,
+    paddingTop: `calc(clamp(0.25rem, 1vh, 0.75rem) * ${scale})`,
+    paddingBottom: `calc(clamp(0.25rem, 1vh, 0.75rem) * ${scale})`,
   };
 }
 
@@ -183,7 +209,7 @@ function TableMatchCell({
 }
 
 export default function CasinoDisplayTablePage() {
-  const { matches, settings } = useCasinoMatches({ pollIntervalMs: 4000 });
+  const { settings } = useCasinoMatches({ pollIntervalMs: 4000 });
   const td = mergeTableDisplay(settings.tableDisplay);
   const vw = useViewportWidth();
   const heroMaxPx = heroTeamMaxPx(vw) * td.heroTeamFontScale;
@@ -197,10 +223,23 @@ export default function CasinoDisplayTablePage() {
     return () => clearInterval(id);
   }, []);
 
+  const matches = useMemo(() => {
+    // Filter finished and sort by nearest start time (soonest first)
+    return HARDCODED_MATCHES
+      .filter((m) => !isHiddenFinished(m, now))
+      .slice()
+      .sort((a, b) => {
+        const sa = getStartOrInfinity(a);
+        const sb = getStartOrInfinity(b);
+        if (sa !== sb) return sa - sb;
+        return a.id.localeCompare(b.id);
+      });
+  }, [now]);
+
   const { activeId, isLive, activeStart } = useMemo(() => {
     const withStart = matches
       .map((m) => ({ m, start: getMatchStartMs(m) }))
-      .filter((x): x is { m: Match; start: number } => x.start !== null);
+      .filter((x): x is { m: HardcodedMatch; start: number } => x.start !== null);
 
     const live = withStart
       .filter((x) => isMatchLive(x.m, now))
@@ -221,7 +260,7 @@ export default function CasinoDisplayTablePage() {
   const activeMatch = matches.find((m) => m.id === activeId) ?? null;
   const rest = matches.filter((m) => m.id !== activeId);
 
-  const pageCount = Math.max(1, Math.ceil(rest.length / pageSize));
+  const pageCount = Math.max(1, Math.ceil(rest.length / 9));
   const [page, setPage] = useState(0);
   useEffect(() => {
     if (pageCount <= 1) {
@@ -235,8 +274,8 @@ export default function CasinoDisplayTablePage() {
     if (page >= pageCount) setPage(0);
   }, [page, pageCount]);
 
-  const pageRows = rest.slice(page * pageSize, page * pageSize + pageSize);
-  const countdownText = activeStart && !isLive ? formatCountdown(activeStart - now) : '';
+  const pageRows = rest.slice(page * 9, page * 9 + 9);
+  const countdownText = activeStart && !isLive ? formatCountdownShort(activeStart - now) : '';
 
   const rowFillScale = computeTableRowFillScale(pageRows.length, td);
   const rowTeamMaxPx = teamMaxPx * rowFillScale;
@@ -310,15 +349,24 @@ export default function CasinoDisplayTablePage() {
                       style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
                     >
                       <span className="h-[clamp(0.4rem,1vw,0.75rem)] w-[clamp(0.4rem,1vw,0.75rem)] animate-pulse rounded-full bg-white" />
-                      Live now
+                      LIVE NOW
                     </span>
                   ) : (
-                    <span
+                    <motion.span
                       className="mb-[clamp(0.5rem,1.5vh,1rem)] rounded-full border border-amber-500/50 bg-amber-500/10 px-[clamp(0.75rem,2.5vw,1.5rem)] py-[clamp(0.35rem,0.8vh,0.5rem)] font-black uppercase tracking-[0.2em] text-amber-400 sm:tracking-[0.35em]"
                       style={{ fontSize: scaledFont(12, 2.2, 24, td.heroBadgeFontScale) }}
+                      animate={{ 
+                        opacity: [0.8, 1, 0.8], 
+                        boxShadow: [
+                          '0 0 0px rgba(245,158,11,0)',
+                          '0 0 15px rgba(245,158,11,0.3)',
+                          '0 0 0px rgba(245,158,11,0)'
+                        ]
+                      }}
+                      transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                     >
-                      Next match
-                    </span>
+                      NEXT MATCH {countdownText && `| ${countdownText}`}
+                    </motion.span>
                   )}
 
                   <div
@@ -339,29 +387,54 @@ export default function CasinoDisplayTablePage() {
                     </div>
 
                     <div
-                      className="flex shrink-0 flex-col items-center"
+                      className="flex shrink-0 flex-col items-center justify-center scale-80"
                       style={{ paddingInline: `calc(clamp(0.15rem, 0.6vw, 1rem) * ${td.heroGapScale})` }}
                     >
-                      {activeMatch.score ? (
-                        <span
-                          className="whitespace-nowrap font-black leading-none tracking-wider text-foreground"
-                          style={{ fontSize: scaledFont(36, 10, 120, td.heroCenterFontScale) }}
-                        >
-                          {activeMatch.score}
-                        </span>
-                      ) : (
-                        <span
-                          className="whitespace-nowrap font-black leading-none text-amber-500"
-                          style={{ fontSize: scaledFont(36, 10, 120, td.heroCenterFontScale) }}
-                        >
-                          {timeLabel(activeMatch)}
-                        </span>
-                      )}
-                      <span
-                        className="mt-1 whitespace-nowrap font-bold uppercase tracking-[0.2em] text-muted-foreground sm:tracking-[0.35em]"
-                        style={{ fontSize: scaledFont(10, 1.8, 24, td.heroCenterFontScale * 0.35) }}
+                      <motion.div
+                        className="flex flex-col items-center justify-center relative"
+                        animate={{ 
+                          scale: [1, 1.02, 1],
+                          filter: [
+                            'drop-shadow(0 0 10px rgba(250,204,21,0.4))',
+                            'drop-shadow(0 0 25px rgba(250,204,21,0.8))',
+                            'drop-shadow(0 0 10px rgba(250,204,21,0.4))'
+                          ]
+                        }}
+                        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                       >
-                        {dateLabel(activeMatch)}
+                        <span
+                          className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500 bg-clip-text text-transparent"
+                          style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                        >
+                          {activeMatch.prize} or
+                        </span>
+                        <span
+                          className="whitespace-nowrap font-black leading-none bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-200 bg-clip-text text-transparent mt-1"
+                          style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                        >
+                          $50 Lucky Chips
+                        </span>
+                        
+                        {/* Shimmer effect overlay */}
+                        <motion.div 
+                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+                          animate={{ x: ['-150%', '150%'] }}
+                          transition={{ duration: 3, repeat: Infinity, ease: 'linear', repeatDelay: 1 }}
+                          style={{ mixBlendMode: 'overlay' }}
+                        />
+                      </motion.div>
+
+                      <span
+                        className="mt-4 whitespace-nowrap font-black uppercase tracking-[0.12em] text-foreground"
+                        style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
+                      >
+                        FIFA PROMO BONUS
+                      </span>
+                      <span
+                        className="mt-1 whitespace-nowrap font-black uppercase tracking-[0.12em] text-amber-400"
+                        style={{ fontSize: scaledFont(21, 4.5, 66, td.heroCenterFontScale * 0.675) }}
+                      >
+                        BET AND WIN
                       </span>
                     </div>
 
@@ -378,33 +451,13 @@ export default function CasinoDisplayTablePage() {
                       />
                     </div>
                   </div>
-
-                  {!isLive && countdownText && (
-                    <motion.p
-                      animate={{ opacity: [0.55, 1, 0.55], scale: [0.98, 1.02, 0.98] }}
-                      transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-                      className="mt-[clamp(0.75rem,2vh,1.5rem)] max-w-full px-2 text-center font-black uppercase leading-snug tracking-[0.06em] text-emerald-400 sm:tracking-[0.12em]"
-                      style={{ fontSize: scaledFont(13, 2.8, 48, td.heroCountdownFontScale) }}
-                    >
-                      {countdownText}
-                    </motion.p>
-                  )}
-
-                  {activeMatch.winner && (
-                    <p
-                      className="mt-3 text-center font-black uppercase tracking-[0.15em] text-amber-500 sm:tracking-[0.25em]"
-                      style={{ fontSize: scaledFont(12, 2, 24, td.heroBadgeFontScale) }}
-                    >
-                      {activeMatch.winner === 'Ничья' ? 'Draw' : `Winner: ${activeMatch.winner}`}
-                    </p>
-                  )}
                 </div>
               </motion.div>
             </AnimatePresence>
           )}
 
           {rest.length > 0 && (
-            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90">
+            <div className="box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] border border-amber-500/25 bg-[hsl(222_47%_5%)]/90 mb-2">
               <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden overflow-x-auto">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
@@ -419,28 +472,37 @@ export default function CasinoDisplayTablePage() {
                       {(['Date', 'Time', 'Match', 'Score', 'Result'] as const).map((label) => (
                         <th
                           key={label}
-                          className={`font-black tracking-[0.06em] sm:tracking-[0.12em] ${
+                          className={`font-black tracking-[0.06em] sm:tracking-[0.12em] text-[12px] sm:text-xs ${
                             label === 'Score' ? 'text-center' : 'text-left'
                           }`}
-                          style={{
-                            ...rowPad,
-                            fontSize: scaledFont(10, 2.2, 36, rowHeaderScale),
-                          }}
+                          style={rowPad}
                         >
                           {label}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="flex min-h-0 flex-1 flex-col">
+                  <motion.tbody
+                    className="flex min-h-0 flex-1 flex-col"
+                    initial="hidden"
+                    animate="show"
+                    variants={{
+                      hidden: {},
+                      show: {
+                        transition: { staggerChildren: 0.045, delayChildren: 0.02 },
+                      },
+                    }}
+                    key={page}
+                  >
                     {pageRows.map((m, i) => {
                       const finished = Boolean(m.finished || m.score || m.winner);
                       return (
                         <motion.tr
                           key={`${page}-${m.id}`}
-                          initial={{ opacity: 0, x: -6 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: i * 0.03 }}
+                          variants={{
+                            hidden: { opacity: 0, x: -10 },
+                            show: { opacity: 1, x: 0, transition: { duration: 0.28, ease: 'easeOut' } },
+                          }}
                           className={`table w-full table-fixed flex-1 border-b border-white/5 ${
                             i % 2 === 0 ? 'bg-white/[0.02]' : ''
                           } ${finished ? 'opacity-75' : ''}`}
@@ -497,7 +559,7 @@ export default function CasinoDisplayTablePage() {
                         </motion.tr>
                       );
                     })}
-                  </tbody>
+                  </motion.tbody>
                 </table>
               </div>
 
