@@ -363,7 +363,7 @@ export default function CasinoDisplayTablePage() {
   const rowPad = cellPad(td.tableCellPaddingScale * rowFillScale);
 
   return (
-    <div className="relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-background text-foreground">
+    <div className={`relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-background text-foreground transition-all duration-300 ${lang === 'zh' ? 'font-zh leading-tight tracking-wide' : ''}`}>
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
