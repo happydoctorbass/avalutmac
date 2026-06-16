@@ -122,8 +122,8 @@ function cellPad(scale: number) {
   return {
     paddingLeft: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
     paddingRight: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
-    paddingTop: `calc(clamp(0.15rem, 0.6vh, 0.5rem) * ${scale})`,
-    paddingBottom: `calc(clamp(0.15rem, 0.6vh, 0.5rem) * ${scale})`,
+    paddingTop: `calc(clamp(0.1rem, 0.4vh, 0.4rem) * ${scale})`,
+    paddingBottom: `calc(clamp(0.1rem, 0.4vh, 0.4rem) * ${scale})`,
   };
 }
 
@@ -148,6 +148,7 @@ function HeroTeamName({
 }) {
   const gap = `calc(clamp(0.25rem, 0.8vw, 0.75rem) * ${gapScale})`;
   const displayName = TEAM_NAMES[name]?.[lang] ?? name;
+  const finalMaxPx = lang === 'en' ? maxPx * 0.8 : maxPx;
 
   return (
     <div className="flex min-w-0 w-full flex-col items-center" style={{ gap }}>
@@ -163,7 +164,7 @@ function HeroTeamName({
         >
           <AutoShrinkText
             text={displayName}
-            maxPx={maxPx}
+            maxPx={finalMaxPx}
             minPx={12}
             className="min-w-0 w-full text-center font-black leading-none"
           />
@@ -359,7 +360,7 @@ export default function CasinoDisplayTablePage() {
   const rowPad = cellPad(td.tableCellPaddingScale * rowFillScale);
 
   return (
-    <div className={`relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[hsl(222,47%,12%)] via-[hsl(222,47%,4%)] to-black text-foreground transition-all duration-300 ${lang === 'zh' ? 'font-zh leading-tight tracking-wide' : ''}`}>
+    <div className={`relative h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1c140d] via-[#0a1128] to-black text-foreground transition-all duration-300 ${lang === 'zh' ? 'font-zh leading-tight tracking-wide' : ''}`}>
       <div
         className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat opacity-40 mix-blend-overlay"
         style={{ backgroundImage: "url('/logo/bg_main.svg')" }}
@@ -414,10 +415,10 @@ export default function CasinoDisplayTablePage() {
                 className="relative box-border w-full min-w-0 shrink-0 overflow-hidden rounded-[clamp(1rem,3vw,2.5rem)] p-[2px]"
               >
                 {/* Snake border animated background */}
-                <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(245,158,11,1)_360deg)]" />
+                <div className="absolute inset-[-100%] animate-[spin_3s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
                 
                 <div
-                  className="relative z-10 flex flex-col items-center bg-[hsl(222_47%_4%)]/95 rounded-[calc(clamp(1rem,3vw,2.5rem)-2px)] overflow-hidden"
+                  className="relative z-10 flex flex-col items-center bg-black/60 backdrop-blur-xl rounded-[calc(clamp(1rem,3vw,2.5rem)-2px)] overflow-hidden"
                   style={{
                     paddingLeft: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
                     paddingRight: `calc(clamp(0.75rem, 2.5vw, 2.5rem) * ${td.heroPaddingScale})`,
@@ -484,12 +485,12 @@ export default function CasinoDisplayTablePage() {
                   </div>
 
                   <div
-                    className="flex w-full min-w-0 items-center"
-                    style={{ gap: `calc(clamp(0.25rem, 1.2vw, 1.5rem) * ${td.heroGapScale})` }}
+                    className="flex w-full min-w-0 items-center justify-between"
+                    style={{ gap: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                   >
                     <div
-                      className="flex min-w-0 flex-1 border-r border-amber-500/20"
-                      style={{ paddingRight: `calc(clamp(0.25rem, 1vw, 1.25rem) * ${td.heroGapScale})` }}
+                      className="flex min-w-0 flex-1 border-r border-amber-500/20 justify-end"
+                      style={{ paddingRight: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                     >
                       <HeroTeamName
                         name={activeMatch.team1}
@@ -502,8 +503,8 @@ export default function CasinoDisplayTablePage() {
                     </div>
 
                     <div
-                      className="flex shrink-0 flex-col items-center justify-center scale-80"
-                      style={{ paddingInline: `calc(clamp(0.15rem, 0.6vw, 1rem) * ${td.heroGapScale})` }}
+                      className="flex shrink-0 flex-col items-center justify-center"
+                      style={{ paddingInline: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                     >
                       <AnimatePresence mode="wait">
                         <motion.div
@@ -520,16 +521,16 @@ export default function CasinoDisplayTablePage() {
                             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
                           >
                             <motion.span
-                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#fcd34d,45%,#fff,55%,#fcd34d)] bg-[length:200%_100%] bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#fcd34d,45%,#fff,55%,#fcd34d)] bg-[length:200%_100%] bg-clip-text text-transparent drop-shadow-[0_4px_10px_rgba(245,158,11,0.5)]"
+                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale * 0.9) }}
                               animate={{ backgroundPosition: ['-100% 0', '100% 0'] }}
                               transition={{ duration: 2.5, repeat: Infinity, ease: 'linear' }}
                             >
                               {DICT[lang].prize(activeMatch.prize)}
                             </motion.span>
                             <motion.span
-                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#f59e0b,45%,#fff,55%,#f59e0b)] bg-[length:200%_100%] bg-clip-text text-transparent mt-1 drop-shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale) }}
+                              className="whitespace-nowrap font-black leading-none bg-[linear-gradient(110deg,#f59e0b,45%,#fff,55%,#f59e0b)] bg-[length:200%_100%] bg-clip-text text-transparent mt-1 drop-shadow-[0_4px_10px_rgba(245,158,11,0.5)]"
+                              style={{ fontSize: scaledFont(28, 7, 96, td.heroCenterFontScale * 0.9) }}
                               animate={{ backgroundPosition: ['-100% 0', '100% 0'] }}
                               transition={{ duration: 2.5, repeat: Infinity, ease: 'linear', delay: 0.2 }}
                             >
@@ -541,8 +542,8 @@ export default function CasinoDisplayTablePage() {
                     </div>
 
                     <div
-                      className="flex min-w-0 flex-1 border-l border-amber-500/20"
-                      style={{ paddingLeft: `calc(clamp(0.25rem, 1vw, 1.25rem) * ${td.heroGapScale})` }}
+                      className="flex min-w-0 flex-1 border-l border-amber-500/20 justify-start"
+                      style={{ paddingLeft: `calc(clamp(0.1rem, 0.5vw, 0.5rem) * ${td.heroGapScale})` }}
                     >
                       <HeroTeamName
                         name={activeMatch.team2}
@@ -565,9 +566,9 @@ export default function CasinoDisplayTablePage() {
               className="relative box-border flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden rounded-[clamp(0.75rem,2vw,1.5rem)] p-[2px] mb-2 mx-auto"
             >
               {/* Snake border animated background */}
-              <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(245,158,11,1)_360deg)]" />
+              <div className="absolute inset-[-100%] animate-[spin_4s_linear_infinite] bg-[conic-gradient(from_0deg,transparent_0_240deg,#CD7F32_270deg,#FFBF00_300deg,#FFD700_330deg,#F5F5F5_360deg)]" />
               
-              <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-[hsl(222_47%_5%)]/95 rounded-[calc(clamp(0.75rem,2vw,1.5rem)-2px)]">
+              <div className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-black/60 backdrop-blur-xl rounded-[calc(clamp(0.75rem,2vw,1.5rem)-2px)]">
                 <table className="flex h-full min-h-0 w-full min-w-full flex-1 flex-col table-fixed border-collapse">
                   <colgroup>
                     <col style={{ width: '25%' }} />
