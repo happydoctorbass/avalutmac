@@ -122,8 +122,8 @@ function cellPad(scale: number) {
   return {
     paddingLeft: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
     paddingRight: `calc(clamp(0.25rem, 0.8vw, 1.25rem) * ${scale})`,
-    paddingTop: `calc(clamp(0.1rem, 0.4vh, 0.4rem) * ${scale})`,
-    paddingBottom: `calc(clamp(0.1rem, 0.4vh, 0.4rem) * ${scale})`,
+    paddingTop: `calc(clamp(0.05rem, 0.3vh, 0.3rem) * ${scale})`,
+    paddingBottom: `calc(clamp(0.05rem, 0.3vh, 0.3rem) * ${scale})`,
   };
 }
 
@@ -336,7 +336,7 @@ export default function CasinoDisplayTablePage() {
   const activeMatch = matches.find((m) => m.id === activeId) ?? null;
   const rest = matches.filter((m) => m.id !== activeId);
 
-  const pageCount = Math.max(1, Math.ceil(rest.length / 9));
+  const pageCount = Math.max(1, Math.ceil(rest.length / 10));
   const [page, setPage] = useState(0);
   useEffect(() => {
     if (pageCount <= 1) {
@@ -350,7 +350,7 @@ export default function CasinoDisplayTablePage() {
     if (page >= pageCount) setPage(0);
   }, [page, pageCount]);
 
-  const pageRows = rest.slice(page * 9, page * 9 + 9);
+  const pageRows = rest.slice(page * 10, page * 10 + 10);
   const countdownText = activeStart && !isLive ? formatCountdownShort(activeStart - now, lang) : '';
 
   const rowFillScale = computeTableRowFillScale(pageRows.length, td);
