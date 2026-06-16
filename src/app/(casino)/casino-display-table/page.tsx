@@ -5,20 +5,13 @@ import { useEffect, useMemo, useState } from 'react';
 import { Match, FlagSize } from '@/types/match';
 import { useCasinoMatches } from '../hooks/useCasinoMatches';
 import { mergeTableDisplay, safeInsetCss, computeTableRowFillScale } from '@/lib/table-display-settings';
+import {
+  getMatchStartMs,
+  isMatchLive,
+} from '@/lib/match-visibility';
 import { heroTeamMaxPx, tableTeamMaxPx, useViewportWidth } from '../hooks/useViewportWidth';
 import { CountryFlag } from '@/components/CountryFlag';
 import { AutoShrinkText } from '../display/components/AutoShrinkText';
-
-function getStartMs(m: Match): number | null {
-  if (m.bishkek?.date_bishkek && m.bishkek?.time_bishkek) {
-    const [Y, Mo, D] = m.bishkek.date_bishkek.split('-').map(Number);
-    const [H, Mi] = m.bishkek.time_bishkek.split(':').map(Number);
-    if ([Y, Mo, D, H, Mi].every((n) => !Number.isNaN(n))) {
-      return Date.UTC(Y, Mo - 1, D, H, Mi) - 6 * 3600 * 1000;
-    }
-  }
-  return null;
-}
 
 function dateLabel(m: Match) {
   if (m.bishkek) {
@@ -58,8 +51,6 @@ function formatCountdown(ms: number) {
   if (parts.length === 2) return `in ${parts[0]} and ${parts[1]}`;
   return `in ${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
-
-const LIVE_WINDOW_MS = 130 * 60 * 1000;
 
 function cellPad(scale: number) {
   return {
@@ -208,11 +199,11 @@ export default function CasinoDisplayTablePage() {
 
   const { activeId, isLive, activeStart } = useMemo(() => {
     const withStart = matches
-      .map((m) => ({ m, start: getStartMs(m) }))
+      .map((m) => ({ m, start: getMatchStartMs(m) }))
       .filter((x): x is { m: Match; start: number } => x.start !== null);
 
     const live = withStart
-      .filter((x) => now >= x.start && now <= x.start + LIVE_WINDOW_MS)
+      .filter((x) => isMatchLive(x.m, now))
       .sort((a, b) => a.start - b.start)[0];
 
     const next = withStart

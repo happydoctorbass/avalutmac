@@ -122,13 +122,16 @@ function FlagSizeSelect({
 export function TableDisplaySettingsCard({
   settings,
   onChange,
+  disabled = false,
 }: {
   settings: CasinoSettings;
   onChange: (s: CasinoSettings) => void;
+  disabled?: boolean;
 }) {
   const td = settings.tableDisplay;
 
   const patch = (partial: Partial<TableDisplaySettings>) => {
+    if (disabled) return;
     onChange({
       ...settings,
       tableDisplay: { ...td, ...partial },

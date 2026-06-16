@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true, ignored: true, ...payload() });
       }
 
-      globalMatches = body.matches || [];
+      globalMatches = body.matches !== undefined ? body.matches : globalMatches;
       globalFocusId = body.focusMatchId !== undefined ? body.focusMatchId : globalFocusId;
       globalSettings = body.settings ? mergeCasinoSettings(body.settings) : globalSettings;
       if (body.currentIndex !== undefined) globalIndex = body.currentIndex;

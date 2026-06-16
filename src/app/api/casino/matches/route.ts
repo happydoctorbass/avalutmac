@@ -60,9 +60,8 @@ export async function GET() {
       const matchDate = new Date(year, month - 1, day);
       const inWindow = matchDate >= windowStart && matchDate <= windowEnd;
 
-      // Прошедшие завершённые матчи (со счётом) показываем всегда,
-      // предстоящие — только в окне 10 дней
-      return hasScore || inWindow;
+      // Только предстоящие матчи в окне 10 дней (прошедшие не отдаём)
+      return !hasScore && inWindow;
     });
 
     const matches: Match[] = filtered.map((match: any) => {

@@ -2,6 +2,7 @@
 
 import { Match, CasinoSettings, DEFAULT_SETTINGS } from '@/types/match';
 import { mergeCasinoSettings } from '@/lib/table-display-settings';
+import { filterActiveMatches } from '@/lib/match-visibility';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { type Channel } from 'pusher-js';
 import { getPusherClient, GAME_CHANNEL } from '@/lib/pusher';
@@ -43,7 +44,8 @@ function readCachedMatches(): Match[] {
     const raw = localStorage.getItem('casino_matches');
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const list = Array.isArray(parsed) ? parsed : [];
+    return filterActiveMatches(list);
   } catch {
     return [];
   }
@@ -57,33 +59,129 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
   const [settings, setSettings] = useState<CasinoSettings>({ ...DEFAULT_SETTINGS });
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   const ref = useRef({ matches, focusMatchId, settings, currentIndex });
   ref.current = { matches, focusMatchId, settings, currentIndex };
 
   const lastVersionRef = useRef<number>(-1);
   const fetchSeqRef = useRef(0);
+  const isHydratedRef = useRef(false);
+  const settingsSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSettingsRef = useRef<CasinoSettings | null>(null);
 
   const setters = { setMatches, setFocusMatchId, setSettings, setCurrentIndex };
 
-  const fetchFromServer = useCallback(async (force = false) => {
-    const seq = ++fetchSeqRef.current;
+  const postSync = useCallback(async (body: Record<string, unknown>) => {
+    const version = Math.max(lastVersionRef.current + 1, Date.now());
+    lastVersionRef.current = version;
+    fetchSeqRef.current += 1;
+
+    const res = await fetch('/api/casino/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...body, version }),
+    });
+
+    const data = await res.json();
+    if (data.success && !data.ignored && typeof data.version === 'number' && data.version >= version) {
+      lastVersionRef.current = data.version;
+    }
+    return data;
+  }, []);
+
+  const pruneAndMaybeSync = useCallback(
+    async (incoming: Match[]) => {
+      const pruned = filterActiveMatches(incoming);
+      const focusOk =
+        ref.current.focusMatchId && pruned.some((m) => m.id === ref.current.focusMatchId)
+          ? ref.current.focusMatchId
+          : null;
+
+      setMatches(pruned);
+      setFocusMatchId(focusOk);
+      ref.current = { ...ref.current, matches: pruned, focusMatchId: focusOk };
+      localStorage.setItem('casino_matches', JSON.stringify(pruned));
+
+      if (pruned.length !== incoming.length && isHydratedRef.current) {
+        await postSync({
+          type: 'SYNC',
+          matches: pruned,
+          focusMatchId: focusOk,
+        });
+      }
+    },
+    [postSync],
+  );
+
+  const fetchFromServer = useCallback(
+    async (force = false) => {
+      const seq = ++fetchSeqRef.current;
+
+      try {
+        const res = await fetch(`/api/casino/sync?t=${Date.now()}`, { cache: 'no-store' });
+        const data = await res.json();
+
+        if (seq !== fetchSeqRef.current) return;
+
+        const serverVersion = typeof data.version === 'number' ? data.version : 0;
+        if (!force && serverVersion <= lastVersionRef.current) return;
+
+        lastVersionRef.current = serverVersion;
+
+        if (data.matches) {
+          const pruned = filterActiveMatches(data.matches);
+          applyPayload({ ...data, matches: pruned }, setters);
+          ref.current = {
+            ...ref.current,
+            matches: pruned,
+            focusMatchId:
+              ref.current.focusMatchId && pruned.some((m) => m.id === data.focusMatchId)
+                ? data.focusMatchId
+                : null,
+          };
+
+          if (pruned.length !== data.matches.length) {
+            await postSync({
+              type: 'SYNC',
+              matches: pruned,
+              focusMatchId: ref.current.focusMatchId,
+            });
+          }
+        } else {
+          applyPayload(data, setters);
+        }
+
+        isHydratedRef.current = true;
+        setIsHydrated(true);
+      } catch (e) {
+        console.log('Failed to fetch casino state', e);
+      }
+    },
+    [postSync],
+  );
+
+  const flushSettingsSync = useCallback(async () => {
+    if (!isHydratedRef.current || !pendingSettingsRef.current) return;
+    const nextSettings = pendingSettingsRef.current;
+    pendingSettingsRef.current = null;
 
     try {
-      const res = await fetch(`/api/casino/sync?t=${Date.now()}`, { cache: 'no-store' });
-      const data = await res.json();
-
-      if (seq !== fetchSeqRef.current) return;
-
-      const serverVersion = typeof data.version === 'number' ? data.version : 0;
-      if (!force && serverVersion <= lastVersionRef.current) return;
-
-      lastVersionRef.current = serverVersion;
-      applyPayload(data, setters);
+      const data = await postSync({ type: 'SYNC', settings: nextSettings });
+      if (data.success && !data.ignored) {
+        applyPayload(data, setters);
+        ref.current = {
+          ...ref.current,
+          matches: data.matches ? filterActiveMatches(data.matches) : ref.current.matches,
+          settings: data.settings ? mergeCasinoSettings(data.settings) : ref.current.settings,
+          focusMatchId: data.focusMatchId ?? ref.current.focusMatchId,
+          currentIndex: data.currentIndex ?? ref.current.currentIndex,
+        };
+      }
     } catch (e) {
-      console.log('Failed to fetch casino state', e);
+      console.error('Failed to sync settings', e);
     }
-  }, []);
+  }, [postSync]);
 
   useEffect(() => {
     fetchFromServer();
@@ -98,7 +196,6 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
 
       channel.bind('casino-sync', (data: SyncPayload & { type?: string }) => {
         if (data.type === 'INVALIDATE') {
-          if (typeof data.version === 'number' && data.version <= lastVersionRef.current) return;
           fetchFromServer(true);
           return;
         }
@@ -108,6 +205,9 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
           lastVersionRef.current = data.version;
         }
 
+        if (data.matches) {
+          void pruneAndMaybeSync(data.matches);
+        }
         applyPayload(data, setters);
       });
     }
@@ -131,8 +231,9 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', onVisible);
       if (pollId) clearInterval(pollId);
+      if (settingsSyncTimerRef.current) clearTimeout(settingsSyncTimerRef.current);
     };
-  }, [fetchFromServer, pollIntervalMs]);
+  }, [fetchFromServer, pollIntervalMs, pruneAndMaybeSync]);
 
   const syncState = useCallback(
     async (opts: {
@@ -141,16 +242,16 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
       settings?: CasinoSettings;
       currentIndex?: number;
     }) => {
+      if (!isHydratedRef.current) {
+        await fetchFromServer(true);
+      }
+
       const cur = ref.current;
-      const finalMatches = opts.matches ?? cur.matches;
+      const finalMatches =
+        opts.matches !== undefined ? filterActiveMatches(opts.matches) : cur.matches;
       const finalFocus = opts.focusMatchId !== undefined ? opts.focusMatchId : cur.focusMatchId;
       const finalSettings = opts.settings ?? cur.settings;
       const finalIndex = opts.currentIndex !== undefined ? opts.currentIndex : cur.currentIndex;
-
-      const version = Math.max(lastVersionRef.current + 1, Date.now());
-      lastVersionRef.current = version;
-
-      fetchSeqRef.current += 1;
 
       setMatches(finalMatches);
       setFocusMatchId(finalFocus);
@@ -167,37 +268,35 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
       localStorage.setItem('casino_matches', JSON.stringify(finalMatches));
 
       try {
-        const res = await fetch('/api/casino/sync', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'SYNC',
-            matches: finalMatches,
-            focusMatchId: finalFocus,
-            settings: finalSettings,
-            currentIndex: finalIndex,
-            version,
-          }),
+        const data = await postSync({
+          type: 'SYNC',
+          matches: finalMatches,
+          focusMatchId: finalFocus,
+          settings: finalSettings,
+          currentIndex: finalIndex,
         });
-
-        const data = await res.json();
-        if (data.success && !data.ignored && typeof data.version === 'number' && data.version >= version) {
-          lastVersionRef.current = data.version;
+        if (data.success && !data.ignored) {
+          applyPayload(data, setters);
         }
       } catch (e) {
         console.error('Failed to sync state', e);
       }
     },
-    [],
+    [fetchFromServer, postSync],
   );
 
-  const addMatch = (match: Match) => syncState({ matches: [...ref.current.matches, match] });
-  const addMatches = (newOnes: Match[]) => syncState({ matches: [...ref.current.matches, ...newOnes] });
+  const addMatch = (match: Match) => {
+    if (!filterActiveMatches([match]).length) return;
+    syncState({ matches: [...ref.current.matches, match] });
+  };
+
+  const addMatches = (newOnes: Match[]) =>
+    syncState({ matches: [...ref.current.matches, ...filterActiveMatches(newOnes)] });
 
   const addMatchesUnique = (newOnes: Match[]) => {
     const seen = new Set(ref.current.matches.map((m) => m.id));
     const merged = [...ref.current.matches];
-    for (const m of newOnes) {
+    for (const m of filterActiveMatches(newOnes)) {
       if (!seen.has(m.id)) {
         seen.add(m.id);
         merged.push(m);
@@ -206,7 +305,7 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
     return syncState({ matches: merged });
   };
 
-  const setMatchesBulk = (next: Match[]) => syncState({ matches: next });
+  const setMatchesBulk = (next: Match[]) => syncState({ matches: filterActiveMatches(next) });
   const clearMatches = () => syncState({ matches: [], focusMatchId: null });
 
   const removeMatch = (id: string) =>
@@ -218,20 +317,34 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
   const setFocus = (id: string | null) => syncState({ focusMatchId: id });
 
   const updateMatch = (id: string, patch: Partial<Match>) =>
-    syncState({ matches: ref.current.matches.map((m) => (m.id === id ? { ...m, ...patch } : m)) });
+    syncState({
+      matches: ref.current.matches.map((m) => (m.id === id ? { ...m, ...patch } : m)),
+    });
 
-  const updateSettings = (newSettings: CasinoSettings) => syncState({ settings: newSettings });
+  const updateSettings = useCallback(
+    (newSettings: CasinoSettings) => {
+      const merged = mergeCasinoSettings(newSettings);
+      setSettings(merged);
+      ref.current = { ...ref.current, settings: merged };
+      pendingSettingsRef.current = merged;
 
-  const goToIndex = (index: number) => syncState({ currentIndex: index, focusMatchId: null });
-  const nextCard = () => syncState({ currentIndex: ref.current.currentIndex + 1, focusMatchId: null });
-  const prevCard = () => syncState({ currentIndex: ref.current.currentIndex - 1, focusMatchId: null });
+      if (!isHydratedRef.current) return;
+
+      if (settingsSyncTimerRef.current) clearTimeout(settingsSyncTimerRef.current);
+      settingsSyncTimerRef.current = setTimeout(() => {
+        void flushSettingsSync();
+      }, 350);
+    },
+    [flushSettingsSync],
+  );
 
   return {
-    matches,
+    matches: filterActiveMatches(matches),
     focusMatchId,
     settings,
     currentIndex,
     isConnected,
+    isHydrated,
     refetch: () => fetchFromServer(true),
     addMatch,
     addMatches,
@@ -242,8 +355,5 @@ export function useCasinoMatches(options?: UseCasinoMatchesOptions) {
     setFocus,
     updateMatch,
     updateSettings,
-    goToIndex,
-    nextCard,
-    prevCard,
   };
 }
