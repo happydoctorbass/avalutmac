@@ -16,6 +16,14 @@ const rawMatches = [
   { date: '26.06', time: '08:00', team1: 'TUR', team2: 'USA', prize: '10000 KGS' },
   { date: '27.06', time: '01:00', team1: 'NOR', team2: 'FRA', prize: '10000 KGS' },
   { date: '27.06', time: '01:00', team1: 'SEN', team2: 'IRQ', prize: '10000 KGS' },
+  { date: '27.06', time: '06:00', team1: 'URU', team2: 'ESP', prize: '10000 KGS' },
+  { date: '27.06', time: '06:00', team1: 'CPV', team2: 'KSA', prize: '10000 KGS' },
+  { date: '27.06', time: '09:00', team1: 'NZL', team2: 'BEL', prize: '10000 KGS' },
+  { date: '27.06', time: '09:00', team1: 'EGV', team2: 'IRN', prize: '10000 KGS' },
+  { date: '28.06', time: '03:00', team1: 'PAN', team2: 'ENG', prize: '10000 KGS' },
+  { date: '28.06', time: '03:00', team1: 'CRO', team2: 'GHA', prize: '10000 KGS' },
+  { date: '28.06', time: '05:30', team1: 'COL', team2: 'POR', prize: '10000 KGS' },
+  { date: '28.06', time: '05:30', team1: 'COD', team2: 'UZB', prize: '10000 KGS' },
 ];
 
 export const HARDCODED_MATCHES: HardcodedMatch[] = rawMatches.map((m, i) => {
