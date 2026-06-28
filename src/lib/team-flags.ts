@@ -53,6 +53,7 @@ const TEAM_COUNTRY_CODE: Record<string, string> = {
   Mexico: 'MX',
   MEX: 'MX',
   Morocco: 'MA',
+  MAR: 'MA',
   Netherlands: 'NL',
   NED: 'NL',
   'New Zealand': 'NZ',
@@ -151,4 +152,5 @@ export const TEAM_NAMES: Record<string, { en: string; zh: string }> = {
   BRA: { en: "BRAZIL", zh: "巴西" },
   MEX: { en: "MEXICO", zh: "墨西哥" },
   SCO: { en: "SCOTLAND", zh: "苏格兰" },
+  MAR: { en: "MOROCCO", zh: "摩洛哥" },
 };
