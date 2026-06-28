@@ -7,6 +7,7 @@ const TEAM_COUNTRY_CODE: Record<string, string> = {
   Australia: 'AU',
   AUS: 'AU',
   Austria: 'AT',
+  AUT: 'AT',
   Belgium: 'BE',
   BEL: 'BE',
   'Bosnia & Herzegovina': 'BA',
@@ -47,6 +48,7 @@ const TEAM_COUNTRY_CODE: Record<string, string> = {
   Japan: 'JP',
   JPN: 'JP',
   Jordan: 'JO',
+  JOR: 'JO',
   Mexico: 'MX',
   Morocco: 'MA',
   Netherlands: 'NL',
@@ -141,4 +143,6 @@ export const TEAM_NAMES: Record<string, { en: string; zh: string }> = {
   URU: { en: "URUGUAY", zh: "乌拉圭" },
   CPV: { en: "CAPE VERDE", zh: "佛得角" },
   NZL: { en: "NEW ZEALAND", zh: "新西兰" },
+  JOR: { en: "JORDAN", zh: "约旦" },
+  AUT: { en: "AUSTRIA", zh: "奥地利" },
 };
