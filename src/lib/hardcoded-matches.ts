@@ -3,6 +3,9 @@ import { Match } from '@/types/match';
 export type HardcodedMatch = Match & { prize: string };
 
 const rawMatches = [
+  { date: '04.07', time: '00:00', team1: 'AUS', team2: 'EGV', prize: '5000 KGS' },
+  { date: '04.07', time: '04:00', team1: 'ARG', team2: 'CPV', prize: '5000 KGS' },
+  { date: '04.07', time: '07:30', team1: 'COL', team2: 'GHA', prize: '5000 KGS' },
   { date: '04.07', time: '23:00', team1: 'CAN', team2: 'MAR', prize: '5000 KGS' },
   { date: '06.07', time: '02:00', team1: 'BRA', team2: 'NOR', prize: '5000 KGS' },
   { date: '06.07', time: '06:00', team1: 'MEX', team2: 'ENG', prize: '5000 KGS' },
