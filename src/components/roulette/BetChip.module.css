@@ -1,0 +1,35 @@
+.chip {
+  width: 75%;
+  height: 75%;
+  max-width: 65px;
+  max-height: 65px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  position: absolute;
+  z-index: 10;
+  border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.chipInner {
+  width: 82%;
+  height: 82%;
+  border-radius: 50%;
+  border: 3px dashed #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.chipText {
+  font-weight: 900;
+  font-size: 1.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90%;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+}
