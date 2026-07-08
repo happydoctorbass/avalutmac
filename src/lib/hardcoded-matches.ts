@@ -3,14 +3,10 @@ import { Match } from '@/types/match';
 export type HardcodedMatch = Match & { prize: string };
 
 const rawMatches = [
-  { date: '04.07', time: '00:00', team1: 'AUS', team2: 'EGV', prize: '5000 KGS' },
-  { date: '04.07', time: '04:00', team1: 'ARG', team2: 'CPV', prize: '5000 KGS' },
-  { date: '04.07', time: '07:30', team1: 'COL', team2: 'GHA', prize: '5000 KGS' },
-  { date: '04.07', time: '23:00', team1: 'CAN', team2: 'MAR', prize: '5000 KGS' },
-  { date: '06.07', time: '02:00', team1: 'BRA', team2: 'NOR', prize: '5000 KGS' },
-  { date: '06.07', time: '06:00', team1: 'MEX', team2: 'ENG', prize: '5000 KGS' },
-  { date: '07.07', time: '01:00', team1: 'POR', team2: 'ESP', prize: '5000 KGS' },
-  { date: '07.07', time: '06:00', team1: 'USA', team2: 'BEL', prize: '5000 KGS' },
+  { date: '10.07', time: '02:00', team1: 'FRA', team2: 'MAR', prize: '5000 KGS' },
+  { date: '11.07', time: '01:00', team1: 'ESP', team2: 'BEL', prize: '5000 KGS' },
+  { date: '12.07', time: '03:00', team1: 'NOR', team2: 'ENG', prize: '5000 KGS' },
+  { date: '12.07', time: '07:00', team1: 'ARG', team2: 'SUI', prize: '5000 KGS' },
 ];
 
 export const HARDCODED_MATCHES: HardcodedMatch[] = rawMatches.map((m, i) => {
