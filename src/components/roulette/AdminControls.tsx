@@ -36,16 +36,24 @@ export function AdminControls() {
     }
 
     setLoading(true);
-    await fetch('/api/roulette/bet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'add',
-        payload: { playerId: playerId.trim(), number: selectedCell, color: selectedColor }
-      })
-    });
-    setLoading(false);
-    closeModal();
+    try {
+      const res = await fetch('/api/roulette/bet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add',
+          payload: { playerId: playerId.trim(), number: selectedCell, color: selectedColor }
+        })
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        alert(json.error || 'Не удалось добавить ставку');
+        return;
+      }
+      closeModal();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteBet = async () => {

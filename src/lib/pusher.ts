@@ -1,12 +1,27 @@
 import Pusher from 'pusher-js';
 
 let instance: Pusher | null = null;
+let warnedMissingKeys = false;
 
 export function getPusherClient(): Pusher | null {
   if (typeof window === 'undefined') return null;
+
+  const key = process.env.NEXT_PUBLIC_PUSHER_KEY;
+  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+  if (!key || !cluster) {
+    if (!warnedMissingKeys) {
+      console.warn(
+        '[Pusher] NEXT_PUBLIC_PUSHER_KEY / NEXT_PUBLIC_PUSHER_CLUSTER missing — client not initialized.'
+      );
+      warnedMissingKeys = true;
+    }
+    return null;
+  }
+
   if (!instance) {
-    instance = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
+    instance = new Pusher(key, {
+      cluster,
       forceTLS: true,
     });
   }

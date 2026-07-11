@@ -1,9 +1,13 @@
 export interface RouletteBet {
-  id: string;
+  id?: string;
   player_id: string;
   number: number;
+  /** Chip color hex — stored as `player_color` in Supabase */
   color: string;
-  created_at: string;
+  player_color?: string | null;
+  is_promo?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Player {
