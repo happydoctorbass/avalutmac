@@ -28,7 +28,7 @@ const PROMO_STYLES = {
 
   /* 👑 ГЛАВНЫЙ ЗАГОЛОВОК — размер и насыщенность (shimmer + gold-glow применяются отдельно) */
   title:
-    "text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-tight shimmer-text gold-glow-text",
+    "text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-tight text-gold-gradient",
 
   /* 💬 ХУК — крупный призыв на слайде «Награды» */
   hook:
@@ -40,7 +40,7 @@ const PROMO_STYLES = {
 
   /* 🃏 КАРТОЧКИ (VIP Gold Leaf Glass) — рамка, фон, тень, скругления */
   card:
-    "border-l-4 border-l-[#ffd700] border-t border-r border-b border-[#d4af37]/50 bg-black/40 backdrop-blur-2xl rounded-r-2xl rounded-l-md px-8 py-5 w-fit shadow-[0_10px_30px_rgba(0,0,0,0.8),0_0_20px_rgba(212,175,55,0.25)]",
+    "bg-black/90 border-l-4 border-l-[#ffd700] border-t border-r border-b border-[#d4af37]/60 rounded-r-2xl rounded-l-md px-8 py-5 w-fit shadow-lg",
 
   /* 🔤 ТЕКСТ ВНУТРИ КАРТОЧЕК — размер и стиль наград / времени */
   cardText:
@@ -60,106 +60,33 @@ const PROMO_STYLES = {
   carousel: "relative flex flex-col justify-center items-start text-left w-full min-h-[250px]",
 } as const;
 
-/* ============================================================================
- * GOLD_DUST — плотный многослойный поток золотой пыли (53 частицы).
- * Детерминированные значения от индекса → стабильный SSR / hydration.
- * ========================================================================== */
-type DustLayer = "speck" | "orb" | "glyph";
-
-type GoldDustParticle = {
-  id: string;
-  layer: DustLayer;
-  left: string;
-  size: number;
-  delay: number;
-  duration: number;
-  driftX: number;
-  opacityPeak: number;
-  color: string;
-  glyph: "✦" | "✨";
-};
-
-/** Псевдо-рандом 0..1 от seed (без Math.random — без рассинхрона SSR) */
-const dustSeed = (n: number) => {
-  const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
-  return x - Math.floor(x);
-};
-
-const SPECK_COLORS = ["#ffd700", "#ffe566", "#fff8dc", "#e6c875", "#ffec8b"] as const;
-const GLYPHS = ["✦", "✨"] as const;
-
-const buildGoldDust = (): GoldDustParticle[] => {
-  const particles: GoldDustParticle[] = [];
-
-  // 35 × острые золотые искры (1–4px)
-  for (let i = 0; i < 35; i++) {
-    const r = dustSeed(i + 1);
-    const r2 = dustSeed(i + 101);
-    const r3 = dustSeed(i + 201);
-    particles.push({
-      id: `speck-${i}`,
-      layer: "speck",
-      left: `${r * 100}%`,
-      size: 1 + Math.floor(r2 * 4), // 1–4px
-      delay: r3 * 8, // 0–8s
-      duration: 4 + dustSeed(i + 301) * 8, // 4–12s
-      driftX: (dustSeed(i + 401) * 2 - 1) * (12 + dustSeed(i + 501) * 28),
-      opacityPeak: 0.7 + dustSeed(i + 601) * 0.3,
-      color: SPECK_COLORS[i % SPECK_COLORS.length],
-      glyph: "✦",
-    });
-  }
-
-  // 10 × мягкие амбиентные орбы (6–12px, blur)
-  for (let i = 0; i < 10; i++) {
-    const r = dustSeed(i + 700);
-    const r2 = dustSeed(i + 800);
-    particles.push({
-      id: `orb-${i}`,
-      layer: "orb",
-      left: `${r * 100}%`,
-      size: 6 + Math.floor(r2 * 7), // 6–12px
-      delay: dustSeed(i + 900) * 8,
-      duration: 6 + dustSeed(i + 1000) * 6, // 6–12s (медленнее)
-      driftX: (dustSeed(i + 1100) * 2 - 1) * (18 + dustSeed(i + 1200) * 36),
-      opacityPeak: 0.3 + dustSeed(i + 1300) * 0.3, // 0.3–0.6
-      color: "#d4af37",
-      glyph: "✦",
-    });
-  }
-
-  // 8 × сверкающие глифы (✦ / ✨) с вращением
-  for (let i = 0; i < 8; i++) {
-    const r = dustSeed(i + 1400);
-    particles.push({
-      id: `glyph-${i}`,
-      layer: "glyph",
-      left: `${r * 100}%`,
-      size: 10 + Math.floor(dustSeed(i + 1500) * 8), // 10–17px font
-      delay: dustSeed(i + 1600) * 8,
-      duration: 5 + dustSeed(i + 1700) * 7, // 5–12s
-      driftX: (dustSeed(i + 1800) * 2 - 1) * (10 + dustSeed(i + 1900) * 24),
-      opacityPeak: 0.55 + dustSeed(i + 2000) * 0.4,
-      color: "#ffd700",
-      glyph: GLYPHS[i % GLYPHS.length],
-    });
-  }
-
-  return particles;
-};
-
-const GOLD_DUST = buildGoldDust();
+export const DiamondIcon = () => (
+  <svg
+    width="1em"
+    height="1em"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="inline-block text-[#ffd700] drop-shadow-md"
+    style={{ verticalAlign: "-0.125em", marginRight: "0.25em" }}
+  >
+    <path
+      d="M12 2L15 10L23 12L15 14L12 22L9 14L1 12L9 10L12 2Z"
+      fill="currentColor"
+    />
+  </svg>
+);
 
 interface PromoScreenProps {
   imageSrc: string | StaticImport;
   orientation: "horizontal" | "vertical";
-  title: string;
-  subtitle: string;
-  hook: string;
-  rewards: string[];
-  scheduleTitle: string;
-  schedule: string[];
-  footer: string;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
+  hook: React.ReactNode;
+  rewards: React.ReactNode[];
+  scheduleTitle: React.ReactNode;
+  schedule: React.ReactNode[];
+  footer: React.ReactNode;
 }
 
 export const PromoScreen: React.FC<PromoScreenProps> = ({
@@ -220,105 +147,6 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
           priority
         />
       </motion.div>
-
-      {/* 🔹 ЗОЛОТАЯ ПЫЛЬ — плотный многослойный поток (53 частицы) */}
-      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden" aria-hidden>
-        {GOLD_DUST.map((p) => {
-          const rise = {
-            top: ["105vh", "-10vh"] as [string, string],
-            x: [0, p.driftX, -p.driftX * 0.7, 0] as [number, number, number, number],
-          };
-
-          if (p.layer === "orb") {
-            return (
-              <motion.span
-                key={p.id}
-                className="absolute rounded-full bg-[#ffd700] blur-[2px]"
-                style={{
-                  left: p.left,
-                  width: p.size,
-                  height: p.size,
-                  boxShadow: `0 0 ${p.size * 4}px rgba(212,175,55,0.55)`,
-                }}
-                initial={{ top: "105vh", opacity: 0, x: 0 }}
-                animate={{
-                  top: rise.top,
-                  x: rise.x,
-                  opacity: [0, p.opacityPeak, p.opacityPeak * 0.7, p.opacityPeak, 0],
-                  scale: [0.8, 1.15, 1, 1.1, 0.7],
-                }}
-                transition={{
-                  duration: p.duration,
-                  delay: p.delay,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            );
-          }
-
-          if (p.layer === "glyph") {
-            return (
-              <motion.span
-                key={p.id}
-                className="absolute select-none leading-none text-[#ffd700]"
-                style={{
-                  left: p.left,
-                  fontSize: p.size,
-                  textShadow: `0 0 8px rgba(255,215,0,0.9), 0 0 16px rgba(212,175,55,0.5)`,
-                }}
-                initial={{ top: "105vh", opacity: 0, x: 0, rotate: 0 }}
-                animate={{
-                  top: rise.top,
-                  x: rise.x,
-                  rotate: [0, 360],
-                  opacity: [0, p.opacityPeak, p.opacityPeak * 0.55, p.opacityPeak, 0],
-                  scale: [0.7, 1.1, 0.95, 1.05, 0.6],
-                }}
-                transition={{
-                  duration: p.duration,
-                  delay: p.delay,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                {p.glyph}
-              </motion.span>
-            );
-          }
-
-          // Sharp gold speck
-          return (
-            <motion.span
-              key={p.id}
-              className="absolute rounded-full"
-              style={{
-                left: p.left,
-                width: p.size,
-                height: p.size,
-                backgroundColor: p.color,
-                boxShadow: `0 0 ${p.size * 3}px rgba(255,215,0,0.95), 0 0 ${p.size * 7}px rgba(212,175,55,0.55)`,
-              }}
-              initial={{ top: "105vh", opacity: 0, x: 0 }}
-              animate={{
-                top: rise.top,
-                x: rise.x,
-                opacity: [0, p.opacityPeak, p.opacityPeak * 0.45, p.opacityPeak, 0],
-                scale: [0.5, 1.25, 0.9, 1.15, 0.4],
-              }}
-              transition={{
-                duration: p.duration,
-                delay: p.delay,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* 🔹 АМБИЕНТНЫЙ ЗОЛОТОЙ СПОТ */}
-      <div className="absolute -top-20 -left-20 w-[600px] h-[600px] bg-[#d4af37]/15 blur-[120px] rounded-full pointer-events-none z-0" />
 
       {/* 🔹 КОНТЕЙНЕР КОНТЕНТА — flex-колонка без наложений */}
       <div className={PROMO_STYLES.container}>

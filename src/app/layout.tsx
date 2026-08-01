@@ -20,6 +20,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru" className={`${geistSans.variable} ${geistMono.variable} ${notoSansSC.variable} h-full antialiased`}>
+      <head>
+        <meta charSet="utf-8" />
+      </head>
       <body className="min-h-full flex flex-col">
         <AppProviders>{children}</AppProviders>
       </body>
