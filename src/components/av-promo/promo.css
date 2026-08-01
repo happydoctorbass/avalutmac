@@ -1,0 +1,46 @@
+.text-gold-gradient {
+  background-image: linear-gradient(to right, #e6c875, #ffd700, #b8860b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #e6c875 0%,
+    #fff 25%,
+    #ffd700 50%,
+    #b8860b 75%,
+    #e6c875 100%
+  );
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+  filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Тройное золотое свечение текста */
+.gold-glow-text {
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7))
+    drop-shadow(0 0 35px rgba(212, 175, 55, 0.4))
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+.shimmer-text.gold-glow-text {
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.7))
+    drop-shadow(0 0 35px rgba(212, 175, 55, 0.4))
+    drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
