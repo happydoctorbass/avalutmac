@@ -1,28 +1,46 @@
-import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
+import { PromoScreen, DiamondIcon, HighlightMoney } from "@/components/av-promo/PromoScreen";
+import { LIVEGAME_PROMO_DATA } from "@/config/promo-data";
 
 export default function LedVerticalPromo() {
+  const data = LIVEGAME_PROMO_DATA;
+  const orientation: "horizontal" | "vertical" = "vertical";
+  
   return (
     <PromoScreen
       imageSrc="/images/promo/ledscreen vertical.png"
-      orientation="vertical"
+      orientation={orientation}
       textAlign="center"
       showBottomPanel={true}
-      subtitle="♠ THE ART OF HIGH STAKES WINNING"
-      title="TRIPLE BOOST BONUS CHIPS"
-      hook="WIN WITH A ×10 BET & TRIPLE YOUR REWARDS!"
+      subtitle={data.subtitle}
+      title={data.title}
+      hook={data.hook}
       rewards={[
-        <span key="1"><DiamondIcon /> BACCARAT BOOST: Win Up to $5,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
-        <span key="2"><DiamondIcon /> NIU NIU BOOST: Win Up to $2,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
-        <span key="3"><DiamondIcon /> VIP DROP BONUS: 10% Cash Back + 10% Promo Chips on Every $1,000 Drop</span>,
-        <span key="4"><DiamondIcon /> LOSS PROTECTION: 5% Promo Reward Next Day on $5,000+ Losses</span>
+        <div key="1" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">BACCARAT BOOST:</span> WIN UP TO</div>
+          <HighlightMoney>$5,000 PROMO CHIPS</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">+ 2,000 KGS TICKET on ×10 Bet</div>
+        </div>,
+        <div key="2" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">NIU NIU BOOST:</span> WIN UP TO</div>
+          <HighlightMoney>$2,000 PROMO CHIPS</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">+ 2,000 KGS TICKET on ×10 Bet</div>
+        </div>,
+        <div key="3" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">VIP DROP BONUS:</span></div>
+          <HighlightMoney>10% CASHBACK + 10% CHIPS</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">On Every $1,000 Drop</div>
+        </div>,
+        <div key="4" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">LOSS PROTECTION:</span></div>
+          <HighlightMoney>5% PROMO REWARD</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">Next Day Return on $5,000+ Loss</div>
+        </div>
       ]}
-      scheduleTitle="DAILY BOOST SESSIONS"
-      schedule={[
-        <span key="1"><DiamondIcon /> SESSION 1: 18:00h – 20:59h</span>,
-        <span key="2"><DiamondIcon /> SESSION 2: 21:00h – 23:59h</span>,
-        <span key="3"><DiamondIcon /> SESSION 3: 00:00h – 03:00h</span>
-      ]}
-      footer="Play with elegance • Win with style • Valid for all visitors"
+      scheduleTitle={data.scheduleTitle}
+      schedule={data.schedule.map((s, i) => (
+        <span key={i}><DiamondIcon /> {s.label}: <strong className="text-yellow-300">{s.time}</strong></span>
+      ))}
+      footer={data.footer}
     />
   );
 }

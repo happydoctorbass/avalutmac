@@ -7,7 +7,7 @@ export interface RewardItem {
 }
 
 export const SLOT_PROMO_DATA = {
-  subtitle: "🎰 UNLEASH YOUR FORTUNE",
+  subtitle: "UNLEASH YOUR FORTUNE",
   title: "SLOTS MEGA BONUS & JACKPOTS",
   hook: "1,000 KGS WELCOME BONUS",
   rewards: [
@@ -50,7 +50,7 @@ export const SLOT_PROMO_DATA = {
 };
 
 export const LIVEGAME_PROMO_DATA = {
-  subtitle: "♠ HIGH STAKES & EXCLUSIVE REWARDS",
+  subtitle: "HIGH STAKES & EXCLUSIVE REWARDS",
   title: "TRIPLE BOOST & CASHBACK",
   hook: "WIN UP TO $5,000 PROMO CHIPS",
   rewards: [
@@ -93,7 +93,7 @@ export const LIVEGAME_PROMO_DATA = {
 };
 
 export const MEGA_AUGUST_DRAW_DATA = {
-  subtitle: "🔥 AUGUST MONTHLY GRAND DRAW",
+  subtitle: "AUGUST MONTHLY GRAND DRAW",
   title: "MEGA DRAW $50,000 + 50,000 KGS",
   hook: "JOIN THE $50,000 SUPER DRAW",
   draws: [

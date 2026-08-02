@@ -1,27 +1,46 @@
-import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
+import { PromoScreen, DiamondIcon, HighlightMoney } from "@/components/av-promo/PromoScreen";
+import { SLOT_PROMO_DATA } from "@/config/promo-data";
 
 export default function SlotVerticalPromo() {
+  const data = SLOT_PROMO_DATA;
+  const orientation: "horizontal" | "vertical" = "vertical";
+  
   return (
     <PromoScreen
-      imageSrc="/images/promo/slot_vertical.png"
-      orientation="vertical"
+      imageSrc={`/images/promo/slot_${orientation}.png`}
+      orientation={orientation}
       textAlign="center"
       showBottomPanel={true}
-      subtitle="🎰 UNLEASH YOUR FORTUNE"
-      title="SLOT MATCH PLAY & JACKPOTS"
-      hook="1,000 KGS INSTANT WELCOME BONUS!"
+      subtitle={data.subtitle}
+      title={data.title}
+      hook={data.hook}
       rewards={[
-        <span key="1"><DiamondIcon /> WELCOME REWARD: 1,000 KGS Promo Ticket on Registration</span>,
-        <span key="2"><DiamondIcon /> DOUBLE YOUR PLAY: Match Play Bonus 1,000 → 2,000 KGS | 2,500 → 5,000 KGS</span>,
-        <span key="3"><DiamondIcon /> 10% SLOT CASHBACK: Instant Cash Back on Drops Over 50,000 KGS</span>,
-        <span key="4"><DiamondIcon /> HAPPY HOURS BOOST: STAR MINI 15,000 KGS | STAR MIDI 40,000 KGS</span>
+        <div key="1" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">WELCOME REWARD:</span></div>
+          <HighlightMoney>1,000 KGS FREE</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">Promo Ticket on New Registration</div>
+        </div>,
+        <div key="2" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">DOUBLE YOUR PLAY:</span></div>
+          <HighlightMoney>100% MATCH BONUS</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">1,000 ➔ 2,000 KGS | 2,500 ➔ 5,000 KGS</div>
+        </div>,
+        <div key="3" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">HAPPY HOURS JACKPOT:</span></div>
+          <HighlightMoney>STAR MIDI 40,000 KGS</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">STAR MINI Starts from 15,000 KGS</div>
+        </div>,
+        <div key="4" className="flex flex-col gap-1">
+          <div><DiamondIcon /> <span className="font-bold text-gray-200">SLOT CASHBACK:</span></div>
+          <HighlightMoney>10% CASHBACK</HighlightMoney>
+          <div className="text-sm md:text-base text-yellow-200/80">Instant Return on Drops over 50,000 KGS</div>
+        </div>
       ]}
-      scheduleTitle="GOLDEN HOURS & NIGHTLY JACKPOTS"
-      schedule={[
-        <span key="1"><DiamondIcon /> GOLDEN HOURS: Mon–Thu & Sun (18:00–22:00) | Fri–Sat (20:00–22:00)</span>,
-        <span key="2"><DiamondIcon /> NIGHTLY JACKPOTS: Every Night 22:00h – 04:00h (Any Bet • Random Time)</span>
-      ]}
-      footer="Your Jackpot is calling • Valid for all visitors"
+      scheduleTitle={data.scheduleTitle}
+      schedule={data.schedule.map((s, i) => (
+        <span key={i}><DiamondIcon /> {s.label}: <strong className="text-yellow-300">{s.time}</strong></span>
+      ))}
+      footer={data.footer}
     />
   );
 }

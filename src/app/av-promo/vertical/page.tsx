@@ -7,7 +7,7 @@ export default function VerticalPromo() {
       orientation="vertical"
       textAlign="center"
       showBottomPanel={true}
-      subtitle="🏆 THE GRAND MONTHLY EVENT"
+      subtitle="THE GRAND MONTHLY EVENT"
       title="AUGUST MONTHLY GIVEAWAY"
       hook="$50,000 + 500,000 KGS PRIZE POOL"
       rewards={[
