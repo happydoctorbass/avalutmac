@@ -6,21 +6,21 @@ export default function HorizontalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/livegame_horizontal.png"
       orientation="horizontal"
-      title="BACCARAT TRIPLE BOOST"
-      subtitle="Play Bigger. Win Bigger. Get Rewarded!"
-      hook="Place your bets and unlock an exclusive reward:"
+      subtitle="BACCARAT & NIU NIU"
+      title="TRIPLE BOOST BONUS"
+      hook="WIN WITH A ×10 BET!"
       rewards={[
-        <span key="1"><DiamondIcon /> Bet ×10</span>,
-        <span key="2"><DiamondIcon /> Win from $250 up to $5,000</span>,
-        <span key="3"><DiamondIcon /> Receive BONUS CHIPS + 2,000 KGS Promo Ticket</span>
+        <span key="1"><DiamondIcon /> Baccarat: Up to $5,000 + 2,000 KGS</span>,
+        <span key="2"><DiamondIcon /> Niu Niu: Up to $2,000 + 2,000 KGS</span>,
+        <span key="3"><DiamondIcon /> Daily: 18:00–20:59 | 21:00–23:59 | 00:00–03:00</span>
       ]}
-      scheduleTitle="Every Day"
+      scheduleTitle="DAILY BOOST SESSIONS"
       schedule={[
-        <span key="1"><DiamondIcon /> 18:00 – 20:59</span>,
-        <span key="2"><DiamondIcon /> 21:00 – 23:59</span>,
-        <span key="3"><DiamondIcon /> 00:00 – 03:00</span>
+        <span key="1"><DiamondIcon /> Session 1: 18:00 – 20:59</span>,
+        <span key="2"><DiamondIcon /> Session 2: 21:00 – 23:59</span>,
+        <span key="3"><DiamondIcon /> Night: 00:00 – 03:00</span>
       ]}
-      footer="Open to All Guests"
+      footer="Play with elegance • Ask dealer for details"
     />
   );
 }

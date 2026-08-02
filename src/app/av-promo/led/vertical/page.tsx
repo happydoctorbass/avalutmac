@@ -9,21 +9,20 @@ export default function LedVerticalPromoPage() {
       containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
       maxContainerWidth="max-w-[90vw]"
       textAlign="center"
-      title="BACCARAT TRIPLE BOOST"
-      subtitle="Play Bigger. Win Bigger. Get Rewarded!"
-      hook="Place your bets and unlock an exclusive reward:"
+      subtitle="PROGRESSIVE JACKPOT"
+      title="HAPPY HOURS BOOST"
+      hook="DOUBLE THE JACKPOT MAGIC!"
       rewards={[
-        <span key="1"><DiamondIcon /> Bet ×10</span>,
-        <span key="2"><DiamondIcon /> Win from $250 up to $5,000</span>,
-        <span key="3"><DiamondIcon /> Receive BONUS CHIPS + 2,000 KGS Promo Ticket</span>
+        <span key="1"><DiamondIcon /> STAR MINI: Starting from 15,000 KGS</span>,
+        <span key="2"><DiamondIcon /> STAR MIDI: Starting from 40,000 KGS</span>,
+        <span key="3"><DiamondIcon /> Nightly Boost: Every Night 22:00 – 04:00</span>
       ]}
-      scheduleTitle="Every Day"
+      scheduleTitle="HAPPY HOURS"
       schedule={[
-        <span key="1"><DiamondIcon /> 18:00 – 20:59</span>,
-        <span key="2"><DiamondIcon /> 21:00 – 23:59</span>,
-        <span key="3"><DiamondIcon /> 00:00 – 03:00</span>
+        <span key="1"><DiamondIcon /> Nightly Session: 22:00 – 04:00</span>,
+        <span key="2"><DiamondIcon /> Any bet can trigger Progressive Jackpot</span>
       ]}
-      footer="Open to All Guests"
+      footer="Random time — real fortune • Open to all guests"
     />
   );
 }

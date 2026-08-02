@@ -9,21 +9,20 @@ export default function VerticalPromoPage() {
       containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
       maxContainerWidth="max-w-[90vw]"
       textAlign="center"
-      title={<><DiamondIcon /> BACCARAT TRIPLE BOOST</>}
-      subtitle="Play Bigger. Win Bigger. Get Rewarded!"
-      hook="Place your bets and unlock an exclusive reward:"
+      subtitle="GRAND MONTHLY GIVEAWAY"
+      title="$50,000 + 500,000 KGS"
+      hook="LUXURIOUS GRAND FINALS"
       rewards={[
-        <span key="1"><DiamondIcon /> Bet ×10</span>,
-        <span key="2"><DiamondIcon /> Win from $250 up to $5,000</span>,
-        <span key="3"><DiamondIcon /> Receive BONUS CHIPS + 2,000 KGS Promo Ticket</span>
+        <span key="1"><DiamondIcon /> August 15 Final: $20,000 + 20,000 KGS</span>,
+        <span key="2"><DiamondIcon /> August 29 Final: $30,000 + 30,000 KGS</span>,
+        <span key="3"><DiamondIcon /> Draws at 22:00, 00:00 & 02:00</span>
       ]}
-      scheduleTitle="Every Day"
+      scheduleTitle="GRAND FINALS"
       schedule={[
-        <span key="1"><DiamondIcon /> 18:00 – 20:59</span>,
-        <span key="2"><DiamondIcon /> 21:00 – 23:59</span>,
-        <span key="3"><DiamondIcon /> 00:00 – 03:00</span>
+        <span key="1"><DiamondIcon /> Live Game: $1,000 drop = 1 ticket</span>,
+        <span key="2"><DiamondIcon /> Slots: 80,000 KGS drop = 1 ticket</span>
       ]}
-      footer="Open to All Guests"
+      footer="Collect your tickets • Ask VIP Host for details"
     />
   );
 }

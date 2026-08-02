@@ -6,21 +6,20 @@ export default function SlotHorizontalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/slot_horizontal.png"
       orientation="horizontal"
-      title="SLOT MEGA JACKPOT"
-      subtitle="Spin the Reels. Hit the Jackpot!"
-      hook="Join the ultimate slot experience:"
+      subtitle="VIP PRIVILEGE CLUB"
+      title="10% CASH BACK"
+      hook="EXCLUSIVE CASHBACK ON DROPS"
       rewards={[
-        <span key="1"><DiamondIcon /> Daily Free Spins</span>,
-        <span key="2"><DiamondIcon /> Weekly Cash Drops</span>,
-        <span key="3"><DiamondIcon /> VIP Exclusive Tournaments</span>
+        <span key="1"><DiamondIcon /> Live Game: 10% Cash Back + 10% Promo Chips</span>,
+        <span key="2"><DiamondIcon /> Slots: 10% Cash Back on 50,000+ KGS</span>,
+        <span key="3"><DiamondIcon /> Special Compliment: 5% Reward Next Day</span>
       ]}
-      scheduleTitle="Tournament Schedule"
+      scheduleTitle="PRIVILEGE REWARDS"
       schedule={[
-        <span key="1"><DiamondIcon /> Friday 20:00</span>,
-        <span key="2"><DiamondIcon /> Saturday 20:00</span>,
-        <span key="3"><DiamondIcon /> Sunday 18:00</span>
+        <span key="1"><DiamondIcon /> Automatic daily cashback calculations</span>,
+        <span key="2"><DiamondIcon /> Ask Pit Boss for VIP status conditions</span>
       ]}
-      footer="VIP Members Only"
+      footer="Fortune returns to VIP guests • Ask your host"
     />
   );
 }

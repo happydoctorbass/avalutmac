@@ -9,21 +9,20 @@ export default function SlotVerticalPromoPage() {
       containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
       maxContainerWidth="max-w-[90vw]"
       textAlign="center"
-      title="BACCARAT TRIPLE BOOST"
-      subtitle="Play Bigger. Win Bigger. Get Rewarded!"
-      hook="Place your bets and unlock an exclusive reward:"
+      subtitle="WELCOME TO THE CASINO"
+      title="SLOT MATCH PLAY"
+      hook="1,000 KGS WELCOME BONUS!"
       rewards={[
-        <span key="1"><DiamondIcon /> Bet ×10</span>,
-        <span key="2"><DiamondIcon /> Win from $250 up to $5,000</span>,
-        <span key="3"><DiamondIcon /> Receive BONUS CHIPS + 2,000 KGS Promo Ticket</span>
+        <span key="1"><DiamondIcon /> Welcome Bonus: 1,000 KGS Instant</span>,
+        <span key="2"><DiamondIcon /> Match Play: Double 1,000 → 2,000 KGS</span>,
+        <span key="3"><DiamondIcon /> Golden Hours: Mon–Thu & Sun (18:00–22:00)</span>
       ]}
-      scheduleTitle="Every Day"
+      scheduleTitle="GOLDEN HOURS"
       schedule={[
-        <span key="1"><DiamondIcon /> 18:00 – 20:59</span>,
-        <span key="2"><DiamondIcon /> 21:00 – 23:59</span>,
-        <span key="3"><DiamondIcon /> 00:00 – 03:00</span>
+        <span key="1"><DiamondIcon /> Mon–Thu & Sun: 18:00 – 22:00</span>,
+        <span key="2"><DiamondIcon /> Fri–Sat: 20:00 – 22:00</span>
       ]}
-      footer="Open to All Guests"
+      footer="Your Jackpot is calling • Ask slot attendant"
     />
   );
 }
