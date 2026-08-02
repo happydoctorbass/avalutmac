@@ -1,7 +1,6 @@
-import React from "react";
 import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 
-export default function LiveGameVerticalPromoPage() {
+export default function LiveGameVerticalPromo() {
   return (
     <PromoScreen
       imageSrc="/images/promo/livegame_vertical.png"
@@ -23,7 +22,7 @@ export default function LiveGameVerticalPromoPage() {
         <span key="2"><DiamondIcon /> SESSION 2: 21:00h – 23:59h</span>,
         <span key="3"><DiamondIcon /> SESSION 3: 00:00h – 03:00h</span>
       ]}
-      footer="Play with elegance • Win with style"
+      footer="Play with elegance • Win with style • Valid for all visitors"
     />
   );
 }

@@ -50,13 +50,13 @@ const PROMO_STYLES = {
   scheduleTitle:
     "text-2xl md:text-3xl lg:text-4xl font-medium text-gray-100 leading-snug drop-shadow-lg uppercase",
 
-  /* 🔤 Текст в карточках — размер: text-xl / md:text-2xl / lg:text-3xl */
+  /* 🔤 Текст в карточках — размер: text-lg / md:text-xl / lg:text-2xl */
   cardText:
-    "text-xl md:text-2xl lg:text-3xl font-semibold text-white tracking-wider",
+    "text-lg md:text-xl lg:text-2xl font-semibold text-white tracking-wider",
 
-  /* 🔻 Футер — размер: text-base / md:text-lg / lg:text-xl */
+  /* 🔻 Футер — размер: text-sm / md:text-base / lg:text-lg */
   footer:
-    "text-base md:text-lg lg:text-xl font-light tracking-[0.2em] text-gray-400 uppercase drop-shadow-md",
+    "text-sm md:text-base lg:text-lg font-light tracking-[0.2em] text-gray-400 uppercase drop-shadow-md",
 
   /* ───────────────────── ▼ VERTICAL (LED / портрет) ───────────────────── */
 
@@ -81,25 +81,25 @@ const PROMO_STYLES = {
   /* 💬 ОПИСАНИЕ ВНИЗУ (вертикаль) — МЕНЯЙ РАЗМЕР ЗДЕСЬ
    *    Сейчас ×5 от базового. Мельче пример: text-[4rem] | Ещё крупнее: text-[12rem] */
   hookV:
-    "text-[9.5rem] md:text-[11rem] lg:text-[15rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
+    "text-[7rem] md:text-[9rem] lg:text-[12rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
 
   /* 📅 Заголовок расписания внизу — тот же размер, что и описание */
   scheduleTitleV:
-    "text-[9.5rem] md:text-[11rem] lg:text-[15rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
+    "text-[7rem] md:text-[9rem] lg:text-[12rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
 
-  /* 🔤 Текст карточек V — размер: text-2xl / md:text-3xl / lg:text-4xl */
+  /* 🔤 Текст карточек V — размер: text-lg / md:text-xl / lg:text-2xl */
   cardTextV:
-    "text-2xl md:text-3xl lg:text-4xl font-semibold text-[#fff8e7] tracking-wide",
+    "text-lg md:text-xl lg:text-2xl font-semibold text-[#fff8e7] tracking-wide",
 
-  /* 🔻 Футер V — размер: text-lg / md:text-xl / lg:text-2xl */
+  /* 🔻 Футер V — размер: text-base / md:text-lg / lg:text-xl */
   footerV:
-    "text-lg md:text-xl lg:text-2xl font-light tracking-[0.28em] text-[#c4b896] uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]",
+    "text-base md:text-lg lg:text-xl font-light tracking-[0.28em] text-[#c4b896] uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]",
 
   /* ───────────────────── 🃏 КАРТОЧКИ (общие) ───────────────────── */
 
-  /* Gold-embossed plates — padding: px-8 py-5 */
+  /* Gold-embossed plates — padding: px-6 py-4 */
   card:
-    "bg-gradient-to-b from-black/90 via-[#0e0d0b]/90 to-black/90 border border-[#d4af37]/70 border-t-[#ffe58f] rounded-2xl px-8 py-5 shadow-[inset_0_1px_1px_rgba(255,215,0,0.35),0_10px_25px_rgba(0,0,0,0.9)] w-fit mx-auto",
+    "bg-gradient-to-b from-black/90 via-[#0e0d0b]/90 to-black/90 border border-[#d4af37]/70 border-t-[#ffe58f] rounded-2xl px-6 py-4 shadow-[inset_0_1px_1px_rgba(255,215,0,0.35),0_10px_25px_rgba(0,0,0,0.9)] w-fit mx-auto",
 
   /* Списки карточек */
   rewardsList: "flex flex-col gap-4 mt-2 w-full items-start text-left",
@@ -109,7 +109,7 @@ const PROMO_STYLES = {
 
   /* Royal Onyx & 24K Gold Plate (carousel + footer) */
   bottomPanel:
-    "bg-gradient-to-b from-[#1c1916]/95 via-[#0a0908]/95 to-[#14110e]/95 border-2 border-[#d4af37]/80 border-t-[#ffe89c] rounded-3xl p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(212,175,55,0.3)] max-w-[92vw] mx-auto w-full flex flex-col items-center gap-6",
+    "bg-gradient-to-b from-[#1c1916]/95 via-[#0a0908]/95 to-[#14110e]/95 border-2 border-[#d4af37]/80 border-t-[#ffe89c] rounded-3xl p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(212,175,55,0.3)] max-w-[92vw] mx-auto w-full flex flex-col items-center gap-5",
 } as const;
 
 /** Тонкая золотая линия-декор (CSS only, без blur / particles) */

@@ -1,7 +1,6 @@
-import React from "react";
 import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 
-export default function SlotVerticalPromoPage() {
+export default function SlotVerticalPromo() {
   return (
     <PromoScreen
       imageSrc="/images/promo/slot_vertical.png"
@@ -22,7 +21,7 @@ export default function SlotVerticalPromoPage() {
         <span key="1"><DiamondIcon /> GOLDEN HOURS: Mon–Thu & Sun (18:00–22:00) | Fri–Sat (20:00–22:00)</span>,
         <span key="2"><DiamondIcon /> NIGHTLY JACKPOTS: Every Night 22:00h – 04:00h (Any Bet • Random Time)</span>
       ]}
-      footer="Valid for all visitors • Your Jackpot is calling"
+      footer="Your Jackpot is calling • Valid for all visitors"
     />
   );
 }

@@ -1,27 +1,28 @@
-import React from "react";
 import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 
-export default function LedVerticalPromoPage() {
+export default function LedVerticalPromo() {
   return (
     <PromoScreen
       imageSrc="/images/promo/ledscreen vertical.png"
       orientation="vertical"
       textAlign="center"
       showBottomPanel={true}
-      subtitle="🌟 PROGRESSIVE JACKPOT BOOST"
-      title="2X HAPPY HOURS JACKPOT"
-      hook="DOUBLE THE PROGRESSIVE THRILL!"
+      subtitle="♠ THE ART OF HIGH STAKES WINNING"
+      title="TRIPLE BOOST BONUS CHIPS"
+      hook="WIN WITH A ×10 BET & TRIPLE YOUR REWARDS!"
       rewards={[
-        <span key="1"><DiamondIcon /> STAR MINI JACKPOT: Starting from 15,000 KGS</span>,
-        <span key="2"><DiamondIcon /> STAR MIDI JACKPOT: Starting from 40,000 KGS</span>,
-        <span key="3"><DiamondIcon /> ANY BET CAN WIN: Random Time • Real Fortune</span>
+        <span key="1"><DiamondIcon /> BACCARAT BOOST: Win Up to $5,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
+        <span key="2"><DiamondIcon /> NIU NIU BOOST: Win Up to $2,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
+        <span key="3"><DiamondIcon /> VIP DROP BONUS: 10% Cash Back + 10% Promo Chips on Every $1,000 Drop</span>,
+        <span key="4"><DiamondIcon /> LOSS PROTECTION: 5% Promo Reward Next Day on $5,000+ Losses</span>
       ]}
-      scheduleTitle="NIGHTLY JACKPOT TIME"
+      scheduleTitle="DAILY BOOST SESSIONS"
       schedule={[
-        <span key="1"><DiamondIcon /> NIGHTLY SESSION: Every Night 22:00h – 04:00h</span>,
-        <span key="2"><DiamondIcon /> 2X Progressive Jackpot Time for All Visitors</span>
+        <span key="1"><DiamondIcon /> SESSION 1: 18:00h – 20:59h</span>,
+        <span key="2"><DiamondIcon /> SESSION 2: 21:00h – 23:59h</span>,
+        <span key="3"><DiamondIcon /> SESSION 3: 00:00h – 03:00h</span>
       ]}
-      footer="Luck knows no limits • Valid for all visitors"
+      footer="Play with elegance • Win with style • Valid for all visitors"
     />
   );
 }
