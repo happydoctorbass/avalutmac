@@ -78,14 +78,14 @@ const PROMO_STYLES = {
   titleV:
     "text-7xl md:text-8xl lg:text-[7.5rem] font-black uppercase text-gold-24k leading-[0.95] drop-shadow-[0_8px_20px_rgba(0,0,0,0.95)]",
 
-  /* 💬 Хук / описание V — размер: text-3xl / md:text-4xl / lg:text-5xl
-   *    Это «описание» на слайде наград. Крупнее: lg:text-6xl | Мельче: text-2xl */
+  /* 💬 ОПИСАНИЕ ВНИЗУ (вертикаль) — МЕНЯЙ РАЗМЕР ЗДЕСЬ
+   *    Сейчас ×5 от базового. Мельче пример: text-[4rem] | Ещё крупнее: text-[12rem] */
   hookV:
-    "text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.12em] leading-tight text-hook-luxe",
+    "text-[9.5rem] md:text-[11rem] lg:text-[15rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
 
-  /* 📅 Заголовок расписания V — размер как hookV */
+  /* 📅 Заголовок расписания внизу — тот же размер, что и описание */
   scheduleTitleV:
-    "text-3xl md:text-4xl lg:text-5xl font-semibold uppercase tracking-[0.12em] leading-tight text-hook-luxe",
+    "text-[9.5rem] md:text-[11rem] lg:text-[15rem] font-semibold uppercase tracking-[0.08em] leading-none text-hook-luxe",
 
   /* 🔤 Текст карточек V — размер: text-2xl / md:text-3xl / lg:text-4xl */
   cardTextV:
