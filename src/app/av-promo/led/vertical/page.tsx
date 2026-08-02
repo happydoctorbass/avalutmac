@@ -1,11 +1,11 @@
 import React from "react";
 import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 
-export default function HorizontalPromoPage() {
+export default function LedVerticalPromoPage() {
   return (
     <PromoScreen
-      imageSrc="/images/promo/horizontal.png"
-      orientation="horizontal"
+      imageSrc="/images/promo/ledscreen vertical.png"
+      orientation="vertical"
       title="BACCARAT TRIPLE BOOST"
       subtitle="Play Bigger. Win Bigger. Get Rewarded!"
       hook="Place your bets and unlock an exclusive reward:"

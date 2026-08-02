@@ -1,5 +1,5 @@
-.text-gold-gradient {
-  background-image: linear-gradient(to right, #e6c875, #ffd700, #b8860b);
+.text-gold-24k {
+  background-image: linear-gradient(to right, #f3e5ab, #ffd700, #b8860b);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

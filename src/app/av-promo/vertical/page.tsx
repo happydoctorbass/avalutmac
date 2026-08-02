@@ -4,7 +4,7 @@ import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 export default function VerticalPromoPage() {
   return (
     <PromoScreen
-      imageSrc="/images/promo/horizontal.png"
+      imageSrc="/images/promo/slot_vertical.png"
       orientation="vertical"
       title={<><DiamondIcon /> BACCARAT TRIPLE BOOST</>}
       subtitle="Play Bigger. Win Bigger. Get Rewarded!"

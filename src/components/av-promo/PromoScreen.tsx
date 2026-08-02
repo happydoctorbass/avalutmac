@@ -26,9 +26,9 @@ const PROMO_STYLES = {
   subtitle:
     "text-lg md:text-xl lg:text-2xl font-semibold tracking-[0.3em] text-[#e6c875] uppercase drop-shadow-md",
 
-  /* 👑 ГЛАВНЫЙ ЗАГОЛОВОК — размер и насыщенность (shimmer + gold-glow применяются отдельно) */
+  /* 👑 ГЛАВНЫЙ ЗАГОЛОВОК — размер и насыщенность */
   title:
-    "text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-tight text-gold-gradient",
+    "text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-tight text-gold-24k",
 
   /* 💬 ХУК — крупный призыв на слайде «Награды» */
   hook:
@@ -40,7 +40,7 @@ const PROMO_STYLES = {
 
   /* 🃏 КАРТОЧКИ (VIP Gold Leaf Glass) — рамка, фон, тень, скругления */
   card:
-    "bg-black/90 border-l-4 border-l-[#ffd700] border-t border-r border-b border-[#d4af37]/60 rounded-r-2xl rounded-l-md px-8 py-5 w-fit shadow-lg",
+    "bg-black/90 border-l-4 border-l-[#ffd700] border-t border-r border-b border-[#d4af37]/60 rounded-r-2xl rounded-l-md px-8 py-5 shadow-2xl w-fit",
 
   /* 🔤 ТЕКСТ ВНУТРИ КАРТОЧЕК — размер и стиль наград / времени */
   cardText:
@@ -125,9 +125,9 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
 
   // Carousel slide variants
   const slideVariants = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } },
-    exit: { opacity: 0, y: -30, transition: { duration: 0.6, ease: "easeIn" as const } },
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" as const } },
+    exit: { opacity: 0, transition: { duration: 0.6, ease: "easeIn" as const } },
   };
 
   return (
@@ -168,13 +168,9 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
 
             {/* 🔹 ГЛАВНЫЙ ЗАГОЛОВОК */}
             <motion.div variants={itemVariants}>
-              <motion.h1
-                animate={{ opacity: [0.85, 1, 0.85], scale: [1, 1.01, 1] }}
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className={`${cinzel.className} ${PROMO_STYLES.title}`}
-              >
+              <h1 className={`${cinzel.className} ${PROMO_STYLES.title}`}>
                 {title}
-              </motion.h1>
+              </h1>
             </motion.div>
           </div>
 
