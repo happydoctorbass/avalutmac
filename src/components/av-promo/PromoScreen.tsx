@@ -15,10 +15,6 @@ const montserrat = Montserrat({ subsets: ["latin"], weight: ["300", "400", "500"
  * Меняйте классы здесь, не ищите их в JSX ниже.
  * ========================================================================== */
 const PROMO_STYLES = {
-  /* 📍 ПОЗИЦИЯ КОНТЕЙНЕРА — отступы от краёв экрана и ширина текстового блока */
-  container:
-    "absolute top-12 left-12 lg:top-16 lg:left-16 max-w-[65vw] z-10",
-
   /* 📦 СТЕК КОНТЕНТА — вертикальные промежутки между секциями (подзаголовок → заголовок → карусель → футер) */
   stack: "flex flex-col gap-6 lg:gap-8",
 
@@ -48,16 +44,15 @@ const PROMO_STYLES = {
 
   /* 📋 СПИСОК КАРТОЧЕК НАГРАД — вертикальный стек */
   rewardsList: "flex flex-col gap-4 mt-2 w-full items-start text-left",
+  rewardsListCenter: "flex flex-col gap-4 mt-2 w-full items-center text-center mx-auto",
 
   /* 🕐 СПИСОК КАРТОЧЕК РАСПИСАНИЯ — горизонтальный wrap */
   scheduleList: "flex flex-wrap gap-6 mt-2 w-full justify-start",
+  scheduleListCenter: "flex flex-wrap gap-6 mt-2 w-full justify-center mx-auto",
 
   /* 🔻 ФУТЕР — нижняя строка (дисклеймер / бренд) */
   footer:
     "text-base md:text-lg lg:text-xl font-light tracking-[0.2em] text-gray-400 uppercase drop-shadow-md",
-
-  /* 🎞️ ОБЛАСТЬ КАРУСЕЛИ — минимальная высота, чтобы слайды не прыгали */
-  carousel: "relative flex flex-col justify-center items-start text-left w-full min-h-[250px]",
 } as const;
 
 export const DiamondIcon = () => (
@@ -79,18 +74,24 @@ export const DiamondIcon = () => (
 
 interface PromoScreenProps {
   imageSrc: string | StaticImport;
-  orientation: "horizontal" | "vertical";
-  title: React.ReactNode;
-  subtitle: React.ReactNode;
-  hook: React.ReactNode;
-  rewards: React.ReactNode[];
-  scheduleTitle: React.ReactNode;
-  schedule: React.ReactNode[];
-  footer: React.ReactNode;
+  orientation?: "horizontal" | "vertical";
+  containerPosition?: string; // Default: "top-12 left-12 lg:top-16 lg:left-16"
+  maxContainerWidth?: string; // Default: "max-w-[65vw]"
+  textAlign?: "left" | "center" | "right"; // Default: "left"
+  title: string | React.ReactNode;
+  subtitle: string | React.ReactNode;
+  hook: string | React.ReactNode;
+  rewards: (string | React.ReactNode)[];
+  scheduleTitle: string | React.ReactNode;
+  schedule: (string | React.ReactNode)[];
+  footer: string | React.ReactNode;
 }
 
 export const PromoScreen: React.FC<PromoScreenProps> = ({
   imageSrc,
+  containerPosition = "top-12 left-12 lg:top-16 lg:left-16",
+  maxContainerWidth = "max-w-[65vw]",
+  textAlign = "left",
   title,
   subtitle,
   hook,
@@ -130,6 +131,17 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
     exit: { opacity: 0, transition: { duration: 0.6, ease: "easeIn" as const } },
   };
 
+  const isCenter = textAlign === "center";
+  const alignClasses =
+    isCenter
+      ? "items-center text-center"
+      : textAlign === "right"
+      ? "items-end text-right"
+      : "items-start text-left";
+
+  const rewardsListClasses = isCenter ? PROMO_STYLES.rewardsListCenter : PROMO_STYLES.rewardsList;
+  const scheduleListClasses = isCenter ? PROMO_STYLES.scheduleListCenter : PROMO_STYLES.scheduleList;
+
   return (
     <div className="relative w-[100vw] h-[100vh] overflow-hidden bg-black flex items-start justify-start text-left">
       {/* 🔹 ФОН — object-fill, без затемняющих оверлеев */}
@@ -149,7 +161,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
       </motion.div>
 
       {/* 🔹 КОНТЕЙНЕР КОНТЕНТА — flex-колонка без наложений */}
-      <div className={PROMO_STYLES.container}>
+      <div className={`absolute ${containerPosition} ${maxContainerWidth} z-10`}>
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -157,7 +169,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
           className={PROMO_STYLES.stack}
         >
           {/* 🔹 ВЕРХНИЙ БЛОК — подзаголовок + главный заголовок */}
-          <div className="flex-none flex flex-col gap-2 items-start text-left">
+          <div className={`flex-none flex flex-col gap-2 ${alignClasses}`}>
             {/* 🔹 ПОДЗАГОЛОВОК */}
             <motion.h2
               variants={itemVariants}
@@ -175,7 +187,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
           </div>
 
           {/* 🔹 КАРУСЕЛЬ — Награды ↔ Расписание (6 сек, mode="wait") */}
-          <div className={PROMO_STYLES.carousel}>
+          <div className={`relative flex flex-col justify-center w-full min-h-[250px] ${alignClasses}`}>
             <AnimatePresence mode="wait">
               {activeSlide === 0 && (
                 <motion.div
@@ -184,7 +196,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
                   initial="hidden"
                   animate="show"
                   exit="exit"
-                  className="flex flex-col gap-6 w-full items-start text-left"
+                  className={`flex flex-col gap-6 w-full ${alignClasses}`}
                 >
                   {/* 🔹 ХУК */}
                   <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>
@@ -192,7 +204,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
                   </p>
 
                   {/* 🔹 КАРТОЧКИ НАГРАД */}
-                  <div className={PROMO_STYLES.rewardsList}>
+                  <div className={rewardsListClasses}>
                     {rewards.map((reward, idx) => (
                       <div key={idx} className={PROMO_STYLES.card}>
                         <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
@@ -211,7 +223,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
                   initial="hidden"
                   animate="show"
                   exit="exit"
-                  className="flex flex-col gap-6 w-full items-start text-left"
+                  className={`flex flex-col gap-6 w-full ${alignClasses}`}
                 >
                   {/* 🔹 ЗАГОЛОВОК РАСПИСАНИЯ */}
                   <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>
@@ -219,7 +231,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
                   </h3>
 
                   {/* 🔹 КАРТОЧКИ РАСПИСАНИЯ */}
-                  <div className={PROMO_STYLES.scheduleList}>
+                  <div className={scheduleListClasses}>
                     {schedule.map((time, idx) => (
                       <div key={idx} className={PROMO_STYLES.card}>
                         <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
@@ -234,7 +246,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
           </div>
 
           {/* 🔹 ФУТЕР */}
-          <motion.div variants={itemVariants} className="flex-none">
+          <motion.div variants={itemVariants} className={`flex-none ${alignClasses}`}>
             <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>
               {footer}
             </p>

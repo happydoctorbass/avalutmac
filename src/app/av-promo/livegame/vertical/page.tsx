@@ -1,10 +1,10 @@
 import React from "react";
 import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 
-export default function LedVerticalPromoPage() {
+export default function LiveGameVerticalPromoPage() {
   return (
     <PromoScreen
-      imageSrc="/images/promo/ledscreen vertical.png"
+      imageSrc="/images/promo/livegame_vertical.png"
       orientation="vertical"
       containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
       maxContainerWidth="max-w-[90vw]"

@@ -6,6 +6,9 @@ export default function SlotVerticalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/slot_vertical.png"
       orientation="vertical"
+      containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
+      maxContainerWidth="max-w-[90vw]"
+      textAlign="center"
       title="BACCARAT TRIPLE BOOST"
       subtitle="Play Bigger. Win Bigger. Get Rewarded!"
       hook="Place your bets and unlock an exclusive reward:"

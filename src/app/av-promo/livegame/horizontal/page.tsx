@@ -6,6 +6,8 @@ export default function LiveGameHorizontalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/livegame_horizontal.png"
       orientation="horizontal"
+      containerPosition="top-12 left-12 lg:top-16 lg:left-16"
+      maxContainerWidth="max-w-[60vw]"
       title="BACCARAT TRIPLE BOOST"
       subtitle="Play Bigger. Win Bigger. Get Rewarded!"
       hook="Place your bets and unlock an exclusive reward:"

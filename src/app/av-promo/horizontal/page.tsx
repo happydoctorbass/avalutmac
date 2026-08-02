@@ -4,7 +4,7 @@ import { PromoScreen, DiamondIcon } from "@/components/av-promo/PromoScreen";
 export default function HorizontalPromoPage() {
   return (
     <PromoScreen
-      imageSrc="/images/promo/horizontal.png"
+      imageSrc="/images/promo/livegame_horizontal.png"
       orientation="horizontal"
       title="BACCARAT TRIPLE BOOST"
       subtitle="Play Bigger. Win Bigger. Get Rewarded!"
