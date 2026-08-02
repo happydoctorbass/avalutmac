@@ -8,20 +8,20 @@ export default function VerticalPromoPage() {
       orientation="vertical"
       textAlign="center"
       showBottomPanel={true}
-      subtitle="AUGUST MONTHLY BONUS"
+      subtitle="🏆 A CONSTELLATION OF PRIZES"
       title="$50,000 + 500,000 KGS"
-      hook="50,000$ PROMO CHIPS + 500,000 KGS PROMO TICKET"
+      hook="GRAND FINALS GIVEAWAY POOL!"
       rewards={[
-        <span key="1"><DiamondIcon /> 15.08.2026 Draw: $20,000 PROMO CHIPS + 20,000 KGS TICKET</span>,
-        <span key="2"><DiamondIcon /> 29.08.2026 Draw: $30,000 PROMO CHIPS + 30,000 KGS TICKET</span>,
-        <span key="3"><DiamondIcon /> Draws at 22:00h, 00:00h and 02:00h</span>
+        <span key="1"><DiamondIcon /> AUG 15 GRAND FINAL: $20,000 PROMO CHIPS + 20,000 KGS TICKET</span>,
+        <span key="2"><DiamondIcon /> AUG 29 GRAND FINAL: $30,000 PROMO CHIPS + 30,000 KGS TICKET</span>,
+        <span key="3"><DiamondIcon /> FINALS DRAWS AT: 22:00h, 00:00h and 02:00h</span>
       ]}
-      scheduleTitle="EARN TICKETS"
+      scheduleTitle="EARN YOUR TICKETS"
       schedule={[
-        <span key="1"><DiamondIcon /> Live Game: Every $1,000 drop = 1 ticket</span>,
-        <span key="2"><DiamondIcon /> Slots: Every 80,000 KGS drop = 1 ticket</span>
+        <span key="1"><DiamondIcon /> LIVE GAME: Every $1,000 Drop = 1 Ticket</span>,
+        <span key="2"><DiamondIcon /> SLOTS: Every 80,000 KGS Drop = 1 Ticket</span>
       ]}
-      footer="Valid for all visitors"
+      footer="Be the star of our Grand Finals • Valid for all visitors"
     />
   );
 }

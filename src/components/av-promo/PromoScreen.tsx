@@ -97,9 +97,9 @@ const PROMO_STYLES = {
 
   /* ───────────────────── 🃏 КАРТОЧКИ (общие) ───────────────────── */
 
-  /* 3D Gold Ingot — padding: px-10 py-6 | Ещё плотнее: px-8 py-5 | Просторнее: px-12 py-7 */
+  /* Gold-embossed plates — padding: px-8 py-5 */
   card:
-    "bg-gradient-to-b from-[#2a2118]/95 via-[#0c0a09]/98 to-[#1a1510]/95 border border-[#d4af37]/85 border-t-[#ffe58f] rounded-2xl px-10 py-6 shadow-[inset_0_1px_1px_rgba(255,215,0,0.35),inset_0_-1px_0_rgba(0,0,0,0.4),0_16px_36px_rgba(0,0,0,0.95)] w-fit mx-auto",
+    "bg-gradient-to-b from-black/90 via-[#0e0d0b]/90 to-black/90 border border-[#d4af37]/70 border-t-[#ffe58f] rounded-2xl px-8 py-5 shadow-[inset_0_1px_1px_rgba(255,215,0,0.35),0_10px_25px_rgba(0,0,0,0.9)] w-fit mx-auto",
 
   /* Списки карточек */
   rewardsList: "flex flex-col gap-4 mt-2 w-full items-start text-left",
@@ -107,9 +107,9 @@ const PROMO_STYLES = {
   scheduleList: "flex flex-wrap gap-6 mt-2 w-full justify-start",
   scheduleListCenter: "flex flex-wrap gap-5 mt-3 w-full justify-center mx-auto",
 
-  /* Защитная VIP-панель под текстом (carousel + footer) */
+  /* Royal Onyx & 24K Gold Plate (carousel + footer) */
   bottomPanel:
-    "bg-black/85 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-[#d4af37]/60 shadow-2xl max-w-[92vw] mx-auto w-full flex flex-col items-center gap-7",
+    "bg-gradient-to-b from-[#1c1916]/95 via-[#0a0908]/95 to-[#14110e]/95 border-2 border-[#d4af37]/80 border-t-[#ffe89c] rounded-3xl p-8 md:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(212,175,55,0.3)] max-w-[92vw] mx-auto w-full flex flex-col items-center gap-6",
 } as const;
 
 /** Тонкая золотая линия-декор (CSS only, без blur / particles) */
