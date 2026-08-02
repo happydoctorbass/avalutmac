@@ -26,6 +26,10 @@ const PROMO_STYLES = {
   title:
     "text-5xl md:text-7xl lg:text-8xl font-black uppercase leading-tight text-gold-24k",
 
+  /* 👑 ГЛАВНЫЙ ЗАГОЛОВОК (ВЕРТИКАЛЬНЫЙ) — размер и насыщенность */
+  titleVertical:
+    "text-6xl md:text-8xl lg:text-[6.5rem] font-black uppercase text-gold-24k leading-none drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]",
+
   /* 💬 ХУК — крупный призыв на слайде «Награды» */
   hook:
     "text-2xl md:text-3xl lg:text-4xl font-medium text-gray-100 leading-snug drop-shadow-lg",
@@ -34,9 +38,9 @@ const PROMO_STYLES = {
   scheduleTitle:
     "text-2xl md:text-3xl lg:text-4xl font-medium text-gray-100 leading-snug drop-shadow-lg uppercase",
 
-  /* 🃏 КАРТОЧКИ (VIP Gold Leaf Glass) — рамка, фон, тень, скругления */
+  /* 🃏 КАРТОЧКИ (3D Gold Ingot) — рамка, фон, тень, скругления */
   card:
-    "bg-black/90 border-l-4 border-l-[#ffd700] border-t border-r border-b border-[#d4af37]/60 rounded-r-2xl rounded-l-md px-8 py-5 shadow-2xl w-fit",
+    "bg-gradient-to-b from-[#1c1917]/95 via-black/95 to-[#1c1917]/95 border border-[#d4af37]/80 border-t-[#ffe58f] rounded-2xl px-10 py-6 shadow-[inset_0_1px_1px_rgba(255,215,0,0.3),0_15px_35px_rgba(0,0,0,0.95)] w-fit mx-auto",
 
   /* 🔤 ТЕКСТ ВНУТРИ КАРТОЧЕК — размер и стиль наград / времени */
   cardText:
@@ -89,6 +93,7 @@ interface PromoScreenProps {
 
 export const PromoScreen: React.FC<PromoScreenProps> = ({
   imageSrc,
+  orientation,
   containerPosition = "top-12 left-12 lg:top-16 lg:left-16",
   maxContainerWidth = "max-w-[65vw]",
   textAlign = "left",
@@ -160,99 +165,181 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
         />
       </motion.div>
 
-      {/* 🔹 КОНТЕЙНЕР КОНТЕНТА — flex-колонка без наложений */}
-      <div className={`absolute ${containerPosition} ${maxContainerWidth} z-10`}>
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className={PROMO_STYLES.stack}
-        >
-          {/* 🔹 ВЕРХНИЙ БЛОК — подзаголовок + главный заголовок */}
-          <div className={`flex-none flex flex-col gap-2 ${alignClasses}`}>
-            {/* 🔹 ПОДЗАГОЛОВОК */}
-            <motion.h2
-              variants={itemVariants}
-              className={`${cinzel.className} ${PROMO_STYLES.subtitle}`}
-            >
+      {orientation === "vertical" ? (
+        <>
+          {/* 🔹 TOP HEADER BLOCK */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="absolute top-10 md:top-14 left-1/2 -translate-x-1/2 w-[90vw] text-center z-10 flex flex-col items-center gap-3"
+          >
+            <motion.h2 variants={itemVariants} className={`${cinzel.className} ${PROMO_STYLES.subtitle}`}>
               {subtitle}
             </motion.h2>
-
-            {/* 🔹 ГЛАВНЫЙ ЗАГОЛОВОК */}
             <motion.div variants={itemVariants}>
-              <h1 className={`${cinzel.className} ${PROMO_STYLES.title}`}>
+              <h1 className={`${cinzel.className} ${PROMO_STYLES.titleVertical}`}>
                 {title}
               </h1>
             </motion.div>
-          </div>
-
-          {/* 🔹 КАРУСЕЛЬ — Награды ↔ Расписание (6 сек, mode="wait") */}
-          <div className={`relative flex flex-col justify-center w-full min-h-[250px] ${alignClasses}`}>
-            <AnimatePresence mode="wait">
-              {activeSlide === 0 && (
-                <motion.div
-                  key="slide-0"
-                  variants={slideVariants}
-                  initial="hidden"
-                  animate="show"
-                  exit="exit"
-                  className={`flex flex-col gap-6 w-full ${alignClasses}`}
-                >
-                  {/* 🔹 ХУК */}
-                  <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>
-                    {hook}
-                  </p>
-
-                  {/* 🔹 КАРТОЧКИ НАГРАД */}
-                  <div className={rewardsListClasses}>
-                    {rewards.map((reward, idx) => (
-                      <div key={idx} className={PROMO_STYLES.card}>
-                        <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
-                          {reward}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {activeSlide === 1 && (
-                <motion.div
-                  key="slide-1"
-                  variants={slideVariants}
-                  initial="hidden"
-                  animate="show"
-                  exit="exit"
-                  className={`flex flex-col gap-6 w-full ${alignClasses}`}
-                >
-                  {/* 🔹 ЗАГОЛОВОК РАСПИСАНИЯ */}
-                  <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>
-                    {scheduleTitle}
-                  </h3>
-
-                  {/* 🔹 КАРТОЧКИ РАСПИСАНИЯ */}
-                  <div className={scheduleListClasses}>
-                    {schedule.map((time, idx) => (
-                      <div key={idx} className={PROMO_STYLES.card}>
-                        <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
-                          {time}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* 🔹 ФУТЕР */}
-          <motion.div variants={itemVariants} className={`flex-none ${alignClasses}`}>
-            <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>
-              {footer}
-            </p>
           </motion.div>
-        </motion.div>
-      </div>
+
+          {/* 🔹 BOTTOM CONTENT BLOCK */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className="absolute bottom-10 md:bottom-14 left-1/2 -translate-x-1/2 w-[90vw] text-center z-10 flex flex-col items-center gap-6"
+          >
+            {/* 🔹 КАРУСЕЛЬ — Награды ↔ Расписание */}
+            <div className="relative flex flex-col justify-center w-full min-h-[250px] items-center text-center">
+              <AnimatePresence mode="wait">
+                {activeSlide === 0 && (
+                  <motion.div
+                    key="slide-0"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
+                    className="flex flex-col gap-6 w-full items-center text-center"
+                  >
+                    <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>{hook}</p>
+                    <div className={PROMO_STYLES.rewardsListCenter}>
+                      {rewards.map((reward, idx) => (
+                        <div key={idx} className={PROMO_STYLES.card}>
+                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                            {reward}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+                {activeSlide === 1 && (
+                  <motion.div
+                    key="slide-1"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
+                    className="flex flex-col gap-6 w-full items-center text-center"
+                  >
+                    <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>{scheduleTitle}</h3>
+                    <div className={PROMO_STYLES.scheduleListCenter}>
+                      {schedule.map((time, idx) => (
+                        <div key={idx} className={PROMO_STYLES.card}>
+                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                            {time}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* 🔹 ФУТЕР */}
+            <motion.div variants={itemVariants} className="flex-none items-center text-center">
+              <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>{footer}</p>
+            </motion.div>
+          </motion.div>
+        </>
+      ) : (
+        <div className={`absolute ${containerPosition} ${maxContainerWidth} z-10`}>
+          {/* 🔹 КОНТЕЙНЕР КОНТЕНТА — flex-колонка без наложений */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            className={PROMO_STYLES.stack}
+          >
+            {/* 🔹 ВЕРХНИЙ БЛОК — подзаголовок + главный заголовок */}
+            <div className={`flex-none flex flex-col gap-2 ${alignClasses}`}>
+              {/* 🔹 ПОДЗАГОЛОВОК */}
+              <motion.h2
+                variants={itemVariants}
+                className={`${cinzel.className} ${PROMO_STYLES.subtitle}`}
+              >
+                {subtitle}
+              </motion.h2>
+
+              {/* 🔹 ГЛАВНЫЙ ЗАГОЛОВОК */}
+              <motion.div variants={itemVariants}>
+                <h1 className={`${cinzel.className} ${PROMO_STYLES.title}`}>
+                  {title}
+                </h1>
+              </motion.div>
+            </div>
+
+            {/* 🔹 КАРУСЕЛЬ — Награды ↔ Расписание (6 сек, mode="wait") */}
+            <div className={`relative flex flex-col justify-center w-full min-h-[250px] ${alignClasses}`}>
+              <AnimatePresence mode="wait">
+                {activeSlide === 0 && (
+                  <motion.div
+                    key="slide-0"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
+                    className={`flex flex-col gap-6 w-full ${alignClasses}`}
+                  >
+                    {/* 🔹 ХУК */}
+                    <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>
+                      {hook}
+                    </p>
+
+                    {/* 🔹 КАРТОЧКИ НАГРАД */}
+                    <div className={rewardsListClasses}>
+                      {rewards.map((reward, idx) => (
+                        <div key={idx} className={PROMO_STYLES.card}>
+                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                            {reward}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeSlide === 1 && (
+                  <motion.div
+                    key="slide-1"
+                    variants={slideVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit="exit"
+                    className={`flex flex-col gap-6 w-full ${alignClasses}`}
+                  >
+                    {/* 🔹 ЗАГОЛОВОК РАСПИСАНИЯ */}
+                    <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>
+                      {scheduleTitle}
+                    </h3>
+
+                    {/* 🔹 КАРТОЧКИ РАСПИСАНИЯ */}
+                    <div className={scheduleListClasses}>
+                      {schedule.map((time, idx) => (
+                        <div key={idx} className={PROMO_STYLES.card}>
+                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                            {time}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* 🔹 ФУТЕР */}
+            <motion.div variants={itemVariants} className={`flex-none ${alignClasses}`}>
+              <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>
+                {footer}
+              </p>
+            </motion.div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
