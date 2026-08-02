@@ -106,6 +106,10 @@ const PROMO_STYLES = {
   rewardsListCenter: "flex flex-col gap-5 mt-3 w-full items-center text-center mx-auto",
   scheduleList: "flex flex-wrap gap-6 mt-2 w-full justify-start",
   scheduleListCenter: "flex flex-wrap gap-5 mt-3 w-full justify-center mx-auto",
+
+  /* Защитная VIP-панель под текстом (carousel + footer) */
+  bottomPanel:
+    "bg-black/85 backdrop-blur-md rounded-3xl p-6 md:p-8 border border-[#d4af37]/60 shadow-2xl max-w-[92vw] mx-auto w-full flex flex-col items-center gap-7",
 } as const;
 
 /** Тонкая золотая линия-декор (CSS only, без blur / particles) */
@@ -148,12 +152,30 @@ export const DiamondIcon = () => (
   </svg>
 );
 
+/** Optional high-contrast VIP shell around carousel + footer */
+const BottomPanelShell = ({
+  enabled,
+  className = "",
+  children,
+}: {
+  enabled: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) =>
+  enabled ? (
+    <div className={`${PROMO_STYLES.bottomPanel} ${className}`}>{children}</div>
+  ) : (
+    <>{children}</>
+  );
+
 interface PromoScreenProps {
   imageSrc: string | StaticImport;
   orientation?: "horizontal" | "vertical";
   containerPosition?: string; // Default: "top-12 left-12 lg:top-16 lg:left-16"
   maxContainerWidth?: string; // Default: "max-w-[60vw]"
   textAlign?: "left" | "center" | "right"; // Default: "left"
+  /** High-contrast VIP panel behind carousel + footer for readability on bright art */
+  showBottomPanel?: boolean;
   title: string | React.ReactNode;
   subtitle: string | React.ReactNode;
   hook: string | React.ReactNode;
@@ -169,6 +191,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
   containerPosition = "top-12 left-12 lg:top-16 lg:left-16",
   maxContainerWidth = "max-w-[60vw]",
   textAlign = "left",
+  showBottomPanel = false,
   title,
   subtitle,
   hook,
@@ -268,74 +291,76 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
             animate="show"
             className={PROMO_STYLES.verticalBottomPos}
           >
-            <div className="relative flex flex-col justify-center w-full min-h-[280px] items-center text-center">
-              <AnimatePresence mode="wait">
-                {activeSlide === 0 && (
-                  <motion.div
-                    key="slide-0"
-                    variants={slideVariants}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    className="flex flex-col gap-7 w-full items-center text-center"
-                  >
-                    {/* Люкс-описание: золотой градиент + орнамент */}
-                    <div className="flex flex-col items-center gap-3 w-full max-w-[90vw]">
-                      <HookOrnament />
-                      <p className={`${cinzel.className} ${PROMO_STYLES.hookV}`}>
-                        {hook}
-                      </p>
-                      <HookOrnament dim />
-                    </div>
+            <BottomPanelShell enabled={showBottomPanel}>
+              <div className="relative flex flex-col justify-center w-full min-h-[280px] items-center text-center">
+                <AnimatePresence mode="wait">
+                  {activeSlide === 0 && (
+                    <motion.div
+                      key="slide-0"
+                      variants={slideVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className="flex flex-col gap-7 w-full items-center text-center"
+                    >
+                      {/* Люкс-описание: золотой градиент + орнамент */}
+                      <div className="flex flex-col items-center gap-3 w-full max-w-[90vw]">
+                        <HookOrnament />
+                        <p className={`${cinzel.className} ${PROMO_STYLES.hookV}`}>
+                          {hook}
+                        </p>
+                        <HookOrnament dim />
+                      </div>
 
-                    <div className={PROMO_STYLES.rewardsListCenter}>
-                      {rewards.map((reward, idx) => (
-                        <div key={idx} className={PROMO_STYLES.card}>
-                          <span className={`${cinzel.className} ${PROMO_STYLES.cardTextV}`}>
-                            {reward}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                      <div className={PROMO_STYLES.rewardsListCenter}>
+                        {rewards.map((reward, idx) => (
+                          <div key={idx} className={PROMO_STYLES.card}>
+                            <span className={`${cinzel.className} ${PROMO_STYLES.cardTextV}`}>
+                              {reward}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                {activeSlide === 1 && (
-                  <motion.div
-                    key="slide-1"
-                    variants={slideVariants}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    className="flex flex-col gap-7 w-full items-center text-center"
-                  >
-                    <div className="flex flex-col items-center gap-3 w-full max-w-[90vw]">
-                      <HookOrnament />
-                      <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitleV}`}>
-                        {scheduleTitle}
-                      </h3>
-                      <HookOrnament dim />
-                    </div>
+                  {activeSlide === 1 && (
+                    <motion.div
+                      key="slide-1"
+                      variants={slideVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className="flex flex-col gap-7 w-full items-center text-center"
+                    >
+                      <div className="flex flex-col items-center gap-3 w-full max-w-[90vw]">
+                        <HookOrnament />
+                        <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitleV}`}>
+                          {scheduleTitle}
+                        </h3>
+                        <HookOrnament dim />
+                      </div>
 
-                    <div className={PROMO_STYLES.scheduleListCenter}>
-                      {schedule.map((time, idx) => (
-                        <div key={idx} className={PROMO_STYLES.card}>
-                          <span className={`${cinzel.className} ${PROMO_STYLES.cardTextV}`}>
-                            {time}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <div className={PROMO_STYLES.scheduleListCenter}>
+                        {schedule.map((time, idx) => (
+                          <div key={idx} className={PROMO_STYLES.card}>
+                            <span className={`${cinzel.className} ${PROMO_STYLES.cardTextV}`}>
+                              {time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            <motion.div variants={itemVariants} className="flex-none">
-              <p className={`${montserrat.className} ${PROMO_STYLES.footerV}`}>
-                {footer}
-              </p>
-            </motion.div>
+              <motion.div variants={itemVariants} className="flex-none">
+                <p className={`${montserrat.className} ${PROMO_STYLES.footerV}`}>
+                  {footer}
+                </p>
+              </motion.div>
+            </BottomPanelShell>
           </motion.div>
         </>
       ) : (
@@ -361,65 +386,67 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
               </motion.div>
             </div>
 
-            <div className={`relative flex flex-col justify-center w-full min-h-[250px] ${alignClasses}`}>
-              <AnimatePresence mode="wait">
-                {activeSlide === 0 && (
-                  <motion.div
-                    key="slide-0"
-                    variants={slideVariants}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    className={`flex flex-col gap-6 w-full ${alignClasses}`}
-                  >
-                    <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>
-                      {hook}
-                    </p>
+            <BottomPanelShell enabled={showBottomPanel} className={alignClasses}>
+              <div className={`relative flex flex-col justify-center w-full min-h-[250px] ${alignClasses}`}>
+                <AnimatePresence mode="wait">
+                  {activeSlide === 0 && (
+                    <motion.div
+                      key="slide-0"
+                      variants={slideVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className={`flex flex-col gap-6 w-full ${alignClasses}`}
+                    >
+                      <p className={`${montserrat.className} ${PROMO_STYLES.hook}`}>
+                        {hook}
+                      </p>
 
-                    <div className={rewardsListClasses}>
-                      {rewards.map((reward, idx) => (
-                        <div key={idx} className={PROMO_STYLES.card}>
-                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
-                            {reward}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
+                      <div className={rewardsListClasses}>
+                        {rewards.map((reward, idx) => (
+                          <div key={idx} className={PROMO_STYLES.card}>
+                            <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                              {reward}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                {activeSlide === 1 && (
-                  <motion.div
-                    key="slide-1"
-                    variants={slideVariants}
-                    initial="hidden"
-                    animate="show"
-                    exit="exit"
-                    className={`flex flex-col gap-6 w-full ${alignClasses}`}
-                  >
-                    <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>
-                      {scheduleTitle}
-                    </h3>
+                  {activeSlide === 1 && (
+                    <motion.div
+                      key="slide-1"
+                      variants={slideVariants}
+                      initial="hidden"
+                      animate="show"
+                      exit="exit"
+                      className={`flex flex-col gap-6 w-full ${alignClasses}`}
+                    >
+                      <h3 className={`${cinzel.className} ${PROMO_STYLES.scheduleTitle}`}>
+                        {scheduleTitle}
+                      </h3>
 
-                    <div className={scheduleListClasses}>
-                      {schedule.map((time, idx) => (
-                        <div key={idx} className={PROMO_STYLES.card}>
-                          <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
-                            {time}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                      <div className={scheduleListClasses}>
+                        {schedule.map((time, idx) => (
+                          <div key={idx} className={PROMO_STYLES.card}>
+                            <span className={`${cinzel.className} ${PROMO_STYLES.cardText}`}>
+                              {time}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
 
-            <motion.div variants={itemVariants} className={`flex-none ${alignClasses}`}>
-              <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>
-                {footer}
-              </p>
-            </motion.div>
+              <motion.div variants={itemVariants} className={`flex-none ${alignClasses}`}>
+                <p className={`${montserrat.className} ${PROMO_STYLES.footer}`}>
+                  {footer}
+                </p>
+              </motion.div>
+            </BottomPanelShell>
           </motion.div>
         </div>
       )}

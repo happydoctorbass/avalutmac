@@ -7,6 +7,7 @@ export default function VerticalPromoPage() {
       imageSrc="/images/promo/livegame_vertical.png"
       orientation="vertical"
       textAlign="center"
+      showBottomPanel={true}
       subtitle="AUGUST MONTHLY BONUS"
       title="$50,000 + 500,000 KGS"
       hook="50,000$ PROMO CHIPS + 500,000 KGS PROMO TICKET"
