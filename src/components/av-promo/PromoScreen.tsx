@@ -152,7 +152,7 @@ interface PromoScreenProps {
   imageSrc: string | StaticImport;
   orientation?: "horizontal" | "vertical";
   containerPosition?: string; // Default: "top-12 left-12 lg:top-16 lg:left-16"
-  maxContainerWidth?: string; // Default: "max-w-[65vw]"
+  maxContainerWidth?: string; // Default: "max-w-[60vw]"
   textAlign?: "left" | "center" | "right"; // Default: "left"
   title: string | React.ReactNode;
   subtitle: string | React.ReactNode;
@@ -167,7 +167,7 @@ export const PromoScreen: React.FC<PromoScreenProps> = ({
   imageSrc,
   orientation,
   containerPosition = "top-12 left-12 lg:top-16 lg:left-16",
-  maxContainerWidth = "max-w-[65vw]",
+  maxContainerWidth = "max-w-[60vw]",
   textAlign = "left",
   title,
   subtitle,

@@ -6,23 +6,24 @@ export default function LiveGameHorizontalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/livegame_horizontal.png"
       orientation="horizontal"
+      textAlign="left"
       containerPosition="top-12 left-12 lg:top-16 lg:left-16"
       maxContainerWidth="max-w-[60vw]"
-      subtitle="BACCARAT & NIU NIU"
-      title="TRIPLE BOOST BONUS"
-      hook="WIN WITH A ×10 BET!"
+      subtitle="LIVE GAME TRIPLE BOOST"
+      title="BACCARAT & NIU NIU"
+      hook="BET × 10 • TRIPLE BOOST BONUS CHIPS"
       rewards={[
-        <span key="1"><DiamondIcon /> Baccarat: Up to $5,000 + 2,000 KGS</span>,
-        <span key="2"><DiamondIcon /> Niu Niu: Up to $2,000 + 2,000 KGS</span>,
-        <span key="3"><DiamondIcon /> Daily: 18:00–20:59 | 21:00–23:59 | 00:00–03:00</span>
+        <span key="1"><DiamondIcon /> Baccarat: Win min. $250 max. $5,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
+        <span key="2"><DiamondIcon /> Niu Niu: Win min. $250 max. $2,000 PROMO CHIPS + 2,000 KGS TICKET</span>,
+        <span key="3"><DiamondIcon /> Daily Sessions: 18:00–20:59h | 21:00–23:59h | 00:00–03:00h</span>
       ]}
-      scheduleTitle="DAILY BOOST SESSIONS"
+      scheduleTitle="DAILY SESSIONS"
       schedule={[
-        <span key="1"><DiamondIcon /> Session 1: 18:00 – 20:59</span>,
-        <span key="2"><DiamondIcon /> Session 2: 21:00 – 23:59</span>,
-        <span key="3"><DiamondIcon /> Night: 00:00 – 03:00</span>
+        <span key="1"><DiamondIcon /> Session 1: 18:00h – 20:59h</span>,
+        <span key="2"><DiamondIcon /> Session 2: 21:00h – 23:59h</span>,
+        <span key="3"><DiamondIcon /> Session 3: 00:00h – 03:00h</span>
       ]}
-      footer="Play with elegance • Ask dealer for details"
+      footer="Valid for all visitors"
     />
   );
 }

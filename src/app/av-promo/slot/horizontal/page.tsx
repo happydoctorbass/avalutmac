@@ -6,20 +6,23 @@ export default function SlotHorizontalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/slot_horizontal.png"
       orientation="horizontal"
-      subtitle="VIP PRIVILEGE CLUB"
-      title="10% CASH BACK"
-      hook="EXCLUSIVE CASHBACK ON DROPS"
+      textAlign="left"
+      containerPosition="top-12 left-12 lg:top-16 lg:left-16"
+      maxContainerWidth="max-w-[60vw]"
+      subtitle="SPECIAL REWARDS & CASHBACK"
+      title="10% CASH BACK & REWARDS"
+      hook="EXCLUSIVE CASHBACK ON SLOTS & LIVE GAME"
       rewards={[
-        <span key="1"><DiamondIcon /> Live Game: 10% Cash Back + 10% Promo Chips</span>,
-        <span key="2"><DiamondIcon /> Slots: 10% Cash Back on 50,000+ KGS</span>,
-        <span key="3"><DiamondIcon /> Special Compliment: 5% Reward Next Day</span>
+        <span key="1"><DiamondIcon /> Slots: 10% Cash Back on Drops Over 50,000 KGS</span>,
+        <span key="2"><DiamondIcon /> Live Game: Every $1,000 Drop = 10% Cash Back + 10% Promo Chips</span>,
+        <span key="3"><DiamondIcon /> Loss Reward: Every $5,000 Loss = Next Day 5% Promo Reward</span>
       ]}
-      scheduleTitle="PRIVILEGE REWARDS"
+      scheduleTitle="PROMOTION NOTICE"
       schedule={[
-        <span key="1"><DiamondIcon /> Automatic daily cashback calculations</span>,
-        <span key="2"><DiamondIcon /> Ask Pit Boss for VIP status conditions</span>
+        <span key="1"><DiamondIcon /> 5% Promo Reward valid only for next day visit</span>,
+        <span key="2"><DiamondIcon /> Valid for all qualifying Slot & Live Game play</span>
       ]}
-      footer="Fortune returns to VIP guests • Ask your host"
+      footer="Valid for all visitors"
     />
   );
 }

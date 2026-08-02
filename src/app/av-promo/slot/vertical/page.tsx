@@ -6,23 +6,21 @@ export default function SlotVerticalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/slot_vertical.png"
       orientation="vertical"
-      containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
-      maxContainerWidth="max-w-[90vw]"
       textAlign="center"
-      subtitle="WELCOME TO THE CASINO"
-      title="SLOT MATCH PLAY"
-      hook="1,000 KGS WELCOME BONUS!"
+      subtitle="SLOT PROMOTION AUGUST 2026"
+      title="WELCOME & MATCH PLAY"
+      hook="1,000 KGS WELCOME BONUS FOR NEW REGISTRATIONS"
       rewards={[
-        <span key="1"><DiamondIcon /> Welcome Bonus: 1,000 KGS Instant</span>,
-        <span key="2"><DiamondIcon /> Match Play: Double 1,000 → 2,000 KGS</span>,
-        <span key="3"><DiamondIcon /> Golden Hours: Mon–Thu & Sun (18:00–22:00)</span>
+        <span key="1"><DiamondIcon /> Choose Bonus: 1000/2000 KGS | 2000/4000 KGS | 2500/5000 KGS</span>,
+        <span key="2"><DiamondIcon /> Mon – Thu & Sun: 18:00h – 22:00h</span>,
+        <span key="3"><DiamondIcon /> Fri – Sat: 20:00h – 22:00h</span>
       ]}
-      scheduleTitle="GOLDEN HOURS"
+      scheduleTitle="MATCH PLAY HOURS"
       schedule={[
-        <span key="1"><DiamondIcon /> Mon–Thu & Sun: 18:00 – 22:00</span>,
-        <span key="2"><DiamondIcon /> Fri–Sat: 20:00 – 22:00</span>
+        <span key="1"><DiamondIcon /> Mon – Thu & Sun: 18:00h – 22:00h</span>,
+        <span key="2"><DiamondIcon /> Fri – Sat: 20:00h – 22:00h</span>
       ]}
-      footer="Your Jackpot is calling • Ask slot attendant"
+      footer="Valid for all visitors"
     />
   );
 }

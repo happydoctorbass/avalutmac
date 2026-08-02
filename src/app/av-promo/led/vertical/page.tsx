@@ -6,23 +6,21 @@ export default function LedVerticalPromoPage() {
     <PromoScreen
       imageSrc="/images/promo/ledscreen vertical.png"
       orientation="vertical"
-      containerPosition="top-12 left-1/2 -translate-x-1/2 items-center text-center"
-      maxContainerWidth="max-w-[90vw]"
       textAlign="center"
-      subtitle="PROGRESSIVE JACKPOT"
-      title="HAPPY HOURS BOOST"
-      hook="DOUBLE THE JACKPOT MAGIC!"
+      subtitle="HAPPY HOURS JACKPOT"
+      title="2 X PROGRESSIVE JACKPOT"
+      hook="EVERY DAY FROM 22:00h UNTIL 04:00h"
       rewards={[
-        <span key="1"><DiamondIcon /> STAR MINI: Starting from 15,000 KGS</span>,
-        <span key="2"><DiamondIcon /> STAR MIDI: Starting from 40,000 KGS</span>,
-        <span key="3"><DiamondIcon /> Nightly Boost: Every Night 22:00 – 04:00</span>
+        <span key="1"><DiamondIcon /> STAR MINI Jackpot: Starts from 15,000 KGS</span>,
+        <span key="2"><DiamondIcon /> STAR MIDI Jackpot: Starts from 40,000 KGS</span>,
+        <span key="3"><DiamondIcon /> Any Bet • Random Time</span>
       ]}
-      scheduleTitle="HAPPY HOURS"
+      scheduleTitle="HAPPY HOURS TIME"
       schedule={[
-        <span key="1"><DiamondIcon /> Nightly Session: 22:00 – 04:00</span>,
+        <span key="1"><DiamondIcon /> Daily Session: 22:00h – 04:00h</span>,
         <span key="2"><DiamondIcon /> Any bet can trigger Progressive Jackpot</span>
       ]}
-      footer="Random time — real fortune • Open to all guests"
+      footer="Valid for all visitors"
     />
   );
 }
