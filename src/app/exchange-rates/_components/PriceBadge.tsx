@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
 
 interface PriceBadgeProps {
   label: string;
@@ -60,15 +59,9 @@ export function PriceBadge({ label, price, variant }: PriceBadgeProps) {
         )}
       </div>
       <div className="mt-2 flex items-baseline justify-between">
-        <motion.span
-          key={`badge-${price}`}
-          initial={flash ? { scale: 1.1 } : false}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-2xl font-black tracking-tight tabular-nums text-white"
-        >
+        <span className="text-2xl font-black tracking-tight tabular-nums text-white">
           {formatPrice(price)}
-        </motion.span>
+        </span>
         <span className="text-xs font-semibold text-slate-500">KGS</span>
       </div>
     </div>

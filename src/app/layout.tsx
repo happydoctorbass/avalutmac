@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 const notoSansSC = Noto_Sans_SC({ 
   weight: ['400', '500', '700', '900'], 
-  preload: false,
+  subsets: ['latin'],
   variable: '--font-noto-sans-sc',
   display: 'swap',
 });
@@ -22,6 +22,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru" className={`${geistSans.variable} ${geistMono.variable} ${notoSansSC.variable} h-full antialiased`}>
       <head>
         <meta charSet="utf-8" />
+        <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap"
+          rel="stylesheet"
+        />
       </head>
       <body className="min-h-full flex flex-col">
         <AppProviders>{children}</AppProviders>

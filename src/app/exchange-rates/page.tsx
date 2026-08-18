@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useRates, useLanguageCycle, useDisplaySettings } from './_hooks';
 import { BoardHeader, RateRow, RatesSkeleton } from './_components';
 
@@ -72,19 +71,10 @@ export default function ExchangeRatesPublicPage() {
                     style={{ fontSize: colHeaderFontSize }}
                     className="py-4 pl-4 sm:pl-6 text-left font-medium w-2/5"
                   >
-                    <div className="h-6 flex items-center overflow-hidden">
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={`cur-${currentLanguage}`}
-                          initial={{ opacity: 0, y: 3 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -3 }}
-                          transition={{ duration: 0.4, ease: 'easeInOut' }}
-                          className="inline-block text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
-                        >
-                          {texts.currency}
-                        </motion.span>
-                      </AnimatePresence>
+                    <div className="h-6 flex items-center">
+                      <span className="inline-block text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                        {texts.currency}
+                      </span>
                     </div>
                   </th>
 
@@ -93,19 +83,10 @@ export default function ExchangeRatesPublicPage() {
                     style={{ fontSize: colHeaderFontSize }}
                     className="py-4 px-4 sm:px-8 text-right font-medium w-[30%]"
                   >
-                    <div className="h-6 flex items-center justify-end overflow-hidden">
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={`buy-${currentLanguage}`}
-                          initial={{ opacity: 0, y: 3 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -3 }}
-                          transition={{ duration: 0.4, ease: 'easeInOut' }}
-                          className="inline-block text-emerald-400 font-bold drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]"
-                        >
-                          {texts.buy}
-                        </motion.span>
-                      </AnimatePresence>
+                    <div className="h-6 flex items-center justify-end">
+                      <span className="inline-block text-emerald-400 font-bold drop-shadow-[0_0_10px_rgba(52,211,153,0.4)]">
+                        {texts.buy}
+                      </span>
                     </div>
                   </th>
 
@@ -114,19 +95,10 @@ export default function ExchangeRatesPublicPage() {
                     style={{ fontSize: colHeaderFontSize }}
                     className="py-4 pr-4 sm:pr-6 text-right font-medium w-[30%]"
                   >
-                    <div className="h-6 flex items-center justify-end overflow-hidden">
-                      <AnimatePresence mode="wait">
-                        <motion.span
-                          key={`sell-${currentLanguage}`}
-                          initial={{ opacity: 0, y: 3 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -3 }}
-                          transition={{ duration: 0.4, ease: 'easeInOut' }}
-                          className="inline-block text-amber-400 font-bold drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]"
-                        >
-                          {texts.sell}
-                        </motion.span>
-                      </AnimatePresence>
+                    <div className="h-6 flex items-center justify-end">
+                      <span className="inline-block text-amber-400 font-bold drop-shadow-[0_0_10px_rgba(251,191,36,0.4)]">
+                        {texts.sell}
+                      </span>
                     </div>
                   </th>
                 </tr>

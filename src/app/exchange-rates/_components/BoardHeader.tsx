@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguageCycle } from '../_hooks';
 
 interface BoardHeaderProps {
@@ -20,7 +19,7 @@ export function BoardHeader({
     setMounted(true);
   }, []);
 
-  const { currentLanguage, texts } = useLanguageCycle(4000);
+  const { texts } = useLanguageCycle(4000);
 
   if (!mounted) {
     return (
@@ -45,7 +44,7 @@ export function BoardHeader({
         {/* Top Thin Horizontal Line */}
         <div
           style={{ opacity: dividerOpacity }}
-          className="flex items-center justify-center gap-2 transition-opacity duration-300"
+          className="flex items-center justify-center gap-2"
         >
           <div className="h-[1px] w-20 sm:w-40 bg-gradient-to-r from-transparent via-white/60 to-white/80" />
           <span className="inline-block h-1 w-1 rotate-45 bg-white/80 shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
@@ -65,7 +64,7 @@ export function BoardHeader({
         {/* Bottom Thin Horizontal Line */}
         <div
           style={{ opacity: dividerOpacity }}
-          className="flex items-center justify-center gap-2 transition-opacity duration-300"
+          className="flex items-center justify-center gap-2"
         >
           <div className="h-[1px] w-20 sm:w-40 bg-gradient-to-r from-transparent via-white/60 to-white/80" />
           <span className="inline-block h-1 w-1 rotate-45 bg-white/80 shadow-[0_0_4px_rgba(255,255,255,0.8)]" />
@@ -73,21 +72,14 @@ export function BoardHeader({
         </div>
       </div>
 
-      {/* HUGE Central Dominant Main Cycling Title: КУРСЫ ВАЛЮТ / EXCHANGE RATES / 汇率 */}
-      <div className="min-h-[72px] sm:min-h-[100px] flex items-center justify-center overflow-hidden mt-1 sm:mt-2">
-        <AnimatePresence mode="wait">
-          <motion.h1
-            key={`title-${currentLanguage}`}
-            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.98 }}
-            transition={{ duration: 0.45, ease: 'easeInOut' }}
-            style={{ fontSize: dominantTitleFontSize }}
-            className="font-extrabold tracking-[0.16em] sm:tracking-[0.24em] text-white uppercase leading-tight drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)] select-none text-center"
-          >
-            {texts.title}
-          </motion.h1>
-        </AnimatePresence>
+      {/* HUGE Central Dominant Main Cycling Title: КУРСЫ ВАЛЮТ / EXCHANGE RATES / 汇率 (Instant text change without animation) */}
+      <div className="min-h-[72px] sm:min-h-[100px] flex items-center justify-center mt-1 sm:mt-2">
+        <h1
+          style={{ fontSize: dominantTitleFontSize }}
+          className="font-extrabold tracking-[0.16em] sm:tracking-[0.24em] text-white uppercase leading-tight drop-shadow-[0_4px_30px_rgba(0,0,0,0.95)] select-none text-center"
+        >
+          {texts.title}
+        </h1>
       </div>
     </header>
   );
