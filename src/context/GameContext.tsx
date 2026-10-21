@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from 'react';
 import { getPusherClient, GAME_CHANNEL, GAME_EVENTS } from '@/lib/pusher';
+import { subscribeLocalGameEvents } from '@/lib/local-game-events';
 import { BetRow, CardData, GameLanguage, GameStatus, GameType } from '@/types/game';
 import { createPusherHandlers, GameSetters } from './pusher-handlers';
 import { AutoFinish } from './AutoFinish';
@@ -40,11 +41,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const saved = localStorage.getItem('localBets');
-    if (saved) { 
-      try { 
+    if (saved) {
+      try {
         const parsed = JSON.parse(saved);
         setTimeout(() => setBets(parsed), 0);
-      } catch {} 
+      } catch {}
     }
   }, []);
 
@@ -67,15 +68,32 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }), [addBet, clearBets]);
 
   useEffect(() => {
-    const client = getPusherClient();
-    if (!client || listenerActive) return;
-    listenerActive = true;
-    const channel = client.subscribe(GAME_CHANNEL);
     const handlers = createPusherHandlers(setters);
-    Object.entries(handlers).forEach(([ev, fn]) => channel.bind(ev, fn as (...args: unknown[]) => void));
-    const teardown = () => { channel.unbind_all(); client.unsubscribe(GAME_CHANNEL); listenerActive = false; };
-    window.addEventListener('beforeunload', teardown);
-    return () => window.removeEventListener('beforeunload', teardown);
+    const client = getPusherClient();
+
+    if (client) {
+      if (listenerActive) return;
+      listenerActive = true;
+      const channel = client.subscribe(GAME_CHANNEL);
+      Object.entries(handlers).forEach(([ev, fn]) => channel.bind(ev, fn as (...args: unknown[]) => void));
+      const teardown = () => {
+        channel.unbind_all();
+        client.unsubscribe(GAME_CHANNEL);
+        listenerActive = false;
+      };
+      window.addEventListener('beforeunload', teardown);
+      return () => {
+        window.removeEventListener('beforeunload', teardown);
+        teardown();
+      };
+    }
+
+    const unsubscribe = subscribeLocalGameEvents((event, data) => {
+      const fn = handlers[event as keyof typeof handlers] as ((payload: Record<string, unknown>) => void) | undefined;
+      if (fn) fn(data);
+    });
+
+    return () => unsubscribe();
   }, [setters]);
 
   return (
