@@ -8,7 +8,7 @@ import { TimerDisplay } from './TimerDisplay';
 import styles from './GameBoard.module.css';
 
 export function GameBoard() {
-  const { revealedCards, cards, playerId, betAmount, language, cardCount, gameType, fontScale } = useGameContext();
+  const { revealedCards, cards, playerId, betAmount, language, cardCount, gameType, fontScale, cardScale } = useGameContext();
   const dict = DICTIONARY[language];
   const title = gameType === 'BACCARAT_TRIPLE' ? dict.titleBACCARAT_TRIPLE : dict.titleNIU_NIU_TRIPLE;
   const twoCards = cardCount === 2;
@@ -22,7 +22,10 @@ export function GameBoard() {
           <h3 className={styles.subtitle}>{dict.subtitle}</h3>
         </div>
       </div>
-      <div className={styles.cardsContainer}>
+      <div
+        className={styles.cardsContainer}
+        style={{ '--card-scale': (cardScale || 100) / 100 } as React.CSSProperties}
+      >
         {Array.from({ length: cardCount }).map((_, index) => {
           const card = cards[index];
           const value = card ? `${card.rank}${card.suit}` : '';

@@ -18,6 +18,8 @@ interface GameContextValue {
   cardCount: number;
   finishAt: string | null;
   fontScale: number;
+  cardScale: number;
+  setCardScale: (scale: number) => void;
   bets: BetRow[];
 }
 
@@ -77,7 +79,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [cardCount, setCardCount] = useState(5);
   const [finishAt, setFinishAt] = useState<string | null>(null);
   const [fontScale, setFontScale] = useState(100);
+  const [cardScale, setCardScaleState] = useState(100);
   const [bets, setBets] = useState<BetRow[]>([]);
+
+  const setCardScale = useCallback((scale: number) => {
+    setCardScaleState(scale);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('tvCardScale', String(scale));
+    }
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem('localBets');
@@ -86,6 +96,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const parsed = JSON.parse(saved);
         setTimeout(() => setBets(parsed), 0);
       } catch {} 
+    }
+    const savedCardScale = localStorage.getItem('tvCardScale');
+    if (savedCardScale) {
+      const parsedScale = Number(savedCardScale);
+      if (!Number.isNaN(parsedScale) && parsedScale >= 50 && parsedScale <= 200) {
+        setTimeout(() => setCardScaleState(parsedScale), 0);
+      }
     }
   }, []);
 
@@ -105,8 +122,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const setters: GameSetters = useMemo(() => ({
     setGameState, setRevealedCards, setCards, setSessionId, setPlayerId, setBetAmount,
-    setLanguage, setGameType, setCardCount, setFinishAt, setFontScale, addBet, clearBets,
-  }), [addBet, clearBets]);
+    setLanguage, setGameType, setCardCount, setFinishAt, setFontScale, setCardScale, addBet, clearBets,
+  }), [addBet, clearBets, setCardScale]);
 
   useEffect(() => {
     const rawHandlers = createPusherHandlers(setters) as Record<string, (data: unknown) => void>;
@@ -171,7 +188,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   }, [setters]);
 
   return (
-    <GameContext.Provider value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount, language, gameType, cardCount, finishAt, fontScale, bets }}>
+    <GameContext.Provider value={{ gameState, sessionId, cards, revealedCards, playerId, betAmount, language, gameType, cardCount, finishAt, fontScale, cardScale, setCardScale, bets }}>
       <AutoFinish finishAt={finishAt} gameState={gameState} />
       {children}
     </GameContext.Provider>

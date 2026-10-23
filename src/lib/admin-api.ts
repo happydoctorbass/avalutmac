@@ -80,6 +80,7 @@ export const postStart = async (payload: {
   playerId?: string;
   betAmount?: number;
   fontScale?: number;
+  cardScale?: number;
 }) => {
   const minutes = Number(payload.durationMinutes) || 180;
   const finishAt = finishAtFromMinutes(minutes);
@@ -97,6 +98,7 @@ export const postStart = async (payload: {
     finishAt,
     sessionId,
     fontScale: payload.fontScale || 100,
+    cardScale: payload.cardScale || 100,
     _eventId,
   });
 
@@ -180,3 +182,7 @@ export const postAutoFinish = async () => {
 
 export const sendLang = (language: GameLanguage) => postPusher(GAME_EVENTS.UPDATE_LANG, { language });
 export const sendFontScale = (scale: number) => postPusher(GAME_EVENTS.UPDATE_FONT_SCALE, { scale });
+
+export async function sendCardScale(scale: number): Promise<void> {
+  await postPusher(GAME_EVENTS.UPDATE_CARD_SCALE, { scale });
+}

@@ -22,6 +22,7 @@ export interface ToggleStatePayload {
   finishAt?: string | null;
   sessionId?: string | null;
   fontScale?: number;
+  cardScale?: number;
 }
 
 export interface RevealCardPayload {

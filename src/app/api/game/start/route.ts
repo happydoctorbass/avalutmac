@@ -21,6 +21,7 @@ export async function POST(req: Request) {
       finishAt,
       sessionId,
       fontScale: body.fontScale || 100,
+      cardScale: body.cardScale || 100,
       _eventId: body._eventId,
     });
 

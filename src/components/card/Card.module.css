@@ -1,14 +1,16 @@
 .cardScene {
-  height: min(200px, 28vh);
-  width: calc(min(200px, 28vh) * 0.7);
+  --scale: var(--card-scale, 1);
+  /* Базовая высота адаптивна под экран, но может свободно масштабироваться без потолка в 200px */
+  height: calc(clamp(160px, 26vh, 480px) * var(--scale));
+  width: calc(clamp(160px, 26vh, 480px) * 0.7 * var(--scale));
   perspective: 1200px;
   filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.5));
-  transition: width 0.3s, height 0.3s;
+  transition: width 0.2s ease-out, height 0.2s ease-out;
 }
 
 .largeCard {
-  height: min(371px, 38vh);
-  width: calc(min(371px, 38vh) * 0.7);
+  height: calc(clamp(260px, 42vh, 750px) * var(--scale));
+  width: calc(clamp(260px, 42vh, 750px) * 0.7 * var(--scale));
 }
 
 .cardInner {

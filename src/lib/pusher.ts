@@ -45,6 +45,7 @@ export const GAME_EVENTS = {
   CLEAR_BETS: 'clear-bets',
   BETS_UPDATED: 'bets-updated',
   UPDATE_FONT_SCALE: 'update-font-scale',
+  UPDATE_CARD_SCALE: 'update-card-scale',
 } as const;
 
 export interface BroadcastMessage {

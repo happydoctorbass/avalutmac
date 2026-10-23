@@ -28,6 +28,7 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
   const [localCardCount, setLocalCardCount] = useState(5);
   const [durationMinutes, setDurationMinutes] = useState('180');
   const [fontScale, setFontScale] = useState(100);
+  const [cardScale, setCardScale] = useState(100);
   const [manualCards, setManualCards] = useState<(CardData | null)[]>([null, null, null, null, null]);
 
   const clearInput = () => { setPlayerId(''); setBetAmount(''); };
@@ -76,7 +77,8 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
       durationMinutes: Number(durationMinutes) || 180,
       playerId: currentPid,
       betAmount: currentBet,
-      fontScale
+      fontScale,
+      cardScale,
     });
   };
 
@@ -112,6 +114,7 @@ export function AdminPanel({ currentCards = [], onCardsGenerated }: AdminPanelPr
             gameType={localGameType} setGameType={setLocalGameType} cardCount={localCardCount} setCardCount={setLocalCardCount}
             durationMinutes={durationMinutes} setDurationMinutes={setDurationMinutes}
             fontScale={fontScale} setFontScale={setFontScale}
+            cardScale={cardScale} setCardScale={setCardScale}
           />
         </section>
 
