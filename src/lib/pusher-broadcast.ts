@@ -4,8 +4,12 @@ import { GAME_CHANNEL } from '@/lib/pusher';
 export async function broadcast(event: string, data: object) {
   const server = getPusherServer();
   if (!server) {
-    console.warn(`[Pusher] Skipping broadcast "${event}" — server not configured.`);
+    console.warn(`[Pusher] Skipping broadcast "${event}" — server not configured (using BroadcastChannel locally).`);
     return;
   }
-  await server.trigger(GAME_CHANNEL, event, data);
+  try {
+    await server.trigger(GAME_CHANNEL, event, data);
+  } catch (err) {
+    console.warn(`[Pusher] Failed to trigger "${event}":`, err);
+  }
 }

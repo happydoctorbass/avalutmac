@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useFinishClock } from '@/hooks/useFinishClock';
+import { postAutoFinish } from '@/lib/admin-api';
 import { GameStatus } from '@/types/game';
 
 export function AutoFinish({ finishAt, gameState }: { finishAt: string | null; gameState: GameStatus }) {
@@ -11,7 +12,7 @@ export function AutoFinish({ finishAt, gameState }: { finishAt: string | null; g
   useEffect(() => {
     if (gameState !== 'GAME' || !isExpired || sent.current) return;
     sent.current = true;
-    fetch('/api/game/autofinish', { method: 'POST' });
+    postAutoFinish();
   }, [gameState, isExpired]);
   return null;
 }

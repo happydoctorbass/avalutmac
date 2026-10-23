@@ -10,11 +10,17 @@ interface CardProps {
   cardCount?: number;
 }
 
+const SUIT_FILE_MAP: Record<string, string> = {
+  '♠': 'Spades',
+  '♣': 'Clubs',
+  '♥': 'Hearts',
+  '♦': 'Diamonds',
+};
+
 export function Card({ isRevealed, value, cardCount = 5 }: CardProps) {
-  const isRed = value.includes('♥') || value.includes('♦');
-  const color = isRed ? '#e50000' : '#1a1a1a';
   const rank = value.slice(0, -1);
   const suit = value.slice(-1);
+  const imageSrc = SUIT_FILE_MAP[suit] && rank ? `/cards/${SUIT_FILE_MAP[suit]}-${rank}.png` : null;
   
   const scaleClass = cardCount === 2 ? styles.largeCard : '';
 
@@ -32,18 +38,15 @@ export function Card({ isRevealed, value, cardCount = 5 }: CardProps) {
           </div>
         </div>
         
-        <div className={`${styles.face} ${styles.front}`} style={{ color }}>
-          <div className={`${styles.indexContainer} ${styles.topLeft}`}>
-            <span className={styles.rank}>{rank}</span>
-            <span className={styles.suit}>{suit}</span>
-          </div>
-          
-          <div className={styles.centerSuit}>{suit}</div>
-          
-          <div className={`${styles.indexContainer} ${styles.bottomRight}`}>
-            <span className={styles.rank}>{rank}</span>
-            <span className={styles.suit}>{suit}</span>
-          </div>
+        <div className={`${styles.face} ${styles.front}`}>
+          {imageSrc ? (
+            <img 
+              src={imageSrc} 
+              alt={value} 
+              draggable={false}
+              className={styles.cardImage} 
+            />
+          ) : null}
         </div>
       </motion.div>
     </div>

@@ -4,10 +4,10 @@ let instance: PusherServer | null = null;
 let warnedMissingKeys = false;
 
 export function getPusherServer(): PusherServer | null {
-  const appId = process.env.PUSHER_APP_ID;
-  const key = process.env.NEXT_PUBLIC_PUSHER_KEY;
-  const secret = process.env.PUSHER_SECRET;
-  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+  const appId = process.env.PUSHER_APP_ID?.trim();
+  const key = process.env.NEXT_PUBLIC_PUSHER_KEY?.trim();
+  const secret = process.env.PUSHER_SECRET?.trim();
+  const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER?.trim();
 
   if (!appId || !key || !secret || !cluster) {
     if (!warnedMissingKeys) {

@@ -8,13 +8,22 @@ export async function POST(req: Request) {
 
     const server = getPusherServer();
     if (!server) {
-      return NextResponse.json(
-        { success: false, error: 'Pusher not configured' },
-        { status: 503 }
-      );
+      return NextResponse.json({
+        success: true,
+        localOnly: true,
+        message: 'Pusher not configured — handled via BroadcastChannel locally',
+      });
     }
 
-    await server.trigger('casino-game-channel', event, data);
+    try {
+      await server.trigger('casino-game-channel', event, data);
+    } catch (pusherErr) {
+      console.warn('PUSHER_TRIGGER_WARN:', pusherErr);
+      return NextResponse.json({
+        success: true,
+        localOnly: true,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

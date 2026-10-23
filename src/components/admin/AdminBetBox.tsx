@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useGameContext } from '@/context/GameContext';
 import { useFinishClock } from '@/hooks/useFinishClock';
-import { postBid } from '@/lib/admin-api';
+import { postBid, postClearBets } from '@/lib/admin-api';
 import styles from './AdminBetBox.module.css';
 
 interface AdminBetBoxProps {
@@ -33,7 +33,7 @@ export function AdminBetBox({ playerId, betAmount, inputValid, onClear }: AdminB
   const clearTable = async () => {
     setLoading(true);
     try {
-      await fetch('/api/bets/clear', { method: 'POST' });
+      await postClearBets();
     } finally {
       setLoading(false);
     }

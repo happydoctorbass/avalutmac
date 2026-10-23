@@ -4,9 +4,9 @@ import { GAME_EVENTS } from '@/lib/pusher';
 
 export async function POST(req: Request) {
   try {
-    const { sessionId } = await req.json();
+    const { sessionId, _eventId } = await req.json();
     // Supabase has been removed; just broadcast the STOP event.
-    await broadcast(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE', sessionId });
+    await broadcast(GAME_EVENTS.TOGGLE_STATE, { state: 'IDLE', sessionId, _eventId });
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error('STOP_ERROR', e);
